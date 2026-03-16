@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Báo cáo SEO — Mảng Khách sạn — 2026-03-17</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+    :root {
+      --bg: #f8fafc; --bg2: #ffffff; --text: #1e293b; --text2: #64748b;
+      --border: #e2e8f0; --accent: #3b82f6; --green: #10b981; --red: #ef4444;
+      --orange: #f59e0b; --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --bg2: #1e293b; --text: #f1f5f9; --text2: #94a3b8;
+      --border: #334155; --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+    .cross-link-bar { background: var(--accent); color: #fff; padding: 10px 20px; text-align: center; font-size: 14px; }
+    .cross-link-bar a { color: #fff; font-weight: 600; text-decoration: underline; }
+    header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 20px; }
+    header h1 { font-size: 24px; }
+    header .meta { color: var(--text2); font-size: 14px; margin-top: 4px; }
+    .dark-toggle { position: fixed; top: 10px; right: 15px; z-index: 1000; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; color: var(--text); font-size: 18px; }
+    .toc { position: sticky; top: 0; z-index: 100; background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 20px; overflow-x: auto; white-space: nowrap; }
+    .toc a { display: inline-block; padding: 6px 14px; margin-right: 4px; color: var(--text2); text-decoration: none; font-size: 13px; border-radius: 6px; transition: all 0.2s; }
+    .toc a.active, .toc a:hover { background: var(--accent); color: #fff; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; padding: 20px 0; }
+    .kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--card-shadow); }
+    .kpi-card .label { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-card .value { font-size: 28px; font-weight: 700; margin: 4px 0; }
+    .kpi-card .change { font-size: 13px; font-weight: 600; }
+    .kpi-card .change.positive { color: var(--green); }
+    .kpi-card .change.negative { color: var(--red); }
+    .kpi-card .change.neutral { color: var(--text2); }
+    section { padding: 24px 0; }
+    section h2 { font-size: 20px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .chart-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .chart-box h3 { font-size: 14px; margin-bottom: 10px; color: var(--text2); }
+    .chart-box canvas { width: 100% !important; height: 300px !important; }
+    .filter-bar { padding: 12px 0; }
+    .filter-bar select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg2); color: var(--text); font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; background: var(--bg2); border-radius: 12px; overflow: hidden; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+    th { background: var(--bg); cursor: pointer; user-select: none; font-weight: 600; position: relative; }
+    th:hover { background: var(--accent); color: #fff; }
+    th .sort-icon { margin-left: 4px; font-size: 10px; }
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+    .site-name { color: var(--accent); text-decoration: underline; cursor: pointer; font-weight: 500; }
+    .site-name:hover { opacity: 0.8; }
+    .anomaly-card { background: var(--bg2); border-left: 4px solid; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+    .anomaly-card.critical { border-color: var(--red); }
+    .anomaly-card.warning { border-color: var(--orange); }
+    .anomaly-card.info { border-color: var(--accent); }
+    .anomaly-card .domain { font-weight: 600; }
+    .anomaly-card .msg { color: var(--text2); font-size: 13px; margin-top: 4px; }
+    .rec-table .priority-high { color: var(--red); font-weight: 700; }
+    .rec-table .priority-mid { color: var(--orange); font-weight: 700; }
+    .rec-table .priority-low { color: var(--green); font-weight: 700; }
+    .trend-text { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; line-height: 1.8; }
+    .highlight-row { background: rgba(239, 68, 68, 0.08) !important; }
+    @media (max-width: 768px) {
+      .chart-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .kpi-card .value { font-size: 22px; }
+    }
+    </style>
+</head>
+<body>
+<button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+<div class="cross-link-bar">
+  📊 Bạn đang xem: <strong>Mảng Khách sạn</strong> (1 website) — 2026-03-17
+  &nbsp;|&nbsp; <a href="seo-restaurants-2026-03-17.html">→ Xem báo cáo Mảng Nhà hàng</a>
+  &nbsp;|&nbsp; <a href="index.html">→ Tất cả báo cáo</a>
+</div>
+<header><div class="container">
+  <h1>Báo cáo SEO — Mảng Khách sạn</h1>
+  <div class="meta">Kỳ phân tích: 60 ngày gần nhất | Cập nhật: 2026-03-17 | 1 website</div>
+</div></header>
+<nav class="toc"><div class="container">
+  <a href="#kpi">Tổng quan KPI</a>
+  <a href="#charts">Biểu đồ xu hướng</a>
+  <a href="#compare">So sánh Website</a>
+  <a href="#keywords">Top Keywords</a>
+  <a href="#anomalies">Phát hiện bất thường</a>
+  <a href="#trends">Phân tích xu hướng</a>
+  <a href="#recs">Đề xuất tối ưu</a>
+</div></nav>
+<div class="container">
+
+<section id="kpi"><h2>Tổng quan KPI (30 ngày gần nhất)</h2>
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="label">Tổng Sessions</div><div class="value">19.0K</div><div class="change negative">↓ -17.7%</div></div>
+  <div class="kpi-card"><div class="label">Tổng Users</div><div class="value">16.7K</div><div class="change negative">↓ -17.4%</div></div>
+  <div class="kpi-card"><div class="label">Tổng Pageviews</div><div class="value">21.9K</div><div class="change negative">↓ -18.2%</div></div>
+  <div class="kpi-card"><div class="label">Tổng Clicks GSC</div><div class="value">3.0K</div><div class="change positive">↑ +104.4%</div></div>
+  <div class="kpi-card"><div class="label">Tổng Impressions</div><div class="value">233.1K</div><div class="change positive">↑ +29.3%</div></div>
+  <div class="kpi-card"><div class="label">TB Bounce Rate</div><div class="value">0.5%</div><div class="change negative">↑ +3.2%</div></div>
+  <div class="kpi-card"><div class="label">TB Engagement Rate</div><div class="value">0.5%</div></div>
+  <div class="kpi-card"><div class="label">TB Vị trí GSC</div><div class="value">9.8</div><div class="change negative">↑ +5.4%</div></div>
+</div></section>
+
+<section id="charts"><h2>Biểu đồ xu hướng</h2>
+<div class="filter-bar"><label>Lọc website: </label><select id="siteFilter" onchange="filterCharts()"><option value="all">Tất cả</option>
+<option value="gohotelly.com">gohotelly.com</option>
+</select></div>
+<div class="chart-grid">
+  <div class="chart-box"><h3>Sessions theo ngày (GA4)</h3><canvas id="sessionsChart"></canvas></div>
+  <div class="chart-box"><h3>Clicks theo ngày (GSC)</h3><canvas id="clicksChart"></canvas></div>
+  <div class="chart-box"><h3>Impressions theo ngày (GSC)</h3><canvas id="impressionsChart"></canvas></div>
+  <div class="chart-box"><h3>Vị trí trung bình (GSC) — thấp = tốt</h3><canvas id="positionChart"></canvas></div>
+</div></section>
+
+<section id="compare"><h2>So sánh Website (30 ngày gần nhất)</h2>
+<div class="table-wrap"><table id="compareTable">
+<thead><tr>
+  <th onclick="sortTable('compareTable',0)">Website <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('compareTable',1)">Sessions <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('compareTable',2)">Users <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('compareTable',3)">Pageviews <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('compareTable',4)">Clicks <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('compareTable',5)">Impressions <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('compareTable',6)">CTR <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('compareTable',7)">Vị trí <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('compareTable',8)">% Thay đổi Sessions <span class="sort-icon">⇅</span></th>
+</tr></thead>
+<tbody><tr>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="19012.0">19.0K</td>
+            <td data-value="16714.0">16.7K</td>
+            <td data-value="21901.0">21.9K</td>
+            <td data-value="3048.0">3.0K</td>
+            <td data-value="233114.0">233.1K</td>
+            <td data-value="0.010308716585765045">0.01%</td>
+            <td data-value="9.807780657053264">9.8</td>
+            <td data-value="-17.7" class="negative">↓ -17.7%</td>
+        </tr></tbody>
+</table></div></section>
+
+<section id="keywords"><h2>Top Keywords (tổng hợp tất cả website)</h2>
+<div class="table-wrap"><table id="kwTable">
+<thead><tr>
+  <th onclick="sortTable('kwTable',0)">Keyword <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('kwTable',1)">Website <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('kwTable',2)">Clicks <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('kwTable',3)">Impressions <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('kwTable',4)">CTR <span class="sort-icon">⇅</span></th>
+  <th onclick="sortTable('kwTable',5)">Vị trí <span class="sort-icon">⇅</span></th>
+</tr></thead>
+<tbody><tr>
+            <td>nau salgados dunas suites</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="100.0">100</td>
+            <td data-value="1369.0">1,369</td>
+            <td data-value="0.073">0.07%</td>
+            <td data-value="3.3747">3.4</td>
+        </tr><tr>
+            <td>ariyana reach hotel</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="65.0">65</td>
+            <td data-value="2283.0">2,283</td>
+            <td data-value="0.0285">0.03%</td>
+            <td data-value="2.855">2.9</td>
+        </tr><tr>
+            <td>ariyana reach</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="58.0">58</td>
+            <td data-value="2208.0">2,208</td>
+            <td data-value="0.0263">0.03%</td>
+            <td data-value="2.8936">2.9</td>
+        </tr><tr>
+            <td>motel urban</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="43.0">43</td>
+            <td data-value="1311.0">1,311</td>
+            <td data-value="0.0328">0.03%</td>
+            <td data-value="9.4416">9.4</td>
+        </tr><tr>
+            <td>ariyana reach hotel maharagama</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="37.0">37</td>
+            <td data-value="617.0">617</td>
+            <td data-value="0.06">0.06%</td>
+            <td data-value="2.4814">2.5</td>
+        </tr><tr>
+            <td>hotel luzino</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="37.0">37</td>
+            <td data-value="1065.0">1,065</td>
+            <td data-value="0.0347">0.03%</td>
+            <td data-value="4.6075">4.6</td>
+        </tr><tr>
+            <td>the village resort & waterpark</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="36.0">36</td>
+            <td data-value="666.0">666</td>
+            <td data-value="0.0541">0.05%</td>
+            <td data-value="6.4324">6.4</td>
+        </tr><tr>
+            <td>udayachal tourist lodge</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="30.0">30</td>
+            <td data-value="929.0">929</td>
+            <td data-value="0.0323">0.03%</td>
+            <td data-value="3.3617">3.4</td>
+        </tr><tr>
+            <td>matara rest house</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="29.0">29</td>
+            <td data-value="2291.0">2,291</td>
+            <td data-value="0.0127">0.01%</td>
+            <td data-value="5.773">5.8</td>
+        </tr><tr>
+            <td>precios de motel urban villas & suites</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td>
+            <td data-value="28.0">28</td>
+            <td data-value="572.0">572</td>
+            <td data-value="0.049">0.05%</td>
+            <td data-value="7.785">7.8</td>
+        </tr></tbody>
+</table></div></section>
+
+<section id="anomalies"><h2>Phát hiện bất thường</h2>
+<div class="anomaly-card info">✅ Không phát hiện bất thường nào trong kỳ báo cáo.</div>
+</section>
+
+<section id="trends"><h2>Phân tích xu hướng SEO</h2>
+<div class="trend-text"><p><strong>Tổng quan:</strong> Mảng Khách sạn có tổng cộng 1 website. Tổng sessions 30 ngày gần nhất: 19.0K (-17.7% so với kỳ trước). Tổng clicks GSC: 3.0K (+104.4%).</p><p><strong>Top 3 tăng trưởng:</strong> <a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a> (-17.7% sessions)</p><p><strong>Top 3 cần chú ý:</strong> <a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a> (-17.7% sessions)</p></div>
+</section>
+
+<section id="recs"><h2>Đề xuất tối ưu SEO</h2>
+<div class="table-wrap"><table class="rec-table" id="recTable">
+<thead><tr><th onclick="sortTable('recTable',0)">Ưu tiên</th><th>Đề xuất</th><th onclick="sortTable('recTable',2)">Website</th></tr></thead>
+<tbody><tr><td class="priority-low">Thấp</td><td>Tối ưu title/meta cho keyword 'motel urban' (vị trí 9, CTR 0.0%)</td><td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a></td></tr></tbody>
+</table></div></section>
+
+</div>
+<script>
+
+    function toggleDarkMode() {
+      const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+      document.querySelector('.dark-toggle').textContent = t === 'dark' ? '☀️' : '🌙';
+    }
+    function sortTable(tableId, col) {
+      const table = document.getElementById(tableId);
+      if (!table) return;
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const th = table.querySelectorAll('th')[col];
+      const asc = th.dataset.sort !== 'asc';
+      th.dataset.sort = asc ? 'asc' : 'desc';
+      rows.sort((a, b) => {
+        let va = a.cells[col].dataset.value || a.cells[col].textContent.trim();
+        let vb = b.cells[col].dataset.value || b.cells[col].textContent.trim();
+        const na = parseFloat(va.replace(/[,%]/g, ''));
+        const nb = parseFloat(vb.replace(/[,%]/g, ''));
+        if (!isNaN(na) && !isNaN(nb)) return asc ? na - nb : nb - na;
+        return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+      });
+      rows.forEach(r => tbody.appendChild(r));
+    }
+    // TOC IntersectionObserver
+    document.addEventListener('DOMContentLoaded', () => {
+      const sections = document.querySelectorAll('section[id]');
+      const tocLinks = document.querySelectorAll('.toc a');
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            tocLinks.forEach(l => l.classList.remove('active'));
+            const link = document.querySelector(`.toc a[href="#${e.target.id}"]`);
+            if (link) link.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-80px 0px -60% 0px' });
+      sections.forEach(s => obs.observe(s));
+      // Smooth scroll
+      tocLinks.forEach(l => l.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(l.getAttribute('href')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }));
+    });
+    
+const ga4Labels = ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"];
+const gscLabels = ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"];
+const allDomains = ["gohotelly.com"];
+let sessionsChart, clicksChart, impressionsChart, positionChart;
+const chartOpts = { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } };
+function initCharts() {
+  sessionsChart = new Chart(document.getElementById('sessionsChart'), {
+    type: 'line', data: { labels: ga4Labels, datasets: [{label:"gohotelly.com",data:[726.0, 730.0, 634.0, 716.0, 753.0, 741.0, 891.0, 816.0, 688.0, 795.0, 988.0, 914.0, 790.0, 786.0, 786.0, 746.0, 978.0, 897.0, 682.0, 738.0, 648.0, 705.0, 590.0, 602.0, 676.0, 762.0, 720.0, 704.0, 554.0, 614.0, 725.0, 842.0, 782.0, 817.0, 673.0, 636.0, 571.0, 581.0, 601.0, 572.0, 643.0, 639.0, 577.0, 789.0, 660.0, 567.0, 590.0, 619.0, 651.0, 666.0, 596.0, 654.0, 633.0, 621.0, 626.0, 692.0, 629.0, 672.0, 661.0, 752.0],borderColor:"#3b82f6",backgroundColor:"#3b82f622",fill:false,tension:0.3,borderWidth:2,pointRadius:0},] }, options: { ...chartOpts, scales: { y: { beginAtZero: true } } }
+  });
+  clicksChart = new Chart(document.getElementById('clicksChart'), {
+    type: 'line', data: { labels: gscLabels, datasets: [{label:"gohotelly.com",data:[35.0, 25.0, 36.0, 38.0, 29.0, 53.0, 51.0, 49.0, 50.0, 48.0, 53.0, 58.0, 49.0, 59.0, 62.0, 31.0, 43.0, 37.0, 42.0, 46.0, 46.0, 57.0, 47.0, 49.0, 52.0, 61.0, 75.0, 50.0, 57.0, 38.0, 65.0, 58.0, 40.0, 61.0, 61.0, 63.0, 66.0, 60.0, 66.0, 63.0, 80.0, 76.0, 67.0, 62.0, 63.0, 58.0, 62.0, 82.0, 64.0, 89.0, 67.0, 83.0, 57.0, 82.0, 74.0, 93.0, 90.0, 93.0, 65.0, 1103.0],borderColor:"#3b82f6",fill:false,tension:0.3,borderWidth:2,pointRadius:0},] }, options: { ...chartOpts, scales: { y: { beginAtZero: true } } }
+  });
+  impressionsChart = new Chart(document.getElementById('impressionsChart'), {
+    type: 'line', data: { labels: gscLabels, datasets: [{label:"gohotelly.com",data:[4922.0, 4630.0, 4939.0, 4790.0, 5141.0, 5704.0, 5701.0, 6246.0, 5836.0, 6275.0, 5541.0, 6225.0, 6259.0, 6062.0, 7601.0, 5408.0, 5814.0, 5181.0, 5552.0, 5628.0, 5521.0, 5610.0, 6077.0, 6309.0, 5410.0, 6525.0, 6229.0, 6323.0, 6184.0, 6211.0, 6407.0, 5333.0, 6473.0, 5398.0, 5383.0, 5674.0, 6239.0, 6810.0, 6028.0, 6747.0, 6361.0, 6374.0, 6220.0, 6876.0, 6049.0, 6369.0, 7259.0, 6599.0, 7063.0, 7200.0, 7126.0, 8057.0, 6839.0, 7323.0, 8345.0, 8140.0, 7737.0, 8556.0, 7776.0, 42760.0],borderColor:"#3b82f6",fill:false,tension:0.3,borderWidth:2,pointRadius:0},] }, options: { ...chartOpts, scales: { y: { beginAtZero: true } } }
+  });
+  positionChart = new Chart(document.getElementById('positionChart'), {
+    type: 'line', data: { labels: gscLabels, datasets: [{label:"gohotelly.com",data:[8.6233, 8.8438, 9.2162, 9.6267, 9.5466, 9.3166, 9.1033, 9.1916, 9.8358, 8.7681, 9.6878, 9.6699, 9.0663, 8.7735, 7.6481, 9.3404, 9.8806, 10.5233, 11.6349, 9.0858, 9.5532, 9.5861, 9.0464, 8.8117, 8.9688, 9.6417, 8.8289, 9.2692, 9.5228, 8.9205, 8.8982, 9.0842, 10.5373, 9.5302, 9.575, 9.528, 9.6254, 9.7646, 9.8359, 10.6203, 9.5961, 9.505, 9.9195, 9.3694, 9.343, 9.7508, 11.2892, 9.404, 10.5366, 10.0956, 10.2254, 10.1215, 10.2648, 9.9507, 11.4376, 9.7781, 9.6248, 9.6426, 9.7582, 6.711839054544662],borderColor:"#3b82f6",fill:false,tension:0.3,borderWidth:2,pointRadius:0},] }, options: { ...chartOpts, scales: { y: { reverse: true, beginAtZero: false } } }
+  });
+}
+function filterCharts() {
+  const sel = document.getElementById('siteFilter').value;
+  [sessionsChart, clicksChart, impressionsChart, positionChart].forEach(chart => {
+    chart.data.datasets.forEach((ds, i) => {
+      ds.hidden = sel !== 'all' && ds.label !== sel;
+    });
+    chart.update();
+  });
+  // Also filter table
+  document.querySelectorAll('#compareTable tbody tr').forEach(tr => {
+    const site = tr.cells[0].textContent.trim();
+    tr.style.display = sel === 'all' || site === sel ? '' : 'none';
+  });
+}
+initCharts();
+</script>
+</body></html>
