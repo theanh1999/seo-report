@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Báo cáo SEO — Mảng Khách sạn</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+    --bg: #0f0f23; --bg2: #1a1a2e; --bg3: #16213e; --text: #e0e0e0; --text2: #a0a0b0;
+    --accent: #e94560; --accent2: #0f3460; --green: #4caf50; --red: #f44336; --orange: #ff9800;
+    --blue: #2196f3; --border: #2a2a4a;
+}
+[data-theme="light"] {
+    --bg: #f5f5f5; --bg2: #ffffff; --bg3: #f0f0f0; --text: #333333; --text2: #666666;
+    --accent: #e94560; --accent2: #e8e8f0; --green: #2e7d32; --red: #c62828; --orange: #e65100;
+    --blue: #1565c0; --border: #dddddd;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+.cross-link-bar { background: var(--accent); color: white; padding: 10px 20px; text-align: center; font-size: 14px; }
+.cross-link-bar a { color: white; text-decoration: underline; margin: 0 8px; }
+header { background: var(--bg2); padding: 30px 20px; text-align: center; border-bottom: 2px solid var(--accent); }
+header h1 { font-size: 28px; margin-bottom: 8px; }
+header .subtitle { color: var(--text2); font-size: 14px; }
+.theme-toggle { position: absolute; top: 15px; right: 20px; background: var(--bg3); color: var(--text); border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+.toc { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 20px; position: sticky; top: 0; z-index: 100; overflow-x: auto; white-space: nowrap; }
+.toc a { color: var(--text2); text-decoration: none; padding: 6px 14px; margin: 0 2px; border-radius: 4px; font-size: 13px; display: inline-block; transition: all 0.2s; }
+.toc a:hover, .toc a.active { background: var(--accent); color: white; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+section { margin-bottom: 30px; }
+section h2 { font-size: 20px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+.kpi-card .label { font-size: 12px; color: var(--text2); text-transform: uppercase; }
+.kpi-card .value { font-size: 24px; font-weight: bold; margin: 6px 0; }
+.kpi-card .change { font-size: 13px; padding: 2px 8px; border-radius: 3px; }
+.kpi-card .change.good { color: var(--green); }
+.kpi-card .change.bad { color: var(--red); }
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(600px, 1fr)); gap: 16px; }
+.chart-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.chart-box h3 { font-size: 15px; margin-bottom: 10px; color: var(--text2); }
+table { width: 100%; border-collapse: collapse; background: var(--bg2); border-radius: 8px; overflow: hidden; font-size: 13px; }
+th { background: var(--bg3); padding: 10px 12px; text-align: left; cursor: pointer; user-select: none; white-space: nowrap; }
+th:hover { background: var(--accent2); }
+td { padding: 8px 12px; border-top: 1px solid var(--border); }
+tr:hover td { background: var(--bg3); }
+.anomaly-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 10px; }
+.anomaly { padding: 12px 16px; border-radius: 6px; border-left: 4px solid; }
+.anomaly.critical { background: rgba(244,67,54,0.1); border-color: var(--red); }
+.anomaly.warning { background: rgba(255,152,0,0.1); border-color: var(--orange); }
+.anomaly.info { background: rgba(33,150,243,0.1); border-color: var(--blue); }
+.anomaly .domain { font-weight: bold; font-size: 13px; }
+.anomaly .msg { font-size: 13px; color: var(--text2); margin-top: 3px; }
+.rec-table .high { color: var(--red); font-weight: bold; }
+.rec-table .medium { color: var(--orange); font-weight: bold; }
+.rec-table .low { color: var(--green); font-weight: bold; }
+.trend-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+.trend-section p { margin-bottom: 10px; font-size: 14px; }
+.trend-section strong { color: var(--accent); }
+.filter-bar { background: var(--bg2); padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--border); }
+.filter-bar label { font-size: 13px; color: var(--text2); margin-right: 8px; }
+.filter-bar select { background: var(--bg3); color: var(--text); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; }
+@media (max-width: 768px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    header h1 { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="cross-link-bar">
+    📊 Bạn đang xem: <strong>Mảng Khách sạn</strong> (1 website) — 16/03/2026
+    &nbsp;|&nbsp;
+    <a href="seo-restaurants-2026-03-16.html">→ Xem báo cáo Mảng Nhà hàng</a>
+    &nbsp;|&nbsp;
+    <a href="index.html">→ Tất cả báo cáo</a>
+</div>
+
+<header style="position:relative;">
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Chế độ sáng</button>
+    <h1>Báo cáo SEO — Mảng Khách sạn</h1>
+    <div class="subtitle">Khoảng thời gian: N/A → N/A | 1 website | Cập nhật: 16/03/2026</div>
+</header>
+
+<nav class="toc" id="toc">
+    <a href="#kpi" class="active">Tổng quan KPI</a>
+    <a href="#charts">Biểu đồ xu hướng</a>
+    <a href="#compare">So sánh Website</a>
+    <a href="#anomalies">Phát hiện bất thường</a>
+    <a href="#trends">Phân tích xu hướng</a>
+    <a href="#recommendations">Đề xuất tối ưu</a>
+</nav>
+
+<div class="container">
+
+<section id="kpi">
+<h2>📊 Tổng quan KPI</h2>
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="label">Tổng Sessions</div>
+        <div class="value">0</div>
+        <div class="change good">+0.0%</div>
+    </div>
+    <div class="kpi-card">
+        <div class="label">Tổng Users</div>
+        <div class="value">0</div>
+    </div>
+    <div class="kpi-card">
+        <div class="label">Tổng Pageviews</div>
+        <div class="value">0</div>
+    </div>
+    <div class="kpi-card">
+        <div class="label">Tổng Clicks GSC</div>
+        <div class="value">0</div>
+        <div class="change good">+0.0%</div>
+    </div>
+    <div class="kpi-card">
+        <div class="label">Tổng Impressions GSC</div>
+        <div class="value">0</div>
+        <div class="change good">+0.0%</div>
+    </div>
+    <div class="kpi-card">
+        <div class="label">TB Bounce Rate</div>
+        <div class="value">0.0%</div>
+    </div>
+    <div class="kpi-card">
+        <div class="label">TB Engagement Rate</div>
+        <div class="value">0.0%</div>
+    </div>
+    <div class="kpi-card">
+        <div class="label">TB Vị trí GSC</div>
+        <div class="value">0.0</div>
+    </div>
+</div>
+</section>
+
+<section id="charts">
+<h2>📈 Biểu đồ xu hướng</h2>
+<div class="filter-bar">
+    <label>Lọc website:</label>
+    <select id="siteFilter" onchange="filterCharts()">
+        <option value="all">Tất cả</option>
+        <option value="gohotelly.com">gohotelly.com</option>
+    </select>
+</div>
+<div class="chart-grid">
+    <div class="chart-box"><h3>Sessions theo ngày</h3><canvas id="sessionsChart"></canvas></div>
+    <div class="chart-box"><h3>Clicks GSC theo ngày</h3><canvas id="clicksChart"></canvas></div>
+    <div class="chart-box"><h3>Impressions theo ngày</h3><canvas id="impressionsChart"></canvas></div>
+    <div class="chart-box"><h3>Vị trí TB theo ngày (thấp = tốt)</h3><canvas id="positionChart"></canvas></div>
+</div>
+</section>
+
+<section id="compare">
+<h2>🔄 So sánh Website</h2>
+<div style="overflow-x:auto;">
+<table id="compareTable">
+<thead>
+<tr>
+    <th onclick="sortTable(0)">Website ↕</th>
+    <th onclick="sortTable(1)">Sessions ↕</th>
+    <th onclick="sortTable(2)">Users ↕</th>
+    <th onclick="sortTable(3)">Pageviews ↕</th>
+    <th onclick="sortTable(4)">Clicks ↕</th>
+    <th onclick="sortTable(5)">Impressions ↕</th>
+    <th onclick="sortTable(6)">CTR ↕</th>
+    <th onclick="sortTable(7)">Vị trí ↕</th>
+    <th onclick="sortTable(8)">% Sessions ↕</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td><strong>gohotelly.com</strong></td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0.00%</td>
+    <td>0.0</td>
+    <td style="color:var(--green);font-weight:bold">+0.0%</td>
+</tr>
+</tbody></table></div>
+</section>
+
+<section id="anomalies">
+<h2>⚠️ Phát hiện bất thường</h2>
+<div class="anomaly-grid">
+<div class="anomaly info"><div class="msg">✅ Không phát hiện bất thường nghiêm trọng</div></div></div>
+</section>
+
+<section id="trends">
+<h2>📉 Phân tích xu hướng SEO</h2>
+<div class="trend-section">
+<p><strong>Tổng quan:</strong> Trong 60 ngày qua, tổng sessions đạt 0 với tổng clicks từ tìm kiếm là 0. Sessions tăng 0.0% so với giai đoạn trước, cho thấy xu hướng tăng trưởng tích cực.</p><p><strong>Top 3 tăng trưởng tốt nhất:</strong></p><ul style="margin-left:20px;margin-bottom:10px;"><li><strong>gohotelly.com</strong>: Sessions thay đổi +0.0%</li></ul><p><strong>Top 3 cần chú ý:</strong></p><ul style="margin-left:20px;margin-bottom:10px;"><li><strong>gohotelly.com</strong>: Sessions thay đổi +0.0%</li></ul></div></section>
+<section id="recommendations">
+<h2>💡 Đề xuất tối ưu</h2>
+<table class="rec-table">
+<thead><tr><th>Ưu tiên</th><th>Đề xuất</th><th>Website</th></tr></thead>
+<tbody>
+<tr><td class="low">Thấp</td><td>Tiếp tục theo dõi, chưa có vấn đề nghiêm trọng</td><td>Tất cả</td></tr></tbody></table>
+</section>
+
+</div>
+
+<footer style="text-align:center;padding:20px;color:var(--text2);font-size:12px;border-top:1px solid var(--border);">
+    SEO Monitor Skill — Tạo tự động bởi AI — 16/03/2026
+</footer>
+
+<script>
+const CHART_DATES = [];
+const SESSIONS_DS = [{"label": "gohotelly.com", "data": [], "borderColor": "#FF6384", "fill": false, "tension": 0.3, "borderWidth": 1.5, "pointRadius": 0}];
+const CLICKS_DS = [{"label": "gohotelly.com", "data": [], "borderColor": "#FF6384", "fill": false, "tension": 0.3, "borderWidth": 1.5, "pointRadius": 0}];
+const IMPRESSIONS_DS = [{"label": "gohotelly.com", "data": [], "borderColor": "#FF6384", "fill": false, "tension": 0.3, "borderWidth": 1.5, "pointRadius": 0}];
+const POSITION_DS = [{"label": "gohotelly.com", "data": [], "borderColor": "#FF6384", "fill": false, "tension": 0.3, "borderWidth": 1.5, "pointRadius": 0}];
+
+let sessionsChart, clicksChart, impressionsChart, positionChart;
+
+function createChart(id, datasets, reverse) {
+    const ctx = document.getElementById(id).getContext('2d');
+    return new Chart(ctx, {
+        type: 'line',
+        data: { labels: CHART_DATES, datasets: JSON.parse(JSON.stringify(datasets)) },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
+            scales: {
+                x: { ticks: { maxRotation: 45, font: { size: 9 }, maxTicksLimit: 15 } },
+                y: { reverse: !!reverse, ticks: { font: { size: 10 } } }
+            }
+        }
+    });
+}
+
+sessionsChart = createChart('sessionsChart', SESSIONS_DS);
+clicksChart = createChart('clicksChart', CLICKS_DS);
+impressionsChart = createChart('impressionsChart', IMPRESSIONS_DS);
+positionChart = createChart('positionChart', POSITION_DS, true);
+
+function filterCharts() {
+    const sel = document.getElementById('siteFilter').value;
+    [sessionsChart, clicksChart, impressionsChart, positionChart].forEach((chart, ci) => {
+        const allDS = [SESSIONS_DS, CLICKS_DS, IMPRESSIONS_DS, POSITION_DS][ci];
+        if (sel === 'all') {
+            chart.data.datasets = JSON.parse(JSON.stringify(allDS));
+        } else {
+            chart.data.datasets = JSON.parse(JSON.stringify(allDS.filter(ds => ds.label === sel)));
+        }
+        chart.update();
+    });
+}
+
+// Table sorting
+let sortDir = {};
+function sortTable(col) {
+    const table = document.getElementById('compareTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    sortDir[col] = !sortDir[col];
+    rows.sort((a, b) => {
+        let va = a.cells[col].textContent.replace(/[,%+]/g, '').trim();
+        let vb = b.cells[col].textContent.replace(/[,%+]/g, '').trim();
+        let na = parseFloat(va.replace(/,/g, '')), nb = parseFloat(vb.replace(/,/g, ''));
+        if (!isNaN(na) && !isNaN(nb)) return sortDir[col] ? na - nb : nb - na;
+        return sortDir[col] ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+    rows.forEach(r => tbody.appendChild(r));
+}
+
+// Theme toggle
+function toggleTheme() {
+    const body = document.body;
+    const btn = document.querySelector('.theme-toggle');
+    if (body.getAttribute('data-theme') === 'light') {
+        body.removeAttribute('data-theme');
+        btn.textContent = '🌓 Chế độ sáng';
+    } else {
+        body.setAttribute('data-theme', 'light');
+        btn.textContent = '🌙 Chế độ tối';
+    }
+}
+
+// TOC active section
+const sections = document.querySelectorAll('section[id]');
+const tocLinks = document.querySelectorAll('.toc a');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            tocLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector('.toc a[href="#' + entry.target.id + '"]');
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-80px 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// Smooth scroll
+tocLinks.forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+</script>
+</body>
+</html>
