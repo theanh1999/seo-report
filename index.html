@@ -1,98 +1,207 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>SEO Monitor Dashboard — 2026-03-16</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEO Dashboard — Tất cả báo cáo</title>
 <style>
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; }
-a { color: #60a5fa; text-decoration: none; }
-a:hover { text-decoration: underline; }
-.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-h1 { font-size: 1.8rem; color: #f1f5f9; margin-bottom: 4px; }
-h2 { font-size: 1.2rem; color: #cbd5e1; margin: 24px 0 12px; padding-bottom: 6px; border-bottom: 1px solid #334155; }
-.subtitle { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 10px; margin-bottom: 20px; }
-.card { background: #1e293b; border-radius: 10px; padding: 14px; border: 1px solid #334155; }
-.card .label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
-.card .value { font-size: 1.5rem; font-weight: 700; color: #f1f5f9; }
-.card .sub { font-size: 0.7rem; color: #64748b; margin-top: 4px; }
-.badge { display:inline-block; padding:2px 8px; border-radius:9999px; font-size:0.72rem; font-weight:600; }
-.badge.up { background:#14532d; color:#4ade80; }
-.badge.down { background:#450a0a; color:#f87171; }
-.badge.neutral { background:#1e3a5f; color:#60a5fa; }
-.table-wrap { background: #1e293b; border-radius: 10px; border: 1px solid #334155; overflow: hidden; margin-bottom: 20px; overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-th { background: #0f172a; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase; padding: 10px 12px; text-align: left; cursor: pointer; white-space: nowrap; }
-th:hover { color: #e2e8f0; }
-td { padding: 10px 12px; border-bottom: 1px solid #1e293b; font-size: 0.85rem; }
-tr:hover td { background: #1e293b88; }
-.anomaly-box { padding: 8px 14px; border-radius: 8px; margin: 3px 0; font-size:0.82rem; }
-.anomaly-box.critical { background:#450a0a; border-left:3px solid #ef4444; }
-.anomaly-box.warning { background:#422006; border-left:3px solid #f59e0b; }
-.anomaly-box.spike { background:#052e16; border-left:3px solid #22c55e; }
-.anomaly-box.info { background:#1e293b; border-left:3px solid #64748b; }
-.chart-wrap { background:#1e293b; border-radius:10px; border:1px solid #334155; padding:16px; margin-bottom:20px; }
-.nav { background:#1e293b; border-bottom:1px solid #334155; padding:10px 20px; position:sticky; top:0; z-index:100; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-.nav a { color:#94a3b8; font-size:0.8rem; }
-.nav a:hover { color:#e2e8f0; }
-.logo { color:#3b82f6; font-weight:700; font-size:1rem; margin-right:8px; }
-.rank { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; background:#3b82f6; border-radius:50%; font-size:0.7rem; font-weight:700; }
-.pos-up { color:#4ade80; } .pos-down { color:#f87171; }
-
-ul.links { list-style:none; column-count:2; }
-ul.links li { padding: 4px 0; }
-.big-num { font-size:2rem; font-weight:800; color:#3b82f6; }
+    :root {
+      --bg: #f8fafc; --bg2: #ffffff; --text: #1e293b; --text2: #64748b;
+      --border: #e2e8f0; --accent: #3b82f6; --green: #10b981; --red: #ef4444;
+      --orange: #f59e0b; --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --bg2: #1e293b; --text: #f1f5f9; --text2: #94a3b8;
+      --border: #334155; --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+    .cross-link-bar { background: var(--accent); color: #fff; padding: 10px 20px; text-align: center; font-size: 14px; }
+    .cross-link-bar a { color: #fff; font-weight: 600; text-decoration: underline; }
+    header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 20px; }
+    header h1 { font-size: 24px; }
+    header .meta { color: var(--text2); font-size: 14px; margin-top: 4px; }
+    .dark-toggle { position: fixed; top: 10px; right: 15px; z-index: 1000; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; color: var(--text); font-size: 18px; }
+    .toc { position: sticky; top: 0; z-index: 100; background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 20px; overflow-x: auto; white-space: nowrap; }
+    .toc a { display: inline-block; padding: 6px 14px; margin-right: 4px; color: var(--text2); text-decoration: none; font-size: 13px; border-radius: 6px; transition: all 0.2s; }
+    .toc a.active, .toc a:hover { background: var(--accent); color: #fff; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; padding: 20px 0; }
+    .kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--card-shadow); }
+    .kpi-card .label { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-card .value { font-size: 28px; font-weight: 700; margin: 4px 0; }
+    .kpi-card .change { font-size: 13px; font-weight: 600; }
+    .kpi-card .change.positive { color: var(--green); }
+    .kpi-card .change.negative { color: var(--red); }
+    .kpi-card .change.neutral { color: var(--text2); }
+    section { padding: 24px 0; }
+    section h2 { font-size: 20px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .chart-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .chart-box h3 { font-size: 14px; margin-bottom: 10px; color: var(--text2); }
+    .chart-box canvas { width: 100% !important; height: 300px !important; }
+    .filter-bar { padding: 12px 0; }
+    .filter-bar select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg2); color: var(--text); font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; background: var(--bg2); border-radius: 12px; overflow: hidden; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+    th { background: var(--bg); cursor: pointer; user-select: none; font-weight: 600; position: relative; }
+    th:hover { background: var(--accent); color: #fff; }
+    th .sort-icon { margin-left: 4px; font-size: 10px; }
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+    .site-name { color: var(--accent); text-decoration: underline; cursor: pointer; font-weight: 500; }
+    .site-name:hover { opacity: 0.8; }
+    .anomaly-card { background: var(--bg2); border-left: 4px solid; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+    .anomaly-card.critical { border-color: var(--red); }
+    .anomaly-card.warning { border-color: var(--orange); }
+    .anomaly-card.info { border-color: var(--accent); }
+    .anomaly-card .domain { font-weight: 600; }
+    .anomaly-card .msg { color: var(--text2); font-size: 13px; margin-top: 4px; }
+    .rec-table .priority-high { color: var(--red); font-weight: 700; }
+    .rec-table .priority-mid { color: var(--orange); font-weight: 700; }
+    .rec-table .priority-low { color: var(--green); font-weight: 700; }
+    .trend-text { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; line-height: 1.8; }
+    .highlight-row { background: rgba(239, 68, 68, 0.08) !important; }
+    @media (max-width: 768px) {
+      .chart-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .kpi-card .value { font-size: 22px; }
+    }
+    
+.idx-hero { text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; }
+.idx-hero h1 { font-size: 32px; }
+.idx-hero p { opacity: 0.9; margin-top: 8px; }
+.idx-section { padding: 30px 20px; }
+.idx-section h2 { font-size: 22px; margin-bottom: 16px; }
+.idx-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.idx-card { display: block; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-decoration: none; color: var(--text); transition: transform 0.2s, box-shadow 0.2s; }
+.idx-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.idx-card h3 { color: var(--accent); font-size: 16px; margin-bottom: 8px; }
+.idx-card div { font-size: 13px; color: var(--text2); margin: 4px 0; }
+.idx-card .positive { color: var(--green); font-weight: 600; }
+.idx-card .negative { color: var(--red); font-weight: 600; }
+.overview-links { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.overview-link { display: inline-block; padding: 14px 28px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 16px; }
+.overview-link:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
-<nav class="nav">
-  <span class="logo">📊 SEO Monitor</span>
-  <a href="seo-restaurants-2026-03-16.html">🍽️ Nhà hàng</a>
-  <a href="seo-hotels-2026-03-16.html">🏨 Khách sạn</a>
-  <span style="margin-left:auto;color:#64748b;font-size:0.73rem">📅 2026-03-16</span>
-</nav>
-<div class="container">
-<h1>📊 SEO Dashboard Tổng Quan</h1>
-<p class="subtitle">Hệ thống giám sát 13 website • Cập nhật: 2026-03-16</p>
-
-<div class="kpi-grid">
-  <div class="card"><div class="label">Tổng Active Users (30d)</div><div class="big-num">5.5M</div></div>
-  <div class="card"><div class="label">Tổng GSC Clicks (30d)</div><div class="big-num">2.4M</div></div>
-  <div class="card"><div class="label">Websites Theo Dõi</div><div class="big-num">13</div></div>
-  <div class="card"><div class="label">Bất Thường Phát Hiện</div><div class="big-num" style="color:#f87171">2</div></div>
+<button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+<div class="idx-hero">
+  <h1>SEO Dashboard</h1>
+  <p>Báo cáo giám sát SEO — 2026-03-17 — 13 website</p>
 </div>
-
-<h2>🔗 Truy cập nhanh</h2>
-<div class="card" style="margin-bottom:20px;">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-    <div>
-      <h3 style="margin-bottom:10px;">📑 Báo cáo tổng quan</h3>
-      <ul style="list-style:none;">
-        <li style="padding:4px 0;"><a href="seo-restaurants-2026-03-16.html">🍽️ Tổng quan Nhà Hàng (12 sites)</a></li>
-        <li style="padding:4px 0;"><a href="seo-hotels-2026-03-16.html">🏨 Tổng quan Khách Sạn</a></li>
-      </ul>
-    </div>
-    <div>
-      <h3 style="margin-bottom:10px;">🔍 Chi tiết từng website</h3>
-      <ul class="links"><li><a href="seo-detail-localoria.com-2026-03-16.html">🍽️ localoria.com</a></li>
-<li><a href="seo-detail-wherebly.com-2026-03-16.html">🍽️ wherebly.com</a></li>
-<li><a href="seo-detail-res-menu.net-2026-03-16.html">🍽️ res-menu.net</a></li>
-<li><a href="seo-detail-foodplacee.com-2026-03-16.html">🍽️ foodplacee.com</a></li>
-<li><a href="seo-detail-restaurants-world.net-2026-03-16.html">🍽️ restaurants-world.net</a></li>
-<li><a href="seo-detail-goto-where.com-2026-03-16.html">🍽️ goto-where.com</a></li>
-<li><a href="seo-detail-menu-world.com-2026-03-16.html">🍽️ menu-world.com</a></li>
-<li><a href="seo-detail-grubbio.com-2026-03-16.html">🍽️ grubbio.com</a></li>
-<li><a href="seo-detail-menustic.com-2026-03-16.html">🍽️ menustic.com</a></li>
-<li><a href="seo-detail-menufyy.com-2026-03-16.html">🍽️ menufyy.com</a></li>
-<li><a href="seo-detail-wherevi.com-2026-03-16.html">🍽️ wherevi.com</a></li>
-<li><a href="seo-detail-placejoys.com-2026-03-16.html">🍽️ placejoys.com</a></li>
-<li><a href="seo-detail-gohotelly.com-2026-03-16.html">🏨 gohotelly.com</a></li>
-</ul>
-    </div>
+<div class="container">
+<div class="idx-section">
+  <h2>Báo cáo tổng quan</h2>
+  <div class="overview-links">
+    <a class="overview-link" href="seo-restaurants-2026-03-17.html">🍽 Mảng Nhà hàng (12 websites)</a>
+    <a class="overview-link" href="seo-hotels-2026-03-17.html">🏨 Mảng Khách sạn (1 website)</a>
   </div>
 </div>
+<div class="idx-section">
+  <h2>🍽 Mảng Nhà hàng — Chi tiết từng website</h2>
+  <div class="idx-grid"><a href="seo-detail-localoria.com-2026-03-17.html" class="idx-card">
+            <h3>localoria.com</h3>
+            <div>Sessions: 136.9K <span class="positive">+35.8%</span></div>
+            <div>Clicks: 7.6K <span class="negative">-23.6%</span></div>
+        </a><a href="seo-detail-wherebly.com-2026-03-17.html" class="idx-card">
+            <h3>wherebly.com</h3>
+            <div>Sessions: 3.5K <span class="positive">+7095.9%</span></div>
+            <div>Clicks: 223 <span class="positive">+2130.0%</span></div>
+        </a><a href="seo-detail-res-menu.net-2026-03-17.html" class="idx-card">
+            <h3>res-menu.net</h3>
+            <div>Sessions: 1.4M <span class="positive">+31.2%</span></div>
+            <div>Clicks: 653.2K <span class="positive">+54.4%</span></div>
+        </a><a href="seo-detail-foodplacee.com-2026-03-17.html" class="idx-card">
+            <h3>foodplacee.com</h3>
+            <div>Sessions: 2.8K <span class="positive">+382.4%</span></div>
+            <div>Clicks: 595 <span class="negative">-99.5%</span></div>
+        </a><a href="seo-detail-restaurants-world.net-2026-03-17.html" class="idx-card">
+            <h3>restaurants-world.net</h3>
+            <div>Sessions: 617.0K <span class="positive">+7.4%</span></div>
+            <div>Clicks: 307.2K <span class="positive">+24.5%</span></div>
+        </a><a href="seo-detail-goto-where.com-2026-03-17.html" class="idx-card">
+            <h3>goto-where.com</h3>
+            <div>Sessions: 1.1M <span class="positive">+60.4%</span></div>
+            <div>Clicks: 228.9K <span class="positive">+40.4%</span></div>
+        </a><a href="seo-detail-menu-world.com-2026-03-17.html" class="idx-card">
+            <h3>menu-world.com</h3>
+            <div>Sessions: 1.5M <span class="negative">-19.1%</span></div>
+            <div>Clicks: 796.2K <span class="negative">-0.8%</span></div>
+        </a><a href="seo-detail-grubbio.com-2026-03-17.html" class="idx-card">
+            <h3>grubbio.com</h3>
+            <div>Sessions: 165.0K <span class="positive">+19.5%</span></div>
+            <div>Clicks: 26.7K <span class="positive">+22.9%</span></div>
+        </a><a href="seo-detail-menustic.com-2026-03-17.html" class="idx-card">
+            <h3>menustic.com</h3>
+            <div>Sessions: 186.8K <span class="positive">+11.2%</span></div>
+            <div>Clicks: 65.3K <span class="positive">+28.5%</span></div>
+        </a><a href="seo-detail-menufyy.com-2026-03-17.html" class="idx-card">
+            <h3>menufyy.com</h3>
+            <div>Sessions: 340.0K <span class="positive">+66.2%</span></div>
+            <div>Clicks: 101.4K <span class="positive">+88.5%</span></div>
+        </a><a href="seo-detail-wherevi.com-2026-03-17.html" class="idx-card">
+            <h3>wherevi.com</h3>
+            <div>Sessions: 185.1K <span class="negative">-31.2%</span></div>
+            <div>Clicks: 42.5K <span class="negative">-32.3%</span></div>
+        </a><a href="seo-detail-placejoys.com-2026-03-17.html" class="idx-card">
+            <h3>placejoys.com</h3>
+            <div>Sessions: 674.1K <span class="positive">+28.2%</span></div>
+            <div>Clicks: 91.7K <span class="positive">+249.5%</span></div>
+        </a></div>
 </div>
+<div class="idx-section">
+  <h2>🏨 Mảng Khách sạn — Chi tiết từng website</h2>
+  <div class="idx-grid"><a href="seo-detail-gohotelly.com-2026-03-17.html" class="idx-card">
+            <h3>gohotelly.com</h3>
+            <div>Sessions: 19.0K <span class="negative">-17.7%</span></div>
+            <div>Clicks: 3.0K <span class="positive">+104.4%</span></div>
+        </a></div>
+</div>
+</div>
+<script>
+    function toggleDarkMode() {
+      const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+      document.querySelector('.dark-toggle').textContent = t === 'dark' ? '☀️' : '🌙';
+    }
+    function sortTable(tableId, col) {
+      const table = document.getElementById(tableId);
+      if (!table) return;
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const th = table.querySelectorAll('th')[col];
+      const asc = th.dataset.sort !== 'asc';
+      th.dataset.sort = asc ? 'asc' : 'desc';
+      rows.sort((a, b) => {
+        let va = a.cells[col].dataset.value || a.cells[col].textContent.trim();
+        let vb = b.cells[col].dataset.value || b.cells[col].textContent.trim();
+        const na = parseFloat(va.replace(/[,%]/g, ''));
+        const nb = parseFloat(vb.replace(/[,%]/g, ''));
+        if (!isNaN(na) && !isNaN(nb)) return asc ? na - nb : nb - na;
+        return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+      });
+      rows.forEach(r => tbody.appendChild(r));
+    }
+    // TOC IntersectionObserver
+    document.addEventListener('DOMContentLoaded', () => {
+      const sections = document.querySelectorAll('section[id]');
+      const tocLinks = document.querySelectorAll('.toc a');
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            tocLinks.forEach(l => l.classList.remove('active'));
+            const link = document.querySelector(`.toc a[href="#${e.target.id}"]`);
+            if (link) link.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-80px 0px -60% 0px' });
+      sections.forEach(s => obs.observe(s));
+      // Smooth scroll
+      tocLinks.forEach(l => l.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(l.getAttribute('href')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }));
+    });
+    </script>
 </body></html>
