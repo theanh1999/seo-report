@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo chi tiết: wherebly.com</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #e5e7eb; }
+        body.dark { background-color: #0f172a; }
+        body.light { background-color: #f3f4f6; color: #1f2937; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        .header { margin-bottom: 30px; border-bottom: 2px solid #1e293b; padding-bottom: 20px; }
+        .header h1 { font-size: 2em; margin-bottom: 10px; }
+        .header p { color: #9ca3af; }
+        .mode-toggle { float: right; }
+        .mode-toggle button { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        
+        .nav-links { margin: 20px 0; }
+        .nav-links a { background: #1e293b; padding: 8px 12px; border-radius: 6px; text-decoration: none; color: #3b82f6; margin-right: 10px; font-size: 0.9em; }
+        
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .kpi-card { background: #1e293b; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; }
+        .kpi-label { font-size: 0.9em; color: #9ca3af; margin-bottom: 8px; }
+        .kpi-value { font-size: 1.8em; font-weight: bold; margin-bottom: 8px; }
+        .kpi-change { font-size: 0.9em; }
+        
+        section { margin: 40px 0; }
+        h2 { font-size: 1.5em; margin: 30px 0 20px 0; color: #3b82f6; }
+        
+        .chart-container { background: #1e293b; padding: 20px; border-radius: 8px; margin: 15px 0; position: relative; height: 300px; }
+        
+        table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 8px; margin: 15px 0; }
+        th { background: #334155; padding: 12px; text-align: left; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #334155; }
+        tr:hover { background: #1f2937; }
+        
+        .no-data { color: #9ca3af; padding: 20px; text-align: center; font-style: italic; }
+        
+        /* Light mode */
+        body.light { background-color: #f3f4f6; color: #1f2937; }
+        body.light .header { border-bottom-color: #e5e7eb; }
+        body.light .nav-links a, body.light .kpi-card, body.light .chart-container, body.light table { background: #fff; border-color: #e5e7eb; }
+        body.light th { background: #f3f4f6; }
+        
+        @media (max-width: 768px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+            table { font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body class="dark">
+    <div class="container">
+        <div class="header">
+            <div class="mode-toggle"><button onclick="toggleMode()">Chế độ sáng</button></div>
+            <h1>wherebly.com</h1>
+            <p>Nhà hàng | 16 tháng 3, 2026</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="seo-restaurants-2026-03-16.html">← Quay lại Nhà hàng</a>
+            <a href="seo-hotels-2026-03-16.html">← Quay lại Khách sạn</a>
+        </div>
+        
+        <section>
+            <h2>Chỉ số chính (30 ngày)</h2>
+            <div class="kpi-grid" id="kpiGrid"></div>
+        </section>
+        
+        <section>
+            <h2>Biểu đồ GA4</h2>
+            <div class="chart-container"><canvas id="sessionsChart"></canvas></div>
+            <div class="chart-container"><canvas id="bounceChart"></canvas></div>
+        </section>
+        
+        <section>
+            <h2>Biểu đồ GSC</h2>
+            <div class="chart-container"><canvas id="clicksChart"></canvas></div>
+            <div class="chart-container"><canvas id="positionChart"></canvas></div>
+        </section>
+        
+        <section>
+            <h2>Từ khóa hàng đầu</h2>
+            <table id="keywordsTable">
+                <thead><tr>
+                    <th>Từ khóa</th>
+                    <th>Nhấp</th>
+                    <th>Lần hiển thị</th>
+                    <th>CTR</th>
+                    <th>Vị trí</th>
+                </tr></thead>
+                <tbody id="keywordsBody"></tbody>
+            </table>
+        </section>
+        
+        <section>
+            <h2>Trang hàng đầu</h2>
+            <table id="pagesTable">
+                <thead><tr>
+                    <th>URL</th>
+                    <th>Nhấp</th>
+                    <th>Lần hiển thị</th>
+                    <th>CTR</th>
+                    <th>Vị trí</th>
+                </tr></thead>
+                <tbody id="pagesBody"></tbody>
+            </table>
+        </section>
+    </div>
+    
+    <script>
+        const domainData = {"domain": "wherebly.com", "type": "restaurant", "ga4": {"raw": {"domain": "wherebly.com", "account_id": "518056444", "last_updated": "2026-03-16", "data_range": {"from": "2026-01-16", "to": "2026-03-15"}, "rows": [{"date": "2026-01-16", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 4.2409, "newusers": 1, "totalusers": 1}, {"date": "2026-01-20", "active_users": 1, "sessions": 1, "screen_page_views": 2, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 7.474, "newusers": 1, "totalusers": 1}, {"date": "2026-01-23", "active_users": 1, "sessions": 1, "screen_page_views": 2, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 9.5768, "newusers": 0, "totalusers": 1}, {"date": "2026-01-24", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 5.1548, "newusers": 1, "totalusers": 1}, {"date": "2026-01-26", "active_users": 4, "sessions": 4, "screen_page_views": 10, "bounce_rate": 0.25, "engagement_rate": 0.75, "average_session_duration": 627.5746, "newusers": 3, "totalusers": 4}, {"date": "2026-01-29", "active_users": 4, "sessions": 4, "screen_page_views": 5, "bounce_rate": 0.75, "engagement_rate": 0.25, "average_session_duration": 2.7652, "newusers": 3, "totalusers": 4}, {"date": "2026-01-30", "active_users": 1, "sessions": 1, "screen_page_views": 2, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 7.6604, "newusers": 1, "totalusers": 1}, {"date": "2026-01-31", "active_users": 2, "sessions": 2, "screen_page_views": 2, "bounce_rate": 0.5, "engagement_rate": 0.5, "average_session_duration": 206.0338, "newusers": 1, "totalusers": 2}, {"date": "2026-02-01", "active_users": 1, "sessions": 1, "screen_page_views": 2, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 5.6115, "newusers": 0, "totalusers": 1}, {"date": "2026-02-04", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 1, "totalusers": 1}, {"date": "2026-02-05", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 1, "totalusers": 1}, {"date": "2026-02-07", "active_users": 14, "sessions": 14, "screen_page_views": 14, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 1.7735, "newusers": 14, "totalusers": 14}, {"date": "2026-02-08", "active_users": 2, "sessions": 2, "screen_page_views": 2, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 4.1549, "newusers": 2, "totalusers": 2}, {"date": "2026-02-09", "active_users": 2, "sessions": 3, "screen_page_views": 4, "bounce_rate": 0.6667, "engagement_rate": 0.3333, "average_session_duration": 53.5014, "newusers": 2, "totalusers": 2}, {"date": "2026-02-10", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 1, "totalusers": 1}, {"date": "2026-02-20", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 1, "totalusers": 1}, {"date": "2026-02-21", "active_users": 3, "sessions": 3, "screen_page_views": 3, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 3, "totalusers": 3}, {"date": "2026-02-22", "active_users": 2, "sessions": 2, "screen_page_views": 2, "bounce_rate": 0.5, "engagement_rate": 0.5, "average_session_duration": 12.5818, "newusers": 2, "totalusers": 2}, {"date": "2026-02-24", "active_users": 3, "sessions": 4, "screen_page_views": 5, "bounce_rate": 0.75, "engagement_rate": 0.25, "average_session_duration": 79.3884, "newusers": 2, "totalusers": 3}, {"date": "2026-02-25", "active_users": 1, "sessions": 1, "screen_page_views": 4, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 1569.5241, "newusers": 0, "totalusers": 1}, {"date": "2026-02-26", "active_users": 16, "sessions": 18, "screen_page_views": 45, "bounce_rate": 0.4444, "engagement_rate": 0.5556, "average_session_duration": 128.7423, "newusers": 14, "totalusers": 16}, {"date": "2026-02-27", "active_users": 144, "sessions": 155, "screen_page_views": 282, "bounce_rate": 0.3677, "engagement_rate": 0.6323, "average_session_duration": 130.4737, "newusers": 143, "totalusers": 145}, {"date": "2026-02-28", "active_users": 228, "sessions": 258, "screen_page_views": 442, "bounce_rate": 0.438, "engagement_rate": 0.562, "average_session_duration": 108.0662, "newusers": 229, "totalusers": 231}, {"date": "2026-03-01", "active_users": 200, "sessions": 237, "screen_page_views": 392, "bounce_rate": 0.4051, "engagement_rate": 0.5949, "average_session_duration": 83.7595, "newusers": 196, "totalusers": 209}, {"date": "2026-03-02", "active_users": 158, "sessions": 178, "screen_page_views": 278, "bounce_rate": 0.4494, "engagement_rate": 0.5506, "average_session_duration": 121.6959, "newusers": 156, "totalusers": 164}, {"date": "2026-03-03", "active_users": 159, "sessions": 178, "screen_page_views": 264, "bounce_rate": 0.4494, "engagement_rate": 0.5506, "average_session_duration": 83.8282, "newusers": 158, "totalusers": 165}, {"date": "2026-03-04", "active_users": 154, "sessions": 174, "screen_page_views": 276, "bounce_rate": 0.454, "engagement_rate": 0.546, "average_session_duration": 77.1534, "newusers": 151, "totalusers": 163}, {"date": "2026-03-05", "active_users": 181, "sessions": 202, "screen_page_views": 336, "bounce_rate": 0.4059, "engagement_rate": 0.5941, "average_session_duration": 100.0214, "newusers": 177, "totalusers": 186}, {"date": "2026-03-06", "active_users": 200, "sessions": 237, "screen_page_views": 363, "bounce_rate": 0.4473, "engagement_rate": 0.5527, "average_session_duration": 76.0715, "newusers": 196, "totalusers": 212}, {"date": "2026-03-07", "active_users": 199, "sessions": 221, "screen_page_views": 350, "bounce_rate": 0.4525, "engagement_rate": 0.5475, "average_session_duration": 89.8422, "newusers": 193, "totalusers": 205}, {"date": "2026-03-08", "active_users": 182, "sessions": 206, "screen_page_views": 350, "bounce_rate": 0.3883, "engagement_rate": 0.6117, "average_session_duration": 118.843, "newusers": 176, "totalusers": 189}, {"date": "2026-03-09", "active_users": 126, "sessions": 147, "screen_page_views": 250, "bounce_rate": 0.483, "engagement_rate": 0.517, "average_session_duration": 56.9203, "newusers": 122, "totalusers": 137}, {"date": "2026-03-10", "active_users": 137, "sessions": 159, "screen_page_views": 254, "bounce_rate": 0.4214, "engagement_rate": 0.5786, "average_session_duration": 94.3097, "newusers": 136, "totalusers": 147}, {"date": "2026-03-11", "active_users": 184, "sessions": 212, "screen_page_views": 349, "bounce_rate": 0.3302, "engagement_rate": 0.6698, "average_session_duration": 70.6453, "newusers": 180, "totalusers": 197}, {"date": "2026-03-12", "active_users": 187, "sessions": 209, "screen_page_views": 335, "bounce_rate": 0.3828, "engagement_rate": 0.6172, "average_session_duration": 114.7787, "newusers": 173, "totalusers": 194}, {"date": "2026-03-13", "active_users": 217, "sessions": 237, "screen_page_views": 393, "bounce_rate": 0.3544, "engagement_rate": 0.6456, "average_session_duration": 109.5808, "newusers": 203, "totalusers": 226}, {"date": "2026-03-14", "active_users": 229, "sessions": 268, "screen_page_views": 399, "bounce_rate": 0.403, "engagement_rate": 0.597, "average_session_duration": 70.6249, "newusers": 219, "totalusers": 245}, {"date": "2026-03-15", "active_users": 197, "sessions": 230, "screen_page_views": 300, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 114.9007, "newusers": 148, "totalusers": 212}]}, "rows": [{"date": "2026-01-16", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 4.2409, "newusers": 1, "totalusers": 1}, {"date": "2026-01-20", "active_users": 1, "sessions": 1, "screen_page_views": 2, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 7.474, "newusers": 1, "totalusers": 1}, {"date": "2026-01-23", "active_users": 1, "sessions": 1, "screen_page_views": 2, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 9.5768, "newusers": 0, "totalusers": 1}, {"date": "2026-01-24", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 5.1548, "newusers": 1, "totalusers": 1}, {"date": "2026-01-26", "active_users": 4, "sessions": 4, "screen_page_views": 10, "bounce_rate": 0.25, "engagement_rate": 0.75, "average_session_duration": 627.5746, "newusers": 3, "totalusers": 4}, {"date": "2026-01-29", "active_users": 4, "sessions": 4, "screen_page_views": 5, "bounce_rate": 0.75, "engagement_rate": 0.25, "average_session_duration": 2.7652, "newusers": 3, "totalusers": 4}, {"date": "2026-01-30", "active_users": 1, "sessions": 1, "screen_page_views": 2, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 7.6604, "newusers": 1, "totalusers": 1}, {"date": "2026-01-31", "active_users": 2, "sessions": 2, "screen_page_views": 2, "bounce_rate": 0.5, "engagement_rate": 0.5, "average_session_duration": 206.0338, "newusers": 1, "totalusers": 2}, {"date": "2026-02-01", "active_users": 1, "sessions": 1, "screen_page_views": 2, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 5.6115, "newusers": 0, "totalusers": 1}, {"date": "2026-02-04", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 1, "totalusers": 1}, {"date": "2026-02-05", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 1, "totalusers": 1}, {"date": "2026-02-07", "active_users": 14, "sessions": 14, "screen_page_views": 14, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 1.7735, "newusers": 14, "totalusers": 14}, {"date": "2026-02-08", "active_users": 2, "sessions": 2, "screen_page_views": 2, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 4.1549, "newusers": 2, "totalusers": 2}, {"date": "2026-02-09", "active_users": 2, "sessions": 3, "screen_page_views": 4, "bounce_rate": 0.6667, "engagement_rate": 0.3333, "average_session_duration": 53.5014, "newusers": 2, "totalusers": 2}, {"date": "2026-02-10", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 1, "totalusers": 1}, {"date": "2026-02-20", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 1, "totalusers": 1}, {"date": "2026-02-21", "active_users": 3, "sessions": 3, "screen_page_views": 3, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 3, "totalusers": 3}, {"date": "2026-02-22", "active_users": 2, "sessions": 2, "screen_page_views": 2, "bounce_rate": 0.5, "engagement_rate": 0.5, "average_session_duration": 12.5818, "newusers": 2, "totalusers": 2}, {"date": "2026-02-24", "active_users": 3, "sessions": 4, "screen_page_views": 5, "bounce_rate": 0.75, "engagement_rate": 0.25, "average_session_duration": 79.3884, "newusers": 2, "totalusers": 3}, {"date": "2026-02-25", "active_users": 1, "sessions": 1, "screen_page_views": 4, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 1569.5241, "newusers": 0, "totalusers": 1}, {"date": "2026-02-26", "active_users": 16, "sessions": 18, "screen_page_views": 45, "bounce_rate": 0.4444, "engagement_rate": 0.5556, "average_session_duration": 128.7423, "newusers": 14, "totalusers": 16}, {"date": "2026-02-27", "active_users": 144, "sessions": 155, "screen_page_views": 282, "bounce_rate": 0.3677, "engagement_rate": 0.6323, "average_session_duration": 130.4737, "newusers": 143, "totalusers": 145}, {"date": "2026-02-28", "active_users": 228, "sessions": 258, "screen_page_views": 442, "bounce_rate": 0.438, "engagement_rate": 0.562, "average_session_duration": 108.0662, "newusers": 229, "totalusers": 231}, {"date": "2026-03-01", "active_users": 200, "sessions": 237, "screen_page_views": 392, "bounce_rate": 0.4051, "engagement_rate": 0.5949, "average_session_duration": 83.7595, "newusers": 196, "totalusers": 209}, {"date": "2026-03-02", "active_users": 158, "sessions": 178, "screen_page_views": 278, "bounce_rate": 0.4494, "engagement_rate": 0.5506, "average_session_duration": 121.6959, "newusers": 156, "totalusers": 164}, {"date": "2026-03-03", "active_users": 159, "sessions": 178, "screen_page_views": 264, "bounce_rate": 0.4494, "engagement_rate": 0.5506, "average_session_duration": 83.8282, "newusers": 158, "totalusers": 165}, {"date": "2026-03-04", "active_users": 154, "sessions": 174, "screen_page_views": 276, "bounce_rate": 0.454, "engagement_rate": 0.546, "average_session_duration": 77.1534, "newusers": 151, "totalusers": 163}, {"date": "2026-03-05", "active_users": 181, "sessions": 202, "screen_page_views": 336, "bounce_rate": 0.4059, "engagement_rate": 0.5941, "average_session_duration": 100.0214, "newusers": 177, "totalusers": 186}, {"date": "2026-03-06", "active_users": 200, "sessions": 237, "screen_page_views": 363, "bounce_rate": 0.4473, "engagement_rate": 0.5527, "average_session_duration": 76.0715, "newusers": 196, "totalusers": 212}, {"date": "2026-03-07", "active_users": 199, "sessions": 221, "screen_page_views": 350, "bounce_rate": 0.4525, "engagement_rate": 0.5475, "average_session_duration": 89.8422, "newusers": 193, "totalusers": 205}, {"date": "2026-03-08", "active_users": 182, "sessions": 206, "screen_page_views": 350, "bounce_rate": 0.3883, "engagement_rate": 0.6117, "average_session_duration": 118.843, "newusers": 176, "totalusers": 189}, {"date": "2026-03-09", "active_users": 126, "sessions": 147, "screen_page_views": 250, "bounce_rate": 0.483, "engagement_rate": 0.517, "average_session_duration": 56.9203, "newusers": 122, "totalusers": 137}, {"date": "2026-03-10", "active_users": 137, "sessions": 159, "screen_page_views": 254, "bounce_rate": 0.4214, "engagement_rate": 0.5786, "average_session_duration": 94.3097, "newusers": 136, "totalusers": 147}, {"date": "2026-03-11", "active_users": 184, "sessions": 212, "screen_page_views": 349, "bounce_rate": 0.3302, "engagement_rate": 0.6698, "average_session_duration": 70.6453, "newusers": 180, "totalusers": 197}, {"date": "2026-03-12", "active_users": 187, "sessions": 209, "screen_page_views": 335, "bounce_rate": 0.3828, "engagement_rate": 0.6172, "average_session_duration": 114.7787, "newusers": 173, "totalusers": 194}, {"date": "2026-03-13", "active_users": 217, "sessions": 237, "screen_page_views": 393, "bounce_rate": 0.3544, "engagement_rate": 0.6456, "average_session_duration": 109.5808, "newusers": 203, "totalusers": 226}, {"date": "2026-03-14", "active_users": 229, "sessions": 268, "screen_page_views": 399, "bounce_rate": 0.403, "engagement_rate": 0.597, "average_session_duration": 70.6249, "newusers": 219, "totalusers": 245}, {"date": "2026-03-15", "active_users": 197, "sessions": 230, "screen_page_views": 300, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 114.9007, "newusers": 148, "totalusers": 212}], "last_updated": "2026-03-16"}, "gsc_daily": {"raw": {"domain": "wherebly.com", "account_id": "sc-domain:wherebly.com", "last_updated": "2026-03-16", "data_range": {"from": "2026-01-15", "to": "2026-03-14"}, "rows": [{"date": "2026-01-15", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-16", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-17", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-18", "clicks": 0, "impressions": 4, "ctr": 0, "position": 5.25}, {"date": "2026-01-19", "clicks": 0, "impressions": 0, "ctr": 0, "position": 0}, {"date": "2026-01-20", "clicks": 1, "impressions": 2, "ctr": 0.5, "position": 1}, {"date": "2026-01-21", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-22", "clicks": 0, "impressions": 0, "ctr": 0, "position": 0}, {"date": "2026-01-23", "clicks": 1, "impressions": 3, "ctr": 0.3333, "position": 1}, {"date": "2026-01-24", "clicks": 0, "impressions": 3, "ctr": 0, "position": 28}, {"date": "2026-01-25", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-26", "clicks": 2, "impressions": 6, "ctr": 0.3333, "position": 1.1667}, {"date": "2026-01-27", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-28", "clicks": 0, "impressions": 0, "ctr": 0, "position": 0}, {"date": "2026-01-29", "clicks": 1, "impressions": 1, "ctr": 1, "position": 1}, {"date": "2026-01-30", "clicks": 1, "impressions": 1, "ctr": 1, "position": 1}, {"date": "2026-01-31", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-02-01", "clicks": 0, "impressions": 9, "ctr": 0, "position": 4.3333}, {"date": "2026-02-02", "clicks": 0, "impressions": 12, "ctr": 0, "position": 5}, {"date": "2026-02-03", "clicks": 0, "impressions": 12, "ctr": 0, "position": 6.4167}, {"date": "2026-02-04", "clicks": 0, "impressions": 22, "ctr": 0, "position": 4.1818}, {"date": "2026-02-05", "clicks": 1, "impressions": 11, "ctr": 0.0909, "position": 6.8182}, {"date": "2026-02-06", "clicks": 0, "impressions": 24, "ctr": 0, "position": 4.875}, {"date": "2026-02-07", "clicks": 0, "impressions": 38, "ctr": 0, "position": 6.6579}, {"date": "2026-02-08", "clicks": 0, "impressions": 16, "ctr": 0, "position": 6.25}, {"date": "2026-02-09", "clicks": 2, "impressions": 19, "ctr": 0.1053, "position": 7.1053}, {"date": "2026-02-10", "clicks": 1, "impressions": 32, "ctr": 0.0312, "position": 6.5938}, {"date": "2026-02-11", "clicks": 0, "impressions": 30, "ctr": 0, "position": 12.4}, {"date": "2026-02-12", "clicks": 0, "impressions": 23, "ctr": 0, "position": 8.2174}, {"date": "2026-02-13", "clicks": 0, "impressions": 27, "ctr": 0, "position": 11.5926}, {"date": "2026-02-14", "clicks": 0, "impressions": 27, "ctr": 0, "position": 6.3704}, {"date": "2026-02-15", "clicks": 0, "impressions": 26, "ctr": 0, "position": 7.6154}, {"date": "2026-02-16", "clicks": 0, "impressions": 23, "ctr": 0, "position": 6.3913}, {"date": "2026-02-17", "clicks": 0, "impressions": 17, "ctr": 0, "position": 11.7059}, {"date": "2026-02-18", "clicks": 0, "impressions": 28, "ctr": 0, "position": 8.0357}, {"date": "2026-02-19", "clicks": 0, "impressions": 40, "ctr": 0, "position": 8.55}, {"date": "2026-02-20", "clicks": 1, "impressions": 22, "ctr": 0.0455, "position": 11.1364}, {"date": "2026-02-21", "clicks": 0, "impressions": 36, "ctr": 0, "position": 7.3056}, {"date": "2026-02-22", "clicks": 1, "impressions": 38, "ctr": 0.0263, "position": 9.5526}, {"date": "2026-02-23", "clicks": 0, "impressions": 16, "ctr": 0, "position": 7.75}, {"date": "2026-02-24", "clicks": 2, "impressions": 31, "ctr": 0.0645, "position": 6.6774}, {"date": "2026-02-25", "clicks": 0, "impressions": 32, "ctr": 0, "position": 6.9688}, {"date": "2026-02-26", "clicks": 0, "impressions": 36, "ctr": 0, "position": 5.8611}, {"date": "2026-02-27", "clicks": 0, "impressions": 36, "ctr": 0, "position": 10.3056}, {"date": "2026-02-28", "clicks": 2, "impressions": 213, "ctr": 0.0094, "position": 5.277}, {"date": "2026-03-01", "clicks": 8, "impressions": 258, "ctr": 0.031, "position": 6.376}, {"date": "2026-03-02", "clicks": 0, "impressions": 127, "ctr": 0, "position": 6.7874}, {"date": "2026-03-03", "clicks": 3, "impressions": 386, "ctr": 0.0078, "position": 6.6606}, {"date": "2026-03-04", "clicks": 6, "impressions": 627, "ctr": 0.0096, "position": 8.2041}, {"date": "2026-03-05", "clicks": 16, "impressions": 1082, "ctr": 0.0148, "position": 6.6303}, {"date": "2026-03-06", "clicks": 28, "impressions": 1285, "ctr": 0.0218, "position": 6.8623}, {"date": "2026-03-07", "clicks": 17, "impressions": 1561, "ctr": 0.0109, "position": 6.991}, {"date": "2026-03-08", "clicks": 15, "impressions": 1426, "ctr": 0.0105, "position": 6.636}, {"date": "2026-03-09", "clicks": 8, "impressions": 1119, "ctr": 0.0071, "position": 7.3378}, {"date": "2026-03-10", "clicks": 25, "impressions": 1369, "ctr": 0.0183, "position": 8.1351}, {"date": "2026-03-11", "clicks": 28, "impressions": 1530, "ctr": 0.0183, "position": 7.332}, {"date": "2026-03-12", "clicks": 10, "impressions": 1774, "ctr": 0.0056, "position": 6.9301}, {"date": "2026-03-13", "clicks": 27, "impressions": 2093, "ctr": 0.0129, "position": 6.5308}, {"date": "2026-03-14", "clicks": 26, "impressions": 2015, "ctr": 0.0129, "position": 7.5385}]}, "rows": [{"date": "2026-01-15", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-16", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-17", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-18", "clicks": 0, "impressions": 4, "ctr": 0, "position": 5.25}, {"date": "2026-01-19", "clicks": 0, "impressions": 0, "ctr": 0, "position": 0}, {"date": "2026-01-20", "clicks": 1, "impressions": 2, "ctr": 0.5, "position": 1}, {"date": "2026-01-21", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-22", "clicks": 0, "impressions": 0, "ctr": 0, "position": 0}, {"date": "2026-01-23", "clicks": 1, "impressions": 3, "ctr": 0.3333, "position": 1}, {"date": "2026-01-24", "clicks": 0, "impressions": 3, "ctr": 0, "position": 28}, {"date": "2026-01-25", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-26", "clicks": 2, "impressions": 6, "ctr": 0.3333, "position": 1.1667}, {"date": "2026-01-27", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-01-28", "clicks": 0, "impressions": 0, "ctr": 0, "position": 0}, {"date": "2026-01-29", "clicks": 1, "impressions": 1, "ctr": 1, "position": 1}, {"date": "2026-01-30", "clicks": 1, "impressions": 1, "ctr": 1, "position": 1}, {"date": "2026-01-31", "clicks": 0, "impressions": 1, "ctr": 0, "position": 1}, {"date": "2026-02-01", "clicks": 0, "impressions": 9, "ctr": 0, "position": 4.3333}, {"date": "2026-02-02", "clicks": 0, "impressions": 12, "ctr": 0, "position": 5}, {"date": "2026-02-03", "clicks": 0, "impressions": 12, "ctr": 0, "position": 6.4167}, {"date": "2026-02-04", "clicks": 0, "impressions": 22, "ctr": 0, "position": 4.1818}, {"date": "2026-02-05", "clicks": 1, "impressions": 11, "ctr": 0.0909, "position": 6.8182}, {"date": "2026-02-06", "clicks": 0, "impressions": 24, "ctr": 0, "position": 4.875}, {"date": "2026-02-07", "clicks": 0, "impressions": 38, "ctr": 0, "position": 6.6579}, {"date": "2026-02-08", "clicks": 0, "impressions": 16, "ctr": 0, "position": 6.25}, {"date": "2026-02-09", "clicks": 2, "impressions": 19, "ctr": 0.1053, "position": 7.1053}, {"date": "2026-02-10", "clicks": 1, "impressions": 32, "ctr": 0.0312, "position": 6.5938}, {"date": "2026-02-11", "clicks": 0, "impressions": 30, "ctr": 0, "position": 12.4}, {"date": "2026-02-12", "clicks": 0, "impressions": 23, "ctr": 0, "position": 8.2174}, {"date": "2026-02-13", "clicks": 0, "impressions": 27, "ctr": 0, "position": 11.5926}, {"date": "2026-02-14", "clicks": 0, "impressions": 27, "ctr": 0, "position": 6.3704}, {"date": "2026-02-15", "clicks": 0, "impressions": 26, "ctr": 0, "position": 7.6154}, {"date": "2026-02-16", "clicks": 0, "impressions": 23, "ctr": 0, "position": 6.3913}, {"date": "2026-02-17", "clicks": 0, "impressions": 17, "ctr": 0, "position": 11.7059}, {"date": "2026-02-18", "clicks": 0, "impressions": 28, "ctr": 0, "position": 8.0357}, {"date": "2026-02-19", "clicks": 0, "impressions": 40, "ctr": 0, "position": 8.55}, {"date": "2026-02-20", "clicks": 1, "impressions": 22, "ctr": 0.0455, "position": 11.1364}, {"date": "2026-02-21", "clicks": 0, "impressions": 36, "ctr": 0, "position": 7.3056}, {"date": "2026-02-22", "clicks": 1, "impressions": 38, "ctr": 0.0263, "position": 9.5526}, {"date": "2026-02-23", "clicks": 0, "impressions": 16, "ctr": 0, "position": 7.75}, {"date": "2026-02-24", "clicks": 2, "impressions": 31, "ctr": 0.0645, "position": 6.6774}, {"date": "2026-02-25", "clicks": 0, "impressions": 32, "ctr": 0, "position": 6.9688}, {"date": "2026-02-26", "clicks": 0, "impressions": 36, "ctr": 0, "position": 5.8611}, {"date": "2026-02-27", "clicks": 0, "impressions": 36, "ctr": 0, "position": 10.3056}, {"date": "2026-02-28", "clicks": 2, "impressions": 213, "ctr": 0.0094, "position": 5.277}, {"date": "2026-03-01", "clicks": 8, "impressions": 258, "ctr": 0.031, "position": 6.376}, {"date": "2026-03-02", "clicks": 0, "impressions": 127, "ctr": 0, "position": 6.7874}, {"date": "2026-03-03", "clicks": 3, "impressions": 386, "ctr": 0.0078, "position": 6.6606}, {"date": "2026-03-04", "clicks": 6, "impressions": 627, "ctr": 0.0096, "position": 8.2041}, {"date": "2026-03-05", "clicks": 16, "impressions": 1082, "ctr": 0.0148, "position": 6.6303}, {"date": "2026-03-06", "clicks": 28, "impressions": 1285, "ctr": 0.0218, "position": 6.8623}, {"date": "2026-03-07", "clicks": 17, "impressions": 1561, "ctr": 0.0109, "position": 6.991}, {"date": "2026-03-08", "clicks": 15, "impressions": 1426, "ctr": 0.0105, "position": 6.636}, {"date": "2026-03-09", "clicks": 8, "impressions": 1119, "ctr": 0.0071, "position": 7.3378}, {"date": "2026-03-10", "clicks": 25, "impressions": 1369, "ctr": 0.0183, "position": 8.1351}, {"date": "2026-03-11", "clicks": 28, "impressions": 1530, "ctr": 0.0183, "position": 7.332}, {"date": "2026-03-12", "clicks": 10, "impressions": 1774, "ctr": 0.0056, "position": 6.9301}, {"date": "2026-03-13", "clicks": 27, "impressions": 2093, "ctr": 0.0129, "position": 6.5308}, {"date": "2026-03-14", "clicks": 26, "impressions": 2015, "ctr": 0.0129, "position": 7.5385}], "last_updated": "2026-03-16"}, "gsc_keywords": {"raw": {"domain": "wherebly.com", "last_updated": "2026-03-16", "rows": [{"query": "dreams cottbus", "clicks": 27, "impressions": 620, "ctr": 0.0435, "position": 3.6629}, {"query": "seafood and more", "clicks": 22, "impressions": 1640, "ctr": 0.0134, "position": 3.1671}, {"query": "winner house", "clicks": 21, "impressions": 260, "ctr": 0.0808, "position": 3.0115}, {"query": "wei\u00dfbierhaus straubing", "clicks": 11, "impressions": 270, "ctr": 0.0407, "position": 3.8185}, {"query": "dreams cottbus speisekarte", "clicks": 8, "impressions": 69, "ctr": 0.1159, "position": 3.3188}, {"query": "cato pizza", "clicks": 7, "impressions": 581, "ctr": 0.012, "position": 5.2427}, {"query": "the original neal's restaurant menu", "clicks": 7, "impressions": 99, "ctr": 0.0707, "position": 2.7374}, {"query": "seafood and more menu", "clicks": 6, "impressions": 422, "ctr": 0.0142, "position": 7.0261}, {"query": "winner house sundbyberg", "clicks": 6, "impressions": 70, "ctr": 0.0857, "position": 2.4857}, {"query": "bellambi lane cafe", "clicks": 4, "impressions": 208, "ctr": 0.0192, "position": 4.2452}]}, "rows": [{"query": "dreams cottbus", "clicks": 27, "impressions": 620, "ctr": 0.0435, "position": 3.6629}, {"query": "seafood and more", "clicks": 22, "impressions": 1640, "ctr": 0.0134, "position": 3.1671}, {"query": "winner house", "clicks": 21, "impressions": 260, "ctr": 0.0808, "position": 3.0115}, {"query": "wei\u00dfbierhaus straubing", "clicks": 11, "impressions": 270, "ctr": 0.0407, "position": 3.8185}, {"query": "dreams cottbus speisekarte", "clicks": 8, "impressions": 69, "ctr": 0.1159, "position": 3.3188}, {"query": "cato pizza", "clicks": 7, "impressions": 581, "ctr": 0.012, "position": 5.2427}, {"query": "the original neal's restaurant menu", "clicks": 7, "impressions": 99, "ctr": 0.0707, "position": 2.7374}, {"query": "seafood and more menu", "clicks": 6, "impressions": 422, "ctr": 0.0142, "position": 7.0261}, {"query": "winner house sundbyberg", "clicks": 6, "impressions": 70, "ctr": 0.0857, "position": 2.4857}, {"query": "bellambi lane cafe", "clicks": 4, "impressions": 208, "ctr": 0.0192, "position": 4.2452}], "last_updated": "2026-03-16"}, "gsc_pages": {"raw": {"domain": "wherebly.com", "account_id": "518056444", "last_updated": "2026-03-16", "rows": [{"page": "https://dreams-vietnamesische-kche.wherebly.com/", "clicks": 49, "impressions": 1294, "ctr": 0.0379, "position": 4.6862}, {"page": "https://winner-house.wherebly.com/", "clicks": 37, "impressions": 711, "ctr": 0.052, "position": 4.6006}, {"page": "https://seafood-and-more.wherebly.com/", "clicks": 32, "impressions": 2827, "ctr": 0.0113, "position": 4.3905}, {"page": "https://1-straubinger-weissbierhaus.wherebly.com/", "clicks": 22, "impressions": 721, "ctr": 0.0305, "position": 8.5381}, {"page": "https://the-original-neals-restaurant.wherebly.com/menu", "clicks": 13, "impressions": 381, "ctr": 0.0341, "position": 6.4829}, {"page": "https://new-york-pizzeria.wherebly.com/", "clicks": 11, "impressions": 1102, "ctr": 0.01, "position": 5.7105}, {"page": "https://new-york-pizzeria.wherebly.com/menu", "clicks": 9, "impressions": 899, "ctr": 0.01, "position": 4.8977}, {"page": "https://bellambi-lane-cafe.wherebly.com/", "clicks": 8, "impressions": 653, "ctr": 0.0123, "position": 4.8897}, {"page": "https://the-original-neals-restaurant.wherebly.com/", "clicks": 8, "impressions": 261, "ctr": 0.0307, "position": 7.4215}, {"page": "https://wherebly.com/", "clicks": 6, "impressions": 61, "ctr": 0.0984, "position": 3.1311}]}, "rows": [{"page": "https://dreams-vietnamesische-kche.wherebly.com/", "clicks": 49, "impressions": 1294, "ctr": 0.0379, "position": 4.6862}, {"page": "https://winner-house.wherebly.com/", "clicks": 37, "impressions": 711, "ctr": 0.052, "position": 4.6006}, {"page": "https://seafood-and-more.wherebly.com/", "clicks": 32, "impressions": 2827, "ctr": 0.0113, "position": 4.3905}, {"page": "https://1-straubinger-weissbierhaus.wherebly.com/", "clicks": 22, "impressions": 721, "ctr": 0.0305, "position": 8.5381}, {"page": "https://the-original-neals-restaurant.wherebly.com/menu", "clicks": 13, "impressions": 381, "ctr": 0.0341, "position": 6.4829}, {"page": "https://new-york-pizzeria.wherebly.com/", "clicks": 11, "impressions": 1102, "ctr": 0.01, "position": 5.7105}, {"page": "https://new-york-pizzeria.wherebly.com/menu", "clicks": 9, "impressions": 899, "ctr": 0.01, "position": 4.8977}, {"page": "https://bellambi-lane-cafe.wherebly.com/", "clicks": 8, "impressions": 653, "ctr": 0.0123, "position": 4.8897}, {"page": "https://the-original-neals-restaurant.wherebly.com/", "clicks": 8, "impressions": 261, "ctr": 0.0307, "position": 7.4215}, {"page": "https://wherebly.com/", "clicks": 6, "impressions": 61, "ctr": 0.0984, "position": 3.1311}], "last_updated": "2026-03-16"}, "comparison": {"ga4": {"sessions": {"last_30": {"total": 3537, "avg": 153.7826086956522, "min": 1, "max": 268, "stdev": 95.69979411098738}, "prev_30": {"total": 38, "avg": 2.533333333333333, "min": 1, "max": 14, "stdev": 3.3565855667130946}, "pct_change": 9207.894736842105}, "active_users": {"last_30": {"total": 3108, "avg": 135.1304347826087, "min": 1, "max": 229, "stdev": 83.73947931087771}, "prev_30": {"total": 37, "avg": 2.466666666666667, "min": 1, "max": 14, "stdev": 3.3565855667130946}, "pct_change": 8300.0}, "screen_page_views": {"last_30": {"total": 5673, "avg": 246.65217391304347, "min": 1, "max": 442, "stdev": 152.089569511358}, "prev_30": {"total": 50, "avg": 3.3333333333333335, "min": 1, "max": 14, "stdev": 3.773340063934768}, "pct_change": 11246.0}, "newusers": {"last_30": {"total": 2978, "avg": 129.47826086956522, "min": 0, "max": 229, "stdev": 80.56271953364116}, "prev_30": {"total": 32, "avg": 2.1333333333333333, "min": 0, "max": 14, "stdev": 3.39887936714161}, "pct_change": 9206.25}, "bounce_rate": {"last_30_avg": 0.4924695652173913, "prev_30_avg": 0.6111133333333333, "pct_change": -19.41436418492074}, "engagement_rate": {"last_30_avg": 0.5075304347826087, "prev_30_avg": 0.38888666666666666, "pct_change": 30.508571850224246}}, "gsc_daily": {"clicks": {"last_30": {"total": 223, "avg": 7.689655172413793, "min": 0, "max": 28, "stdev": 10.240338471930722}, "prev_30": {"total": 10, "avg": 0.3333333333333333, "min": 0, "max": 2, "stdev": 0.6064784348631227}, "pct_change": 2130.0}, "impressions": {"last_30": {"total": 17273, "avg": 595.6206896551724, "min": 16, "max": 2093, "stdev": 725.603513034549}, "prev_30": {"total": 302, "avg": 10.066666666666666, "min": 0, "max": 38, "stdev": 11.500924500570209}, "pct_change": 5619.536423841059}, "ctr": {"last_30_avg": 0.011282758620689655, "prev_30_avg": 0.11313333333333334, "pct_change": -90.0270253794729}, "position": {"last_30_avg": 7.532937931034483, "prev_30_avg": 4.528623333333333, "pct_change": 66.34057144005831}}}, "anomalies": [{"type": "clicks_spike", "source": "GSC", "severity": "info", "date": "2026-03-11", "value": 28, "message": "Click spike: 28 (avg: 9)"}]};
+        
+        function toggleMode() {
+            const body = document.body;
+            const btn = event.target;
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                btn.textContent = 'Chế độ tối';
+            } else {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                btn.textContent = 'Chế độ sáng';
+            }
+        }
+        
+        function formatNumber(num) {
+            return num.toLocaleString('vi-VN');
+        }
+        
+        function formatPercent(num) {
+            return (num * 100).toFixed(2) + '%';
+        }
+        
+        // Populate KPIs
+        function populateKPIs() {
+            const comp = domainData.comparison;
+            const kpis = [];
+            
+            if (comp.ga4 && comp.ga4.sessions) {
+                kpis.push({
+                    label: 'Phiên',
+                    value: formatNumber(comp.ga4.sessions.last_30.total),
+                    change: comp.ga4.sessions.pct_change
+                });
+            }
+            
+            if (comp.ga4 && comp.ga4.active_users) {
+                kpis.push({
+                    label: 'Người dùng',
+                    value: formatNumber(comp.ga4.active_users.last_30.total),
+                    change: comp.ga4.active_users.pct_change
+                });
+            }
+            
+            if (comp.gsc_daily && comp.gsc_daily.clicks) {
+                kpis.push({
+                    label: 'Nhấp',
+                    value: formatNumber(comp.gsc_daily.clicks.last_30.total),
+                    change: comp.gsc_daily.clicks.pct_change
+                });
+            }
+            
+            if (comp.gsc_daily && comp.gsc_daily.impressions) {
+                kpis.push({
+                    label: 'Lần hiển thị',
+                    value: formatNumber(comp.gsc_daily.impressions.last_30.total),
+                    change: 0
+                });
+            }
+            
+            if (comp.gsc_daily && comp.gsc_daily.position) {
+                kpis.push({
+                    label: 'Vị trí',
+                    value: comp.gsc_daily.position.last_30_avg.toFixed(2),
+                    change: 0
+                });
+            }
+            
+            const grid = document.getElementById('kpiGrid');
+            kpis.forEach(k => {
+                const color = k.change > 5 ? '#10b981' : (k.change < -5 ? '#ef4444' : '#6b7280');
+                grid.innerHTML += `
+                    <div class="kpi-card">
+                        <div class="kpi-label">${k.label}</div>
+                        <div class="kpi-value">${k.value}</div>
+                        <div class="kpi-change" style="color: ${color};">${k.change > 0 ? '+' : ''}${k.change.toFixed(1)}%</div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Populate keywords table
+        function populateKeywords() {
+            const keywords = domainData.gsc_keywords.rows || [];
+            const tbody = document.getElementById('keywordsBody');
+            
+            if (keywords.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">Chưa có dữ liệu</td></tr>';
+                return;
+            }
+            
+            keywords.slice(0, 10).forEach(k => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${k.query}</td>
+                        <td>${formatNumber(k.clicks)}</td>
+                        <td>${formatNumber(k.impressions)}</td>
+                        <td>${formatPercent(k.ctr)}</td>
+                        <td>${k.position.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        // Populate pages table
+        function populatePages() {
+            const pages = domainData.gsc_pages.rows || [];
+            const tbody = document.getElementById('pagesBody');
+            
+            if (pages.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">Chưa có dữ liệu</td></tr>';
+                return;
+            }
+            
+            pages.slice(0, 10).forEach(p => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">${p.page}</td>
+                        <td>${formatNumber(p.clicks)}</td>
+                        <td>${formatNumber(p.impressions)}</td>
+                        <td>${formatPercent(p.ctr)}</td>
+                        <td>${p.position.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        // Create charts
+        function createCharts() {
+            const ga4 = domainData.ga4.rows || [];
+            const gsc = domainData.gsc_daily.rows || [];
+            
+            const gaLast30 = ga4.slice(-30);
+            const gscLast30 = gsc.slice(-30);
+            
+            const gaDateLabels = gaLast30.map(r => r.date);
+            const gscDateLabels = gscLast30.map(r => r.date);
+            
+            // Sessions chart
+            if (gaLast30.length > 0) {
+                new Chart(document.getElementById('sessionsChart'), {
+                    type: 'line',
+                    data: {
+                        labels: gaDateLabels,
+                        datasets: [{
+                            label: 'Phiên',
+                            data: gaLast30.map(r => r.sessions),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true }, },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+            
+            // Bounce rate chart
+            if (gaLast30.length > 0) {
+                new Chart(document.getElementById('bounceChart'), {
+                    type: 'line',
+                    data: {
+                        labels: gaDateLabels,
+                        datasets: [{
+                            label: 'Tỷ lệ thoát (%)',
+                            data: gaLast30.map(r => r.bounce_rate * 100),
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            }
+            
+            // Clicks chart
+            if (gscLast30.length > 0) {
+                new Chart(document.getElementById('clicksChart'), {
+                    type: 'line',
+                    data: {
+                        labels: gscDateLabels,
+                        datasets: [{
+                            label: 'Nhấp',
+                            data: gscLast30.map(r => r.clicks),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+            
+            // Position chart (reversed Y axis - lower is better)
+            if (gscLast30.length > 0) {
+                new Chart(document.getElementById('positionChart'), {
+                    type: 'line',
+                    data: {
+                        labels: gscDateLabels,
+                        datasets: [{
+                            label: 'Vị trí (thấp = tốt)',
+                            data: gscLast30.map(r => r.position),
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                reverse: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        populateKPIs();
+        populateKeywords();
+        populatePages();
+        createCharts();
+    </script>
+</body>
+</html>
