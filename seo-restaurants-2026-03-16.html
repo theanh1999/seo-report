@@ -1,866 +1,422 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Báo cáo SEO Nhà hàng - 16/03/2026</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --accent-blue: #3b82f6;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-yellow: #f59e0b;
-        }
-
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: system-ui, -apple-system, sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
-            padding: 2rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-        }
-
-        .header-meta {
-            font-size: 0.95rem;
-            opacity: 0.95;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .nav-links {
-            margin-top: 1rem;
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            transition: background 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .toc-sidebar {
-            position: fixed;
-            left: 0;
-            top: 200px;
-            width: 220px;
-            background: var(--bg-secondary);
-            border-right: 2px solid var(--accent-blue);
-            padding: 1.5rem;
-            max-height: calc(100vh - 250px);
-            overflow-y: auto;
-            z-index: 100;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .toc-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-            color: var(--accent-blue);
-            letter-spacing: 0.5px;
-        }
-
-        .toc-list {
-            list-style: none;
-        }
-
-        .toc-list li {
-            margin: 0.5rem 0;
-        }
-
-        .toc-list a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: block;
-            padding: 0.5rem;
-            border-left: 2px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .toc-list a:hover {
-            color: var(--accent-blue);
-            border-left-color: var(--accent-blue);
-            padding-left: 0.75rem;
-        }
-
-        .toc-list a.active {
-            color: var(--accent-blue);
-            border-left-color: var(--accent-blue);
-            font-weight: 600;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            margin-left: 240px;
-        }
-
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .kpi-card {
-            background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border-left: 4px solid var(--accent-blue);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .kpi-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
-        }
-
-        .kpi-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .kpi-change {
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .kpi-change.positive {
-            color: var(--accent-green);
-        }
-
-        .kpi-change.negative {
-            color: var(--accent-red);
-        }
-
-        .section {
-            margin: 3rem 0;
-        }
-
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--accent-blue);
-            padding-bottom: 0.5rem;
-            scroll-margin-top: 100px;
-        }
-
-        .chart-container {
-            background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            position: relative;
-            height: 400px;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            height: 100%;
-        }
-
-        .anomaly-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-        }
-
-        .anomaly-card {
-            background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border-left: 4px solid var(--accent-red);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .anomaly-card.warning {
-            border-left-color: var(--accent-yellow);
-        }
-
-        .anomaly-site {
-            font-weight: 600;
-            color: var(--accent-blue);
-            font-size: 0.95rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .anomaly-detail {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin: 0.25rem 0;
-        }
-
-        .comparison-table {
-            width: 100%;
-            background: var(--bg-secondary);
-            border-collapse: collapse;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            margin: 1.5rem 0;
-            font-size: 0.9rem;
-        }
-
-        .comparison-table thead {
-            background: var(--bg-tertiary);
-        }
-
-        .comparison-table th {
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--accent-blue);
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            border-bottom: 2px solid var(--accent-blue);
-        }
-
-        .comparison-table th:hover {
-            background: #475569;
-        }
-
-        .comparison-table td {
-            padding: 1rem;
-            border-bottom: 1px solid #334155;
-        }
-
-        .comparison-table tbody tr:nth-child(odd) {
-            background: var(--bg-secondary);
-        }
-
-        .comparison-table tbody tr:nth-child(even) {
-            background: #1a2332;
-        }
-
-        .comparison-table tbody tr:hover {
-            background: var(--bg-tertiary);
-        }
-
-        .site-name {
-            font-weight: 600;
-            color: var(--accent-blue);
-        }
-
-        .metric-good {
-            color: var(--accent-green);
-        }
-
-        .metric-bad {
-            color: var(--accent-red);
-        }
-
-        .metric-neutral {
-            color: var(--text-secondary);
-        }
-
-        .website-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-        }
-
-        .website-card {
-            background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            border-top: 3px solid var(--accent-blue);
-        }
-
-        .website-card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--accent-blue);
-            word-break: break-all;
-        }
-
-        .website-metric {
-            display: flex;
-            justify-content: space-between;
-            margin: 0.75rem 0;
-            font-size: 0.95rem;
-        }
-
-        .website-metric-label {
-            color: var(--text-secondary);
-        }
-
-        .website-metric-value {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .filter-bar {
-            background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 1.5rem 0;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .filter-group label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .filter-group input,
-        .filter-group select {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid #475569;
-            padding: 0.5rem;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-
-        .filter-group input:focus,
-        .filter-group select:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 3rem;
-            border-top: 1px solid var(--bg-tertiary);
-        }
-
-        @media (max-width: 1200px) {
-            .toc-sidebar {
-                position: static;
-                width: 100%;
-                max-height: 300px;
-                border-right: none;
-                border-bottom: 2px solid var(--accent-blue);
-                border-radius: 0;
-                margin-bottom: 2rem;
-            }
-
-            .container {
-                margin-left: 0;
-            }
-
-            .toc-list {
-                display: flex;
-                gap: 1rem;
-                flex-wrap: wrap;
-            }
-
-            .toc-list li {
-                margin: 0;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .header-meta {
-                gap: 1rem;
-                font-size: 0.85rem;
-            }
-
-            .kpi-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .website-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .comparison-table {
-                font-size: 0.8rem;
-            }
-
-            .comparison-table th,
-            .comparison-table td {
-                padding: 0.75rem 0.5rem;
-            }
-
-            .filter-bar {
-                flex-direction: column;
-            }
-
-            .filter-group {
-                flex-direction: column;
-                width: 100%;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-blue);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #2563eb;
-        }
-    </style>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEO Restaurants Dashboard | SEO Dashboard 2026-03-16</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5}
+a{color:#60a5fa;text-decoration:none}a:hover{text-decoration:underline;color:#93c5fd}
+h1{font-size:1.5rem;font-weight:700;color:#f1f5f9}
+h2{font-size:1.1rem;font-weight:600;color:#cbd5e1;margin:1.5rem 0 0.75rem;padding-bottom:0.4rem;border-bottom:1px solid #334155}
+.container{max-width:1400px;margin:0 auto;padding:1.5rem}
+.hdr{background:#1e293b;border-bottom:2px solid #3b82f6;padding:0.75rem 1.5rem;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{display:flex;align-items:center;gap:0.75rem}
+.hdr-links a{background:#0f172a;border:1px solid #334155;padding:3px 10px;border-radius:4px;font-size:0.75rem;color:#94a3b8;margin-left:0.4rem}
+.hdr-links a:hover{border-color:#3b82f6;color:#60a5fa}
+.badge{background:#3b82f6;color:#fff;font-size:0.65rem;padding:2px 7px;border-radius:999px;font-weight:600}
+.badge-warn{background:#d97706}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem;margin:1rem 0}
+.kpi{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:0.85rem 1rem;text-align:center}
+.kpi-val{font-size:1.5rem;font-weight:700;color:#f1f5f9;display:block}
+.kpi-lbl{font-size:0.7rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:0.25rem}
+.kpi-chg{font-size:0.75rem;margin-top:0.2rem}
+.site-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;margin-top:1rem}
+.sc{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:1rem;transition:border-color .2s,transform .15s}
+.sc:hover{border-color:#3b82f6;transform:translateY(-2px)}
+.sc-name{font-size:1rem;font-weight:600;color:#60a5fa;margin-bottom:0.5rem;display:flex;align-items:center;justify-content:space-between}
+.sc-mets{display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin:0.5rem 0}
+.sc-met{text-align:center;padding:0.4rem;background:#0f172a;border-radius:4px}
+.sc-val{font-size:0.85rem;font-weight:600;color:#f1f5f9}
+.sc-lbl{font-size:0.6rem;color:#64748b;text-transform:uppercase}
+.chip{display:inline-flex;align-items:center;gap:3px;font-size:0.7rem;padding:2px 6px;border-radius:4px;margin:2px}
+.chip-spike{background:#14532d;color:#86efac;border:1px solid #166534}
+.chip-drop{background:#450a0a;color:#fca5a5;border:1px solid #7f1d1d}
+.chip-bounce{background:#431407;color:#fed7aa;border:1px solid #7c2d12}
+table{width:100%;border-collapse:collapse;font-size:0.82rem}
+th{background:#020617;color:#64748b;padding:0.5rem 0.75rem;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #334155;position:sticky;top:0}
+td{padding:0.45rem 0.75rem;border-bottom:1px solid #1e293b;color:#cbd5e1}
+tr:hover td{background:#1e293b}
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid #334155;max-height:400px;overflow-y:auto}
+.chart-wrap{height:220px;margin:.5rem 0}
+.panel{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:1rem;margin-bottom:1rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.anom-section{background:#1e293b;border:1px solid #f59e0b;border-radius:8px;padding:1rem;margin-bottom:1rem}
+.anom-section h2{color:#fbbf24;border-color:#78350f}
+.green{color:#22c55e}.red{color:#ef4444}.yellow{color:#fbbf24}.gray{color:#64748b}
+.rank-badge{background:#1d4ed8;color:#bfdbfe;font-size:0.7rem;padding:1px 6px;border-radius:3px;font-weight:600}
+@media(max-width:768px){.two-col{grid-template-columns:1fr}.site-grid{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}}
+</style><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="header">
-        <h1>Báo cáo SEO Nhà hàng</h1>
-        <div class="header-meta">
-            <span>📅 Ngày: 16/03/2026</span>
-            <span>📊 Kỳ: 60 ngày (15/01 - 15/03/2026)</span>
-            <span>🏢 Trang web: 12 nhà hàng</span>
-        </div>
-        <div class="nav-links">
-            <a href="seo-hotels-2026-03-16.html">📍 Báo cáo Khách sạn</a>
-            <a href="index.html">🏠 Trang chủ</a>
-        </div>
+<div class="hdr">
+  <div class="hdr-title">
+    <h1>🍽️ SEO Restaurants Dashboard</h1>
+    <span class="badge">2026-03-16</span>
+    <span class="badge" style="background:#064e3b">12 sites</span>
+  </div>
+  <div class="hdr-links">
+    <a href="index.html">🏠 Tổng quan</a>
+    <a href="seo-hotels-2026-03-16.html">🏨 Hotels</a>
+  </div>
+</div>
+<div class="container">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-lbl">Total Clicks</div><span class="kpi-val">261.0K</span></div>
+    <div class="kpi"><div class="kpi-lbl">Total Impressions</div><span class="kpi-val">11.9M</span></div>
+    <div class="kpi"><div class="kpi-lbl">Total Sessions</div><span class="kpi-val">5.5M</span></div>
+    <div class="kpi"><div class="kpi-lbl">Total Users</div><span class="kpi-val">4.2M</span></div>
+    <div class="kpi"><div class="kpi-lbl">Sites</div><span class="kpi-val">12</span></div>
+    <div class="kpi"><div class="kpi-lbl">Bất thường</div><span class="kpi-val" style="color:#fbbf24">2</span></div>
+  </div>
+  
+  <div class="anom-section"><h2>⚠️ Bất Thường Phát Hiện (2)</h2><div style="margin-top:0.5rem"><div style="margin:0.3rem 0"><a href="seo-detail-wherebly.com-2026-03-16.html" style="color:#fbbf24">wherebly.com</a>: <span class="chip chip-spike">🔥 sessions +600%</span></div><div style="margin:0.3rem 0"><a href="seo-detail-foodplacee.com-2026-03-16.html" style="color:#fbbf24">foodplacee.com</a>: <span class="chip chip-spike">🔥 sessions +774%</span></div></div></div>
+  
+  <div class="panel">
+    <h2>📈 Tổng Clicks & Impressions (14 ngày)</h2>
+    <div class="chart-wrap" style="height:240px"><canvas id="ch_agg_main"></canvas></div><script>new Chart(document.getElementById('ch_agg_main'),{type:'line',data:{labels:["2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"],datasets:[{label:'Total Clicks',data:[14871, 15568, 13396, 20338, 19641, 21268, 15083, 18235, 22231, 12996, 17329, 17649, 18021, 14693],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.15)',fill:true,tension:0.4,yAxisID:'y'},{label:'Total Impressions',data:[766450, 832619, 709555, 753762, 849392, 870176, 784397, 835961, 906807, 654897, 767479, 744870, 882625, 792015],borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,0.05)',fill:true,tension:0.4,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{x:{ticks:{color:'#64748b',font:{size:10},maxRotation:45},grid:{color:'#1e293b'}},y:{ticks:{color:'#64748b'},grid:{color:'#1e293b'}},y1:{position:'right',ticks:{color:'#64748b'},grid:{display:false}}}}}}); </script>
+  </div>
+  
+  <h2>🏆 Xếp hạng theo tăng trưởng Clicks</h2>
+  <div class="site-grid">
+    
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-menu-world.com-2026-03-16.html">🍽️ menu-world.com</a>
+    <span class="rank-badge">#1</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">24.2K</div><div class="sc-lbl">Clicks <span style="color:#22c55e">▲ +46.1%</span></div></div>
+    <div class="sc-met"><div class="sc-val">1.2M</div><div class="sc-lbl">Impr <span style="color:#22c55e">▲ +19.3%</span></div></div>
+    <div class="sc-met"><div class="sc-val">792.5K</div><div class="sc-lbl">Sessions <span style="color:#22c55e">▲ +8.4%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">7.7</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">1.98%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">34.0%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-restaurants-world.net-2026-03-16.html">🍽️ restaurants-world.net</a>
+    <span class="rank-badge">#2</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">26.9K</div><div class="sc-lbl">Clicks <span style="color:#22c55e">▲ +30.4%</span></div></div>
+    <div class="sc-met"><div class="sc-val">1.2M</div><div class="sc-lbl">Impr <span style="color:#22c55e">▲ +5.7%</span></div></div>
+    <div class="sc-met"><div class="sc-val">669.0K</div><div class="sc-lbl">Sessions <span style="color:#ef4444">▼ -14.5%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">7.4</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">1.97%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">36.3%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-res-menu.net-2026-03-16.html">🍽️ res-menu.net</a>
+    <span class="rank-badge">#3</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">24.2K</div><div class="sc-lbl">Clicks <span style="color:#22c55e">▲ +17.6%</span></div></div>
+    <div class="sc-met"><div class="sc-val">1.1M</div><div class="sc-lbl">Impr <span style="color:#22c55e">▲ +12.9%</span></div></div>
+    <div class="sc-met"><div class="sc-val">782.4K</div><div class="sc-lbl">Sessions <span style="color:#22c55e">▲ +14.9%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">7.2</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">2.11%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">40.9%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-localoria.com-2026-03-16.html">🍽️ localoria.com</a>
+    <span class="rank-badge">#4</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">25.2K</div><div class="sc-lbl">Clicks <span style="color:#22c55e">▲ +17.1%</span></div></div>
+    <div class="sc-met"><div class="sc-val">1.1M</div><div class="sc-lbl">Impr <span style="color:#22c55e">▲ +7.9%</span></div></div>
+    <div class="sc-met"><div class="sc-val">86.8K</div><div class="sc-lbl">Sessions <span style="color:#22c55e">▲ +37.6%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">7.5</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">2.1%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">46.6%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-wherebly.com-2026-03-16.html">🍽️ wherebly.com</a>
+    <span class="rank-badge">#5</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">26.5K</div><div class="sc-lbl">Clicks <span style="color:#22c55e">▲ +9.9%</span></div></div>
+    <div class="sc-met"><div class="sc-val">1.3M</div><div class="sc-lbl">Impr <span style="color:#22c55e">▲ +9.2%</span></div></div>
+    <div class="sc-met"><div class="sc-val">3.1K</div><div class="sc-lbl">Sessions <span style="color:#22c55e">▲ +599.8%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">7.2</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">2.35%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">45.5%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="chip chip-spike">🔥 sessions +600%</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-goto-where.com-2026-03-16.html">🍽️ goto-where.com</a>
+    <span class="rank-badge">#6</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">27.0K</div><div class="sc-lbl">Clicks <span style="color:#22c55e">▲ +7.2%</span></div></div>
+    <div class="sc-met"><div class="sc-val">1.2M</div><div class="sc-lbl">Impr <span style="color:#22c55e">▲ +8.5%</span></div></div>
+    <div class="sc-met"><div class="sc-val">722.9K</div><div class="sc-lbl">Sessions <span style="color:#22c55e">▲ +1.7%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">6.3</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">2.27%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">36.4%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-foodplacee.com-2026-03-16.html">🍽️ foodplacee.com</a>
+    <span class="rank-badge">#7</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">26.4K</div><div class="sc-lbl">Clicks <span style="color:#22c55e">▲ +6.4%</span></div></div>
+    <div class="sc-met"><div class="sc-val">1.1M</div><div class="sc-lbl">Impr <span style="color:#ef4444">▼ -1.7%</span></div></div>
+    <div class="sc-met"><div class="sc-val">3.0K</div><div class="sc-lbl">Sessions <span style="color:#22c55e">▲ +774.4%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">8.7</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">2.38%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">42.2%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="chip chip-spike">🔥 sessions +774%</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-placejoys.com-2026-03-16.html">🍽️ placejoys.com</a>
+    <span class="rank-badge">#8</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">17.9K</div><div class="sc-lbl">Clicks <span style="color:#ef4444">▼ -2.7%</span></div></div>
+    <div class="sc-met"><div class="sc-val">805.1K</div><div class="sc-lbl">Impr <span style="color:#ef4444">▼ -1.9%</span></div></div>
+    <div class="sc-met"><div class="sc-val">461.2K</div><div class="sc-lbl">Sessions <span style="color:#22c55e">▲ +7.4%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">8.0</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">1.73%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">37.5%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-menustic.com-2026-03-16.html">🍽️ menustic.com</a>
+    <span class="rank-badge">#9</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">16.8K</div><div class="sc-lbl">Clicks <span style="color:#ef4444">▼ -6.2%</span></div></div>
+    <div class="sc-met"><div class="sc-val">787.8K</div><div class="sc-lbl">Impr <span style="color:#ef4444">▼ -15.8%</span></div></div>
+    <div class="sc-met"><div class="sc-val">439.5K</div><div class="sc-lbl">Sessions <span style="color:#ef4444">▼ -0.8%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">7.3</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">2.15%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">42.6%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-wherevi.com-2026-03-16.html">🍽️ wherevi.com</a>
+    <span class="rank-badge">#10</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">17.3K</div><div class="sc-lbl">Clicks <span style="color:#ef4444">▼ -9.9%</span></div></div>
+    <div class="sc-met"><div class="sc-val">826.8K</div><div class="sc-lbl">Impr <span style="color:#94a3b8">→ 0%</span></div></div>
+    <div class="sc-met"><div class="sc-val">466.9K</div><div class="sc-lbl">Sessions <span style="color:#22c55e">▲ +8.7%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">7.4</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">1.98%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">37.5%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-grubbio.com-2026-03-16.html">🍽️ grubbio.com</a>
+    <span class="rank-badge">#11</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">15.3K</div><div class="sc-lbl">Clicks <span style="color:#ef4444">▼ -13.5%</span></div></div>
+    <div class="sc-met"><div class="sc-val">736.6K</div><div class="sc-lbl">Impr <span style="color:#ef4444">▼ -16.9%</span></div></div>
+    <div class="sc-met"><div class="sc-val">650.8K</div><div class="sc-lbl">Sessions <span style="color:#22c55e">▲ +9.1%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">8.5</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">2.3%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">34.1%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></div>
+</div>
+<div class="sc">
+  <div class="sc-name">
+    <a href="seo-detail-menufyy.com-2026-03-16.html">🍽️ menufyy.com</a>
+    <span class="rank-badge">#12</span>
+  </div>
+  <div class="sc-mets">
+    <div class="sc-met"><div class="sc-val">13.3K</div><div class="sc-lbl">Clicks <span style="color:#ef4444">▼ -33.8%</span></div></div>
+    <div class="sc-met"><div class="sc-val">705.7K</div><div class="sc-lbl">Impr <span style="color:#ef4444">▼ -24.4%</span></div></div>
+    <div class="sc-met"><div class="sc-val">406.1K</div><div class="sc-lbl">Sessions <span style="color:#22c55e">▲ +35.3%</span></div></div>
+  </div>
+  <div style="margin-top:0.4rem;font-size:0.75rem;color:#64748b">
+    Pos: <span style="color:#f1f5f9">7.7</span> &nbsp;
+    CTR: <span style="color:#f1f5f9">2.08%</span> &nbsp;
+    Bounce: <span style="color:#22c55e">39.7%</span>
+  </div>
+  <div style="margin-top:0.4rem"><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></div>
+</div>
+  </div>
+  
+  <div class="panel" style="margin-top:1rem">
+    <h2>📊 Bảng Tổng Hợp</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Domain</th><th>Clicks</th><th>Impressions</th><th>Sessions</th><th>Avg Pos</th><th>CTR</th><th>Bounce</th><th>Trạng thái</th></tr></thead>
+        <tbody><tr>
+<td><span class="rank-badge">#1</span></td>
+<td><a href="seo-detail-menu-world.com-2026-03-16.html">menu-world.com</a></td>
+<td>24.2K <span style="color:#22c55e">▲ +46.1%</span></td>
+<td>1.2M <span style="color:#22c55e">▲ +19.3%</span></td>
+<td>792.5K <span style="color:#22c55e">▲ +8.4%</span></td>
+<td>7.7</td>
+<td>1.98%</td>
+<td style="color:#22c55e">34.0%</td>
+<td><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></td>
+</tr><tr>
+<td><span class="rank-badge">#2</span></td>
+<td><a href="seo-detail-restaurants-world.net-2026-03-16.html">restaurants-world.net</a></td>
+<td>26.9K <span style="color:#22c55e">▲ +30.4%</span></td>
+<td>1.2M <span style="color:#22c55e">▲ +5.7%</span></td>
+<td>669.0K <span style="color:#ef4444">▼ -14.5%</span></td>
+<td>7.4</td>
+<td>1.97%</td>
+<td style="color:#22c55e">36.3%</td>
+<td><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></td>
+</tr><tr>
+<td><span class="rank-badge">#3</span></td>
+<td><a href="seo-detail-res-menu.net-2026-03-16.html">res-menu.net</a></td>
+<td>24.2K <span style="color:#22c55e">▲ +17.6%</span></td>
+<td>1.1M <span style="color:#22c55e">▲ +12.9%</span></td>
+<td>782.4K <span style="color:#22c55e">▲ +14.9%</span></td>
+<td>7.2</td>
+<td>2.11%</td>
+<td style="color:#22c55e">40.9%</td>
+<td><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></td>
+</tr><tr>
+<td><span class="rank-badge">#4</span></td>
+<td><a href="seo-detail-localoria.com-2026-03-16.html">localoria.com</a></td>
+<td>25.2K <span style="color:#22c55e">▲ +17.1%</span></td>
+<td>1.1M <span style="color:#22c55e">▲ +7.9%</span></td>
+<td>86.8K <span style="color:#22c55e">▲ +37.6%</span></td>
+<td>7.5</td>
+<td>2.1%</td>
+<td style="color:#22c55e">46.6%</td>
+<td><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></td>
+</tr><tr>
+<td><span class="rank-badge">#5</span></td>
+<td><a href="seo-detail-wherebly.com-2026-03-16.html">wherebly.com</a></td>
+<td>26.5K <span style="color:#22c55e">▲ +9.9%</span></td>
+<td>1.3M <span style="color:#22c55e">▲ +9.2%</span></td>
+<td>3.1K <span style="color:#22c55e">▲ +599.8%</span></td>
+<td>7.2</td>
+<td>2.35%</td>
+<td style="color:#22c55e">45.5%</td>
+<td><span class="chip chip-spike">🔥 sessions +600%</span></td>
+</tr><tr>
+<td><span class="rank-badge">#6</span></td>
+<td><a href="seo-detail-goto-where.com-2026-03-16.html">goto-where.com</a></td>
+<td>27.0K <span style="color:#22c55e">▲ +7.2%</span></td>
+<td>1.2M <span style="color:#22c55e">▲ +8.5%</span></td>
+<td>722.9K <span style="color:#22c55e">▲ +1.7%</span></td>
+<td>6.3</td>
+<td>2.27%</td>
+<td style="color:#22c55e">36.4%</td>
+<td><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></td>
+</tr><tr>
+<td><span class="rank-badge">#7</span></td>
+<td><a href="seo-detail-foodplacee.com-2026-03-16.html">foodplacee.com</a></td>
+<td>26.4K <span style="color:#22c55e">▲ +6.4%</span></td>
+<td>1.1M <span style="color:#ef4444">▼ -1.7%</span></td>
+<td>3.0K <span style="color:#22c55e">▲ +774.4%</span></td>
+<td>8.7</td>
+<td>2.38%</td>
+<td style="color:#22c55e">42.2%</td>
+<td><span class="chip chip-spike">🔥 sessions +774%</span></td>
+</tr><tr>
+<td><span class="rank-badge">#8</span></td>
+<td><a href="seo-detail-placejoys.com-2026-03-16.html">placejoys.com</a></td>
+<td>17.9K <span style="color:#ef4444">▼ -2.7%</span></td>
+<td>805.1K <span style="color:#ef4444">▼ -1.9%</span></td>
+<td>461.2K <span style="color:#22c55e">▲ +7.4%</span></td>
+<td>8.0</td>
+<td>1.73%</td>
+<td style="color:#22c55e">37.5%</td>
+<td><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></td>
+</tr><tr>
+<td><span class="rank-badge">#9</span></td>
+<td><a href="seo-detail-menustic.com-2026-03-16.html">menustic.com</a></td>
+<td>16.8K <span style="color:#ef4444">▼ -6.2%</span></td>
+<td>787.8K <span style="color:#ef4444">▼ -15.8%</span></td>
+<td>439.5K <span style="color:#ef4444">▼ -0.8%</span></td>
+<td>7.3</td>
+<td>2.15%</td>
+<td style="color:#22c55e">42.6%</td>
+<td><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></td>
+</tr><tr>
+<td><span class="rank-badge">#10</span></td>
+<td><a href="seo-detail-wherevi.com-2026-03-16.html">wherevi.com</a></td>
+<td>17.3K <span style="color:#ef4444">▼ -9.9%</span></td>
+<td>826.8K <span style="color:#94a3b8">→ 0%</span></td>
+<td>466.9K <span style="color:#22c55e">▲ +8.7%</span></td>
+<td>7.4</td>
+<td>1.98%</td>
+<td style="color:#22c55e">37.5%</td>
+<td><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></td>
+</tr><tr>
+<td><span class="rank-badge">#11</span></td>
+<td><a href="seo-detail-grubbio.com-2026-03-16.html">grubbio.com</a></td>
+<td>15.3K <span style="color:#ef4444">▼ -13.5%</span></td>
+<td>736.6K <span style="color:#ef4444">▼ -16.9%</span></td>
+<td>650.8K <span style="color:#22c55e">▲ +9.1%</span></td>
+<td>8.5</td>
+<td>2.3%</td>
+<td style="color:#22c55e">34.1%</td>
+<td><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></td>
+</tr><tr>
+<td><span class="rank-badge">#12</span></td>
+<td><a href="seo-detail-menufyy.com-2026-03-16.html">menufyy.com</a></td>
+<td>13.3K <span style="color:#ef4444">▼ -33.8%</span></td>
+<td>705.7K <span style="color:#ef4444">▼ -24.4%</span></td>
+<td>406.1K <span style="color:#22c55e">▲ +35.3%</span></td>
+<td>7.7</td>
+<td>2.08%</td>
+<td style="color:#22c55e">39.7%</td>
+<td><span class="gray" style="font-size:0.75rem">✅ Ổn định</span></td>
+</tr></tbody>
+      </table>
     </div>
-
-    <div class="toc-sidebar">
-        <div class="toc-title">📑 Mục lục</div>
-        <ul class="toc-list">
-            <li><a href="#kpi-section">KPI Chính</a></li>
-            <li><a href="#traffic-trend">Xu hướng Lưu lượng</a></li>
-            <li><a href="#gsc-performance">Hiệu năng GSC</a></li>
-            <li><a href="#comparison">So sánh Website</a></li>
-            <li><a href="#anomalies">Bất thường</a></li>
-            <li><a href="#website-cards">Chi tiết Website</a></li>
-        </ul>
-    </div>
-
-    <div class="container">
-        <div class="section" id="kpi-section">
-            <h2 class="section-title">📈 KPI Chính (30 ngày gần nhất)</h2>
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-label">Tổng Phiên làm việc</div>
-                    <div class="kpi-value">5,909,850</div>
-                    <div class="kpi-change positive">↑ +12% so với 30 ngày trước</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">Tổng Người dùng</div>
-                    <div class="kpi-value">2,918,425</div>
-                    <div class="kpi-change positive">↑ +8% so với 30 ngày trước</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">Tổng Lượt xem trang</div>
-                    <div class="kpi-value">9,860,750</div>
-                    <div class="kpi-change positive">↑ +15% so với 30 ngày trước</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">Tỷ lệ Thoát trung bình</div>
-                    <div class="kpi-value">44.3%</div>
-                    <div class="kpi-change negative">↓ -3% so với 30 ngày trước</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-bar">
-            <div class="filter-group">
-                <label>🔍 Tìm kiếm Website:</label>
-                <input type="text" id="searchInput" placeholder="Nhập tên website...">
-            </div>
-            <div class="filter-group">
-                <label>📅 Loại bỏ trên:</label>
-                <select id="filterBy">
-                    <option value="">Tất cả</option>
-                    <option value="high-traffic">Lưu lượng cao (>500K phiên)</option>
-                    <option value="medium-traffic">Lưu lượng trung bình (100K-500K)</option>
-                    <option value="low-traffic">Lưu lượng thấp (<100K)</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="section" id="traffic-trend">
-            <h2 class="section-title">📊 Xu hướng Lưu lượng (60 ngày)</h2>
-            <div class="chart-container">
-                <div class="chart-wrapper">
-                    <canvas id="trafficChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="section" id="gsc-performance">
-            <h2 class="section-title">🔍 Hiệu năng Google Search Console</h2>
-            <div class="chart-container">
-                <div class="chart-wrapper">
-                    <canvas id="gscChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="section" id="comparison">
-            <h2 class="section-title">🏪 So sánh Website (30 ngày)</h2>
-            <table class="comparison-table" id="comparisonTable">
-                <thead>
-                    <tr>
-                        <th onclick="sortTable('website')">🌐 Website</th>
-                        <th onclick="sortTable('sessions')">Phiên (30d)</th>
-                        <th onclick="sortTable('users')">Người dùng</th>
-                        <th onclick="sortTable('pageviews')">Lượt xem</th>
-                        <th onclick="sortTable('bounce')">Tỷ lệ Thoát</th>
-                        <th onclick="sortTable('clicks')">Nhấp GSC</th>
-                        <th onclick="sortTable('impressions')">Ấn tượng</th>
-                        <th onclick="sortTable('ctr')">CTR</th>
-                        <th onclick="sortTable('position')">Vị trí</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                </tbody>
-            </table>
-        </div>
-
-        <div class="section" id="anomalies">
-            <h2 class="section-title">⚠️ Phát hiện Bất thường</h2>
-            <div class="anomaly-grid" id="anomalyGrid">
-            </div>
-        </div>
-
-        <div class="section" id="website-cards">
-            <h2 class="section-title">📱 Chi tiết Website</h2>
-            <div class="website-cards" id="websiteCardsContainer">
-            </div>
-        </div>
-
-        <footer>
-            <p>Báo cáo được tạo lúc: 16/03/2026</p>
-            <p>Dữ liệu từ Google Analytics 4 và Google Search Console</p>
-        </footer>
-    </div>
-
-    <script>
-        const restaurantData = {"localoria.com": {"ga4_30d_sessions": 93000, "ga4_30d_users": 45000, "ga4_30d_pageviews": 156000, "ga4_bounce_rate": 0.43, "gsc_30d_clicks": 6900, "gsc_impressions": 540000, "gsc_ctr": 0.0128, "gsc_position": 8.0}, "wherebly.com": {"ga4_30d_sessions": 3000, "ga4_30d_users": 1500, "ga4_30d_pageviews": 5000, "ga4_bounce_rate": 0.45, "gsc_30d_clicks": 375, "gsc_impressions": 15000, "gsc_ctr": 0.025, "gsc_position": 8.5}, "res-menu.net": {"ga4_30d_sessions": 1410000, "ga4_30d_users": 680000, "ga4_30d_pageviews": 2360000, "ga4_bounce_rate": 0.42, "gsc_30d_clicks": 480000, "gsc_impressions": 30000000, "gsc_ctr": 0.016, "gsc_position": 9.5}, "foodplacee.com": {"ga4_30d_sessions": 2850, "ga4_30d_users": 1425, "ga4_30d_pageviews": 4750, "ga4_bounce_rate": 0.48, "gsc_30d_clicks": 375, "gsc_impressions": 14000, "gsc_ctr": 0.0268, "gsc_position": 8.8}, "restaurants-world.net": {"ga4_30d_sessions": 660000, "ga4_30d_users": 320000, "ga4_30d_pageviews": 1100000, "ga4_bounce_rate": 0.41, "gsc_30d_clicks": 240000, "gsc_impressions": 39000000, "gsc_ctr": 0.0062, "gsc_position": 9.0}, "goto-where.com": {"ga4_30d_sessions": 900000, "ga4_30d_users": 450000, "ga4_30d_pageviews": 1500000, "ga4_bounce_rate": 0.56, "gsc_30d_clicks": 210000, "gsc_impressions": 45000000, "gsc_ctr": 0.0047, "gsc_position": 9.0}, "menu-world.com": {"ga4_30d_sessions": 1500000, "ga4_30d_users": 750000, "ga4_30d_pageviews": 2500000, "ga4_bounce_rate": 0.39, "gsc_30d_clicks": 810000, "gsc_impressions": 72000000, "gsc_ctr": 0.0113, "gsc_position": 8.7}, "grubbio.com": {"ga4_30d_sessions": 144000, "ga4_30d_users": 72000, "ga4_30d_pageviews": 240000, "ga4_bounce_rate": 0.46, "gsc_30d_clicks": 24900, "gsc_impressions": 3000000, "gsc_ctr": 0.0083, "gsc_position": 8.3}, "menustic.com": {"ga4_30d_sessions": 177000, "ga4_30d_users": 88500, "ga4_30d_pageviews": 295000, "ga4_bounce_rate": 0.44, "gsc_30d_clicks": 63000, "gsc_impressions": 7500000, "gsc_ctr": 0.0084, "gsc_position": 7.3}, "menufyy.com": {"ga4_30d_sessions": 225000, "ga4_30d_users": 112500, "ga4_30d_pageviews": 375000, "ga4_bounce_rate": 0.42, "gsc_30d_clicks": 69000, "gsc_impressions": 7800000, "gsc_ctr": 0.0088, "gsc_position": 8.0}, "wherevi.com": {"ga4_30d_sessions": 195000, "ga4_30d_users": 97500, "ga4_30d_pageviews": 325000, "ga4_bounce_rate": 0.45, "gsc_30d_clicks": 51000, "gsc_impressions": 3450000, "gsc_ctr": 0.0148, "gsc_position": 8.6}, "placejoys.com": {"ga4_30d_sessions": 600000, "ga4_30d_users": 300000, "ga4_30d_pageviews": 1000000, "ga4_bounce_rate": 0.4, "gsc_30d_clicks": 147000, "gsc_impressions": 15000000, "gsc_ctr": 0.0098, "gsc_position": 8.5}};
-        const chartColors = {
-            primary: '#3b82f6',
-            secondary: '#10b981',
-            tertiary: '#f59e0b',
-            danger: '#ef4444',
-            background: '#1e293b'
-        };
-
-        function initTOC() {
-            const sections = document.querySelectorAll('.section');
-            const tocLinks = document.querySelectorAll('.toc-list a');
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        tocLinks.forEach(link => link.classList.remove('active'));
-                        const activeLink = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
-                        if (activeLink) activeLink.classList.add('active');
-                    }
-                });
-            }, { threshold: 0.3 });
-            sections.forEach(section => observer.observe(section));
-        }
-
-        function createTrafficChart() {
-            const ctx = document.getElementById('trafficChart').getContext('2d');
-            const dates = ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"];
-            const sessions = [168063, 211379, 196456, 190074, 145801, 162864, 171305, 159849, 158739, 178109, 145035, 205018, 152420, 211576, 168231, 156574, 171740, 199671, 199806, 160047, 164485, 144018, 192906, 147829, 157727, 179498, 183179, 196268, 210237, 161246, 1108303, 191507, 214484, 181814, 177619, 197017, 162098, 166732, 202833, 183071, 182072, 200049, 164605, 191638, 193244, 230890, 222859, 211584, 167323, 221788, 206009, 217904, 207750, 199735, 218717, 222672, 195952, 1414487, 225929, 216552];
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: 'Tổng Phiên (12 Website)',
-                        data: sessions,
-                        borderColor: chartColors.primary,
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 3,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: chartColors.primary,
-                        pointBorderColor: '#0f172a',
-                        pointBorderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#cbd5e1', font: { size: 12 } }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#334155' },
-                            ticks: { color: '#cbd5e1' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#cbd5e1', maxRotation: 45, minRotation: 0 }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createGSCChart() {
-            const ctx = document.getElementById('gscChart').getContext('2d');
-            const dates = ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"];
-            const clicks = [53531, 53013, 41980, 59586, 54051, 69388, 56536, 70955, 52162, 66958, 62333, 51736, 43969, 63247, 59722, 44456, 72996, 53564, 76656, 64767, 49488, 73841, 54885, 69017, 55890, 57910, 56279, 63433, 68686, 74458, 89615, 69841, 56490, 55743, 73752, 50906, 90703, 82932, 75811, 70979, 61218, 49843, 54417, 50089, 65549, 52222, 59021, 60523, 58948, 72544, 86822, 53388, 85757, 76417, 83484, 85434, 56739, 52062, 58958, 65961];
-            const positions = [8.5, 8.0, 8.5, 8.4, 8.1, 8.3, 8.8, 8.7, 8.6, 8.8, 8.1, 8.9, 8.6, 8.2, 8.8, 8.5, 8.9, 8.8, 8.6, 8.5, 8.1, 8.8, 8.1, 8.2, 8.9, 8.8, 8.5, 8.9, 8.9, 8.3, 8.1, 8.6, 8.6, 8.2, 8.1, 8.9, 8.3, 8.6, 8.0, 8.3, 8.9, 8.1, 8.7, 8.7, 8.0, 8.7, 8.2, 8.5, 8.8, 8.8, 8.8, 8.2, 8.1, 8.4, 8.9, 8.8, 8.2, 8.3, 8.8, 9.0];
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [
-                        {
-                            label: 'Tổng Nhấp (GSC)',
-                            data: clicks,
-                            borderColor: chartColors.secondary,
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'Vị trí Trung bình',
-                            data: positions,
-                            borderColor: chartColors.tertiary,
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                            fill: false,
-                            tension: 0.4,
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: {
-                            labels: { color: '#cbd5e1', font: { size: 12 } }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            position: 'left',
-                            grid: { color: '#334155' },
-                            ticks: { color: '#cbd5e1' },
-                            title: { display: true, text: 'Nhấp', color: '#cbd5e1' }
-                        },
-                        y1: {
-                            type: 'linear',
-                            position: 'right',
-                            grid: { display: false },
-                            ticks: { color: '#cbd5e1' },
-                            title: { display: true, text: 'Vị trí', color: '#cbd5e1' },
-                            min: 0,
-                            max: 15
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#cbd5e1', maxRotation: 45, minRotation: 0 }
-                        }
-                    }
-                }
-            });
-        }
-
-        function populateTable() {
-            const tbody = document.getElementById('tableBody');
-            const rows = [];
-            for (const [site, data] of Object.entries(restaurantData)) {
-                rows.push({
-                    website: site,
-                    sessions: data.ga4_30d_sessions,
-                    users: data.ga4_30d_users,
-                    pageviews: data.ga4_30d_pageviews,
-                    bounce: data.ga4_bounce_rate,
-                    clicks: data.gsc_30d_clicks,
-                    impressions: data.gsc_impressions,
-                    ctr: data.gsc_ctr,
-                    position: data.gsc_position
-                });
-            }
-            rows.forEach(row => {
-                const tr = document.createElement('tr');
-                const bounceClass = row.bounce > 0.45 ? 'metric-bad' : 'metric-good';
-                const ctrClass = row.ctr > 0.015 ? 'metric-good' : 'metric-neutral';
-                tr.innerHTML = `
-                    <td><a class="site-name" href="seo-detail-${row.website}-2026-03-16.html" style="text-decoration:underline;cursor:pointer;">${row.website}</a></td>
-                    <td>${row.sessions.toLocaleString()}</td>
-                    <td>${row.users.toLocaleString()}</td>
-                    <td>${row.pageviews.toLocaleString()}</td>
-                    <td class="${bounceClass}">${(row.bounce * 100).toFixed(1)}%</td>
-                    <td>${row.clicks.toLocaleString()}</td>
-                    <td>${row.impressions.toLocaleString()}</td>
-                    <td class="${ctrClass}">${(row.ctr * 100).toFixed(2)}%</td>
-                    <td>${row.position.toFixed(1)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function populateAnomalies() {
-            const grid = document.getElementById('anomalyGrid');
-            const anomalies = [
-                { site: 'goto-where.com', type: 'spike', detail: '🔥 Mar 8: 154,957 phiên (5.2x bình thường)' },
-                { site: 'res-menu.net', type: 'spike', detail: '🔥 Mar 14: 99,269 phiên (2.1x bình thường)' },
-                { site: 'menufyy.com', type: 'spike', detail: '🔥 Mar 11: 79K phiên (10.5x bình thường)' },
-                { site: 'localoria.com', type: 'drop', detail: '📉 Mar 15: Bounce rate 99.7% (anomaly)' },
-                { site: 'res-menu.net', type: 'drop', detail: '📉 Mar 15: Bounce rate 99.5% (anomaly)' },
-                { site: 'menu-world.com', type: 'steady', detail: '✅ Tăng trưởng ổn định 50K-83K phiên/ngày' }
-            ];
-            anomalies.forEach(anom => {
-                const div = document.createElement('div');
-                div.className = `anomaly-card ${anom.type === 'drop' ? 'warning' : ''}`;
-                div.innerHTML = `
-                    <div class="anomaly-site"><a href="seo-detail-${anom.site}-2026-03-16.html" style="color:inherit;text-decoration:underline;">${anom.site}</a></div>
-                    <div class="anomaly-detail">${anom.detail}</div>
-                `;
-                grid.appendChild(div);
-            });
-        }
-
-        function populateWebsiteCards() {
-            const container = document.getElementById('websiteCardsContainer');
-            for (const [site, data] of Object.entries(restaurantData)) {
-                const card = document.createElement('div');
-                card.className = 'website-card';
-                card.innerHTML = `
-                    <div class="website-card-title"><a href="seo-detail-${site}-2026-03-16.html" style="color:inherit;text-decoration:underline;">${site}</a></div>
-                    <div class="website-metric">
-                        <span class="website-metric-label">Phiên (30d):</span>
-                        <span class="website-metric-value">${data.ga4_30d_sessions.toLocaleString()}</span>
-                    </div>
-                    <div class="website-metric">
-                        <span class="website-metric-label">Người dùng:</span>
-                        <span class="website-metric-value">${data.ga4_30d_users.toLocaleString()}</span>
-                    </div>
-                    <div class="website-metric">
-                        <span class="website-metric-label">Lượt xem:</span>
-                        <span class="website-metric-value">${data.ga4_30d_pageviews.toLocaleString()}</span>
-                    </div>
-                    <div class="website-metric">
-                        <span class="website-metric-label">Tỷ lệ Thoát:</span>
-                        <span class="website-metric-value">${(data.ga4_bounce_rate * 100).toFixed(1)}%</span>
-                    </div>
-                    <div class="website-metric">
-                        <span class="website-metric-label">Nhấp GSC:</span>
-                        <span class="website-metric-value">${data.gsc_30d_clicks.toLocaleString()}</span>
-                    </div>
-                    <div class="website-metric">
-                        <span class="website-metric-label">Ấn tượng:</span>
-                        <span class="website-metric-value">${data.gsc_impressions.toLocaleString()}</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            }
-        }
-
-        function sortTable(column) {
-            const tbody = document.getElementById('tableBody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            const idx = {'website': 0, 'sessions': 1, 'users': 2, 'pageviews': 3, 'bounce': 4, 'clicks': 5, 'impressions': 6, 'ctr': 7, 'position': 8}[column];
-            rows.sort((a, b) => {
-                let aVal = a.children[idx].textContent.replace(/[^0-9.-]/g, '');
-                let bVal = b.children[idx].textContent.replace(/[^0-9.-]/g, '');
-                return isNaN(aVal) ? aVal.localeCompare(bVal) : bVal - aVal;
-            });
-            rows.forEach(row => tbody.appendChild(row));
-        }
-
-        document.getElementById('searchInput').addEventListener('input', e => {
-            const query = e.target.value.toLowerCase();
-            document.querySelectorAll('#tableBody tr').forEach(row => {
-                const site = row.children[0].textContent.toLowerCase();
-                row.style.display = site.includes(query) ? '' : 'none';
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            createTrafficChart();
-            createGSCChart();
-            populateTable();
-            populateAnomalies();
-            populateWebsiteCards();
-            initTOC();
-        });
-    </script>
-</body>
-</html>
+  </div>
+  
+  <div style="text-align:center;color:#475569;font-size:0.75rem;padding:1rem 0;margin-top:1rem;border-top:1px solid #1e293b">
+    SEO Monitor Dashboard · Dữ liệu: 2026-03-16 · Powered by Windsor.ai
+  </div>
+</div>
+</body></html>
