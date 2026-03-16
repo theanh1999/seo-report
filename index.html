@@ -1,183 +1,131 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SEO Monitor Dashboard — Tổng quan</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<style>
-:root {
-  --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #e2e8f0;
-  --muted: #64748b; --accent: #3b82f6; --green: #22c55e; --red: #ef4444;
-  --yellow: #f59e0b;
-}
-[data-theme="light"] {
-  --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b;
-  --muted: #94a3b8; --accent: #2563eb; --green: #16a34a; --red: #dc2626; --yellow: #d97706;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5;transition:background 0.2s,color 0.2s}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-h1{font-size:1.5rem;font-weight:700}
-h2{font-size:1rem;font-weight:600;color:var(--muted);margin:1.5rem 0 0.75rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)}
-.hdr{background:var(--card);border-bottom:2px solid var(--accent);padding:0.75rem 1.5rem;position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.hdr-right{display:flex;align-items:center;gap:0.5rem}
-.hdr-links a{background:var(--bg);border:1px solid var(--border);padding:3px 10px;border-radius:4px;font-size:0.75rem;color:var(--muted);margin-left:0.25rem}
-.hdr-links a:hover{border-color:var(--accent);color:var(--accent)}
-.dark-btn{background:var(--card);border:1px solid var(--border);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem;color:var(--text)}
-.cross-bar{background:linear-gradient(135deg,#1d4ed8,#0369a1);padding:0.4rem 1.5rem;font-size:0.78rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap}
-.cross-bar a{color:#bfdbfe;font-weight:500}
-.toc{background:var(--card);border-bottom:1px solid var(--border);padding:0 1.5rem;position:sticky;top:57px;z-index:190;overflow-x:auto;white-space:nowrap}
-.toc a{display:inline-block;padding:0.6rem 0.75rem;font-size:0.75rem;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent;transition:all .2s}
-.toc a.active,.toc a:hover{color:var(--accent);border-bottom-color:var(--accent)}
-.container{max-width:1400px;margin:0 auto;padding:1.5rem}
-.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.75rem;margin:1rem 0}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.85rem 1rem;text-align:center}
-.kpi-val{font-size:1.4rem;font-weight:700;display:block}
-.kpi-lbl{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:0.2rem}
-.kpi-chg{font-size:0.72rem;margin-top:0.15rem}
-.panel{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:1.25rem}
-.chart-wrap{position:relative;height:200px}
-.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.tbl-wrap{overflow:auto;max-height:400px;border-radius:6px;border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-size:0.82rem}
-th{background:#020617;color:var(--muted);padding:0.5rem 0.75rem;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);position:sticky;top:0;cursor:pointer;user-select:none;white-space:nowrap}
-th:hover{color:var(--accent)}
-th.sort-asc::after{content:" ▲"}
-th.sort-desc::after{content:" ▼"}
-td{padding:0.45rem 0.75rem;border-bottom:1px solid var(--border)}
-tr:hover td{background:rgba(255,255,255,0.03)}
-.site-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
-.sc{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;transition:border-color .2s,transform .15s}
-.sc:hover{border-color:var(--accent);transform:translateY(-2px)}
-.sc-name{font-size:0.95rem;font-weight:600;color:var(--accent);margin-bottom:0.5rem;display:flex;align-items:center;justify-content:space-between}
-.sc-mets{display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin:0.5rem 0}
-.sc-met{text-align:center;padding:0.4rem;background:var(--bg);border-radius:4px}
-.sc-val{font-size:0.82rem;font-weight:600}
-.sc-lbl{font-size:0.6rem;color:var(--muted);text-transform:uppercase}
-.chip{display:inline-flex;align-items:center;gap:3px;font-size:0.7rem;padding:2px 6px;border-radius:4px;margin:2px}
-.chip-spike{background:#14532d;color:#86efac;border:1px solid #166534}
-.chip-drop{background:#450a0a;color:#fca5a5;border:1px solid #7f1d1d}
-.chip-warn{background:#431407;color:#fed7aa;border:1px solid #7c2d12}
-.anom-section{background:var(--card);border:1px solid var(--yellow);border-radius:8px;padding:1rem;margin-bottom:1.25rem}
-.anom-section h2{color:#fbbf24;border-color:#78350f}
-.anom-card{border:1px solid;border-radius:6px;padding:0.6rem 0.85rem;margin-bottom:0.5rem;font-size:0.82rem}
-.anom-critical{background:#450a0a;border-color:#7f1d1d;color:#fca5a5}
-.anom-warning{background:#431407;border-color:#7c2d12;color:#fed7aa}
-.anom-info{background:#0c1a2e;border-color:#1e3a5f;color:#93c5fd}
-.badge{background:var(--accent);color:#fff;font-size:0.65rem;padding:2px 7px;border-radius:999px;font-weight:600}
-.badge-up{background:#166534;color:#86efac}
-.badge-down{background:#7f1d1d;color:#fca5a5}
-.rank{background:#1d4ed8;color:#bfdbfe;font-size:0.7rem;padding:1px 6px;border-radius:3px;font-weight:600}
-.opp{background:#0c2d1a;border-left:3px solid var(--green);padding:0.5rem 0.75rem;border-radius:4px;margin:3px 0;font-size:0.8rem}
-.footer{text-align:center;color:var(--muted);font-size:0.72rem;padding:1.5rem 0;margin-top:1rem;border-top:1px solid var(--border)}
-@media(max-width:768px){.charts-grid{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}.site-grid{grid-template-columns:1fr}}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo SEO - Trang chủ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0f172a;
+            color: #e5e7eb;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; color: #3b82f6; }
+        .subtitle { color: #9ca3af; margin-bottom: 40px; font-size: 1.1em; }
+        
+        .sections { display: grid; gap: 30px; }
+        .section { background: #1e293b; padding: 30px; border-radius: 8px; }
+        .section h2 { color: #3b82f6; margin-bottom: 20px; }
+        .links { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .link-card {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.3s ease;
+        }
+        .link-card:hover {
+            background: #1f2937;
+            transform: translateX(5px);
+        }
+        .link-title { font-weight: bold; color: #3b82f6; }
+        .link-desc { font-size: 0.9em; color: #d1d5db; margin-top: 5px; }
+        
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #334155; color: #9ca3af; text-align: center; }
+    </style>
 </head>
 <body>
-<header class="hdr">
-  <div><h1>🏠 SEO Monitor Dashboard</h1><small style="color:var(--muted)">Tổng quan tất cả báo cáo</small></div>
-  <button class="dark-btn" id="darkBtn" onclick="toggleDarkMode()">☀️ Light</button>
-</header>
-<div class="container">
-
-<h2 style="margin-top:1rem">📅 Báo cáo mới nhất — 16/03/2026</h2>
-<div style="display:flex;gap:1rem;margin:1rem 0;flex-wrap:wrap">
-  <a href="seo-restaurants-2026-03-16.html" style="background:#1d4ed8;color:#fff;padding:0.6rem 1.2rem;border-radius:6px;font-size:0.9rem">🍽 Xem báo cáo Nhà hàng (12 website)</a>
-  <a href="seo-hotels-2026-03-16.html" style="background:#0369a1;color:#fff;padding:0.6rem 1.2rem;border-radius:6px;font-size:0.9rem">🏨 Xem báo cáo Khách sạn (1 website)</a>
-</div>
-
-<h2>📊 Lịch sử báo cáo</h2>
-<div class="tbl-wrap">
-<table>
-<thead><tr><th>Ngày</th><th>Nhà hàng</th><th>Khách sạn</th><th>Chi tiết</th></tr></thead>
-<tbody><tr>
-<td>16/03/2026 <span style="background:#166534;color:#86efac;font-size:0.65rem;padding:1px 6px;border-radius:999px">Mới nhất</span></td>
-<td><a href="seo-restaurants-2026-03-16.html">🍽 Xem báo cáo Nhà hàng</a></td>
-<td><a href="seo-hotels-2026-03-16.html">🏨 Xem báo cáo Khách sạn</a></td>
-<td><a href="index.html#detail-2026-03-16">📋 Chi tiết</a></td>
-</tr></tbody>
-</table>
-</div>
-
-<h2 id="detail-2026-03-16" style="margin-top:1.5rem">🔍 Báo cáo chi tiết — 16/03/2026</h2>
-<div style="margin-top:0.5rem"><a href="seo-detail-localoria.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">localoria.com</a><a href="seo-detail-wherebly.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">wherebly.com</a><a href="seo-detail-res-menu.net-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">res-menu.net</a><a href="seo-detail-foodplacee.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">foodplacee.com</a><a href="seo-detail-restaurants-world.net-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">restaurants-world.net</a><a href="seo-detail-goto-where.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">goto-where.com</a><a href="seo-detail-menu-world.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">menu-world.com</a><a href="seo-detail-grubbio.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">grubbio.com</a><a href="seo-detail-menustic.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">menustic.com</a><a href="seo-detail-menufyy.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">menufyy.com</a><a href="seo-detail-wherevi.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">wherevi.com</a><a href="seo-detail-placejoys.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">placejoys.com</a><a href="seo-detail-gohotelly.com-2026-03-16.html" style="display:inline-block;margin:3px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:0.78rem">gohotelly.com</a></div>
-
-</div>
-<div class="footer">SEO Monitor Dashboard · Cập nhật: 16/03/2026 · Powered by Windsor.ai</div>
-<script>
-function toggleDarkMode() {
-  const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') !== 'light';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  const btn = document.getElementById('darkBtn');
-  if(btn) btn.textContent = isDark ? '🌙 Dark' : '☀️ Light';
-  document.querySelectorAll('canvas').forEach(c => {
-    if(c.chart) { c.chart.options.scales && Object.values(c.chart.options.scales).forEach(s => {
-      s.ticks = s.ticks || {};
-      s.ticks.color = isDark ? '#94a3b8' : '#475569';
-      s.grid = s.grid || {};
-      s.grid.color = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-    }); c.chart.update(); }
-  });
-}
-
-function initTOC() {
-  const toc = document.getElementById('toc');
-  if(!toc) return;
-  const links = toc.querySelectorAll('a[href^="#"]');
-  const sections = [];
-  links.forEach(a => {
-    const id = a.getAttribute('href').slice(1);
-    const el = document.getElementById(id);
-    if(el) sections.push({el, a});
-  });
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if(e.isIntersecting) {
-        const s = sections.find(s => s.el === e.target);
-        if(s) {
-          links.forEach(a => a.classList.remove('active'));
-          s.a.classList.add('active');
-        }
-      }
-    });
-  }, {rootMargin:'-60px 0px -70% 0px'});
-  sections.forEach(s => observer.observe(s.el));
-  links.forEach(a => {
-    a.addEventListener('click', e => {
-      e.preventDefault();
-      const id = a.getAttribute('href').slice(1);
-      document.getElementById(id)?.scrollIntoView({behavior:'smooth'});
-    });
-  });
-}
-
-function makeSortable(tableId) {
-  const table = document.getElementById(tableId);
-  if(!table) return;
-  const ths = table.querySelectorAll('th[data-col]');
-  ths.forEach(th => {
-    th.addEventListener('click', () => {
-      const col = th.getAttribute('data-col');
-      const asc = th.classList.contains('sort-asc');
-      ths.forEach(t => t.classList.remove('sort-asc','sort-desc'));
-      th.classList.add(asc ? 'sort-desc' : 'sort-asc');
-      const tbody = table.querySelector('tbody');
-      const rows = Array.from(tbody.querySelectorAll('tr'));
-      rows.sort((a, b) => {
-        const aVal = a.cells[parseInt(col)]?.getAttribute('data-val') || a.cells[parseInt(col)]?.textContent || '0';
-        const bVal = b.cells[parseInt(col)]?.getAttribute('data-val') || b.cells[parseInt(col)]?.textContent || '0';
-        const aNum = parseFloat(aVal.replace(/[^0-9.-]/g,'')) || 0;
-        const bNum = parseFloat(bVal.replace(/[^0-9.-]/g,'')) || 0;
-        return asc ? bNum - aNum : aNum - bNum;
-      });
-      rows.forEach(r => tbody.appendChild(r));
-    });
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => { initTOC(); });
-</script>
-</body></html>
+    <div class="container">
+        <h1>Báo cáo SEO</h1>
+        <p class="subtitle">Tổng quan về hiệu suất trang web | 16 tháng 3, 2026</p>
+        
+        <div class="sections">
+            <div class="section">
+                <h2>Tổng quan</h2>
+                <div class="links">
+                    <a href="seo-restaurants-2026-03-16.html" class="link-card">
+                        <div class="link-title">Nhà hàng</div>
+                        <div class="link-desc">Tổng quan 12 trang web nhà hàng</div>
+                    </a>
+                    <a href="seo-hotels-2026-03-16.html" class="link-card">
+                        <div class="link-title">Khách sạn</div>
+                        <div class="link-desc">Báo cáo chi tiết gohotelly.com</div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Trang web nhà hàng</h2>
+                <div class="links">
+                    <a href="seo-detail-localoria.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">localoria.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-wherebly.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">wherebly.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-res-menu.net-2026-03-16.html" class="link-card">
+                        <div class="link-title">res-menu.net</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-foodplacee.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">foodplacee.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-restaurants-world.net-2026-03-16.html" class="link-card">
+                        <div class="link-title">restaurants-world.net</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-goto-where.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">goto-where.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-menu-world.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">menu-world.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-grubbio.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">grubbio.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-menustic.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">menustic.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-menufyy.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">menufyy.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-wherevi.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">wherevi.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                    <a href="seo-detail-placejoys.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">placejoys.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Khách sạn</h2>
+                <div class="links">
+                    <a href="seo-detail-gohotelly.com-2026-03-16.html" class="link-card">
+                        <div class="link-title">gohotelly.com</div>
+                        <div class="link-desc">Chi tiết & biểu đồ</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Báo cáo được tạo vào 16 tháng 3, 2026</p>
+        </div>
+    </div>
+</body>
+</html>
