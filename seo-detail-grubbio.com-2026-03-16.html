@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo chi tiết: grubbio.com</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #e5e7eb; }
+        body.dark { background-color: #0f172a; }
+        body.light { background-color: #f3f4f6; color: #1f2937; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        .header { margin-bottom: 30px; border-bottom: 2px solid #1e293b; padding-bottom: 20px; }
+        .header h1 { font-size: 2em; margin-bottom: 10px; }
+        .header p { color: #9ca3af; }
+        .mode-toggle { float: right; }
+        .mode-toggle button { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        
+        .nav-links { margin: 20px 0; }
+        .nav-links a { background: #1e293b; padding: 8px 12px; border-radius: 6px; text-decoration: none; color: #3b82f6; margin-right: 10px; font-size: 0.9em; }
+        
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .kpi-card { background: #1e293b; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; }
+        .kpi-label { font-size: 0.9em; color: #9ca3af; margin-bottom: 8px; }
+        .kpi-value { font-size: 1.8em; font-weight: bold; margin-bottom: 8px; }
+        .kpi-change { font-size: 0.9em; }
+        
+        section { margin: 40px 0; }
+        h2 { font-size: 1.5em; margin: 30px 0 20px 0; color: #3b82f6; }
+        
+        .chart-container { background: #1e293b; padding: 20px; border-radius: 8px; margin: 15px 0; position: relative; height: 300px; }
+        
+        table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 8px; margin: 15px 0; }
+        th { background: #334155; padding: 12px; text-align: left; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #334155; }
+        tr:hover { background: #1f2937; }
+        
+        .no-data { color: #9ca3af; padding: 20px; text-align: center; font-style: italic; }
+        
+        /* Light mode */
+        body.light { background-color: #f3f4f6; color: #1f2937; }
+        body.light .header { border-bottom-color: #e5e7eb; }
+        body.light .nav-links a, body.light .kpi-card, body.light .chart-container, body.light table { background: #fff; border-color: #e5e7eb; }
+        body.light th { background: #f3f4f6; }
+        
+        @media (max-width: 768px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+            table { font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body class="dark">
+    <div class="container">
+        <div class="header">
+            <div class="mode-toggle"><button onclick="toggleMode()">Chế độ sáng</button></div>
+            <h1>grubbio.com</h1>
+            <p>Nhà hàng | 16 tháng 3, 2026</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="seo-restaurants-2026-03-16.html">← Quay lại Nhà hàng</a>
+            <a href="seo-hotels-2026-03-16.html">← Quay lại Khách sạn</a>
+        </div>
+        
+        <section>
+            <h2>Chỉ số chính (30 ngày)</h2>
+            <div class="kpi-grid" id="kpiGrid"></div>
+        </section>
+        
+        <section>
+            <h2>Biểu đồ GA4</h2>
+            <div class="chart-container"><canvas id="sessionsChart"></canvas></div>
+            <div class="chart-container"><canvas id="bounceChart"></canvas></div>
+        </section>
+        
+        <section>
+            <h2>Biểu đồ GSC</h2>
+            <div class="chart-container"><canvas id="clicksChart"></canvas></div>
+            <div class="chart-container"><canvas id="positionChart"></canvas></div>
+        </section>
+        
+        <section>
+            <h2>Từ khóa hàng đầu</h2>
+            <table id="keywordsTable">
+                <thead><tr>
+                    <th>Từ khóa</th>
+                    <th>Nhấp</th>
+                    <th>Lần hiển thị</th>
+                    <th>CTR</th>
+                    <th>Vị trí</th>
+                </tr></thead>
+                <tbody id="keywordsBody"></tbody>
+            </table>
+        </section>
+        
+        <section>
+            <h2>Trang hàng đầu</h2>
+            <table id="pagesTable">
+                <thead><tr>
+                    <th>URL</th>
+                    <th>Nhấp</th>
+                    <th>Lần hiển thị</th>
+                    <th>CTR</th>
+                    <th>Vị trí</th>
+                </tr></thead>
+                <tbody id="pagesBody"></tbody>
+            </table>
+        </section>
+    </div>
+    
+    <script>
+        const domainData = {"domain": "grubbio.com", "type": "restaurant", "ga4": {"raw": {"domain": "grubbio.com", "account_id": "501377762", "last_updated": "2026-03-16", "data_range": {"from": "2026-01-15", "to": "2026-03-15"}, "rows": [{"date": "2026-01-15", "active_users": 3790, "sessions": 4308, "screen_page_views": 6428, "bounce_rate": 0.5248, "engagement_rate": 0.4752, "average_session_duration": 86.8144, "newusers": 3673, "totalusers": 4040}, {"date": "2026-01-16", "active_users": 4456, "sessions": 4990, "screen_page_views": 7533, "bounce_rate": 0.5329, "engagement_rate": 0.4671, "average_session_duration": 78.1628, "newusers": 4332, "totalusers": 4713}, {"date": "2026-01-17", "active_users": 5560, "sessions": 6177, "screen_page_views": 8588, "bounce_rate": 0.6286, "engagement_rate": 0.3714, "average_session_duration": 63.4375, "newusers": 5404, "totalusers": 5824}, {"date": "2026-01-18", "active_users": 4483, "sessions": 5053, "screen_page_views": 7454, "bounce_rate": 0.5636, "engagement_rate": 0.4364, "average_session_duration": 72.1062, "newusers": 4356, "totalusers": 4754}, {"date": "2026-01-19", "active_users": 4225, "sessions": 4859, "screen_page_views": 6736, "bounce_rate": 0.5797, "engagement_rate": 0.4203, "average_session_duration": 75.4433, "newusers": 4104, "totalusers": 4500}, {"date": "2026-01-20", "active_users": 3804, "sessions": 4260, "screen_page_views": 6094, "bounce_rate": 0.5638, "engagement_rate": 0.4362, "average_session_duration": 66.3632, "newusers": 3676, "totalusers": 4029}, {"date": "2026-01-21", "active_users": 3803, "sessions": 4277, "screen_page_views": 6086, "bounce_rate": 0.5623, "engagement_rate": 0.4377, "average_session_duration": 69.5859, "newusers": 3678, "totalusers": 4043}, {"date": "2026-01-22", "active_users": 3776, "sessions": 4386, "screen_page_views": 6248, "bounce_rate": 0.5634, "engagement_rate": 0.4366, "average_session_duration": 77.9233, "newusers": 3659, "totalusers": 3984}, {"date": "2026-01-23", "active_users": 3870, "sessions": 4293, "screen_page_views": 6352, "bounce_rate": 0.5386, "engagement_rate": 0.4614, "average_session_duration": 79.8413, "newusers": 3722, "totalusers": 4106}, {"date": "2026-01-24", "active_users": 3952, "sessions": 4611, "screen_page_views": 6564, "bounce_rate": 0.5441, "engagement_rate": 0.4559, "average_session_duration": 81.2499, "newusers": 3820, "totalusers": 4209}, {"date": "2026-01-25", "active_users": 3388, "sessions": 3919, "screen_page_views": 5689, "bounce_rate": 0.5272, "engagement_rate": 0.4728, "average_session_duration": 69.6739, "newusers": 3294, "totalusers": 3641}, {"date": "2026-01-26", "active_users": 3210, "sessions": 3691, "screen_page_views": 5490, "bounce_rate": 0.5134, "engagement_rate": 0.4866, "average_session_duration": 83.393, "newusers": 3087, "totalusers": 3454}, {"date": "2026-01-27", "active_users": 3318, "sessions": 3790, "screen_page_views": 5597, "bounce_rate": 0.5058, "engagement_rate": 0.4942, "average_session_duration": 77.3065, "newusers": 3212, "totalusers": 3543}, {"date": "2026-01-28", "active_users": 3457, "sessions": 3994, "screen_page_views": 5928, "bounce_rate": 0.5008, "engagement_rate": 0.4992, "average_session_duration": 85.9648, "newusers": 3310, "totalusers": 3713}, {"date": "2026-01-29", "active_users": 3496, "sessions": 3923, "screen_page_views": 5885, "bounce_rate": 0.4971, "engagement_rate": 0.5029, "average_session_duration": 79.1314, "newusers": 3348, "totalusers": 3696}, {"date": "2026-01-30", "active_users": 3841, "sessions": 4416, "screen_page_views": 6730, "bounce_rate": 0.4957, "engagement_rate": 0.5043, "average_session_duration": 93.1396, "newusers": 3687, "totalusers": 4082}, {"date": "2026-01-31", "active_users": 4138, "sessions": 4920, "screen_page_views": 7078, "bounce_rate": 0.538, "engagement_rate": 0.462, "average_session_duration": 79.2085, "newusers": 3988, "totalusers": 4406}, {"date": "2026-02-01", "active_users": 3748, "sessions": 4386, "screen_page_views": 6395, "bounce_rate": 0.5233, "engagement_rate": 0.4767, "average_session_duration": 74.8413, "newusers": 3624, "totalusers": 4020}, {"date": "2026-02-02", "active_users": 3360, "sessions": 3923, "screen_page_views": 5668, "bounce_rate": 0.5315, "engagement_rate": 0.4685, "average_session_duration": 80.0586, "newusers": 3230, "totalusers": 3618}, {"date": "2026-02-03", "active_users": 3424, "sessions": 3906, "screen_page_views": 5798, "bounce_rate": 0.5133, "engagement_rate": 0.4867, "average_session_duration": 85.6976, "newusers": 3290, "totalusers": 3672}, {"date": "2026-02-04", "active_users": 3623, "sessions": 4193, "screen_page_views": 6116, "bounce_rate": 0.5156, "engagement_rate": 0.4844, "average_session_duration": 81.5492, "newusers": 3476, "totalusers": 3870}, {"date": "2026-02-05", "active_users": 3851, "sessions": 4470, "screen_page_views": 6593, "bounce_rate": 0.519, "engagement_rate": 0.481, "average_session_duration": 81.8251, "newusers": 3744, "totalusers": 4101}, {"date": "2026-02-06", "active_users": 4329, "sessions": 4934, "screen_page_views": 7208, "bounce_rate": 0.5197, "engagement_rate": 0.4803, "average_session_duration": 115.8371, "newusers": 4182, "totalusers": 4579}, {"date": "2026-02-07", "active_users": 4549, "sessions": 5106, "screen_page_views": 7641, "bounce_rate": 0.4816, "engagement_rate": 0.5184, "average_session_duration": 73.6142, "newusers": 4404, "totalusers": 4826}, {"date": "2026-02-08", "active_users": 4438, "sessions": 5020, "screen_page_views": 7289, "bounce_rate": 0.5373, "engagement_rate": 0.4627, "average_session_duration": 73.3766, "newusers": 4281, "totalusers": 4750}, {"date": "2026-02-09", "active_users": 3649, "sessions": 4126, "screen_page_views": 6042, "bounce_rate": 0.493, "engagement_rate": 0.507, "average_session_duration": 72.4558, "newusers": 3536, "totalusers": 3846}, {"date": "2026-02-10", "active_users": 3428, "sessions": 3952, "screen_page_views": 5936, "bounce_rate": 0.4701, "engagement_rate": 0.5299, "average_session_duration": 87.0097, "newusers": 3260, "totalusers": 3641}, {"date": "2026-02-11", "active_users": 3483, "sessions": 3966, "screen_page_views": 6061, "bounce_rate": 0.4448, "engagement_rate": 0.5552, "average_session_duration": 78.76, "newusers": 3355, "totalusers": 3707}, {"date": "2026-02-12", "active_users": 3760, "sessions": 4206, "screen_page_views": 6444, "bounce_rate": 0.4425, "engagement_rate": 0.5575, "average_session_duration": 82.6389, "newusers": 3587, "totalusers": 3976}, {"date": "2026-02-13", "active_users": 4186, "sessions": 4763, "screen_page_views": 7047, "bounce_rate": 0.4608, "engagement_rate": 0.5392, "average_session_duration": 78.2659, "newusers": 3995, "totalusers": 4405}, {"date": "2026-02-14", "active_users": 4601, "sessions": 5235, "screen_page_views": 7789, "bounce_rate": 0.4701, "engagement_rate": 0.5299, "average_session_duration": 73.6167, "newusers": 4415, "totalusers": 4824}, {"date": "2026-02-15", "active_users": 4156, "sessions": 4817, "screen_page_views": 7008, "bounce_rate": 0.4939, "engagement_rate": 0.5061, "average_session_duration": 73.4282, "newusers": 3999, "totalusers": 4424}, {"date": "2026-02-16", "active_users": 3820, "sessions": 4387, "screen_page_views": 6422, "bounce_rate": 0.4775, "engagement_rate": 0.5225, "average_session_duration": 97.7137, "newusers": 3647, "totalusers": 4064}, {"date": "2026-02-17", "active_users": 3740, "sessions": 4197, "screen_page_views": 6377, "bounce_rate": 0.4589, "engagement_rate": 0.5411, "average_session_duration": 85.9745, "newusers": 3576, "totalusers": 3971}, {"date": "2026-02-18", "active_users": 4893, "sessions": 5411, "screen_page_views": 7592, "bounce_rate": 0.5866, "engagement_rate": 0.4134, "average_session_duration": 58.3978, "newusers": 4746, "totalusers": 5119}, {"date": "2026-02-19", "active_users": 4068, "sessions": 4537, "screen_page_views": 6781, "bounce_rate": 0.4823, "engagement_rate": 0.5177, "average_session_duration": 79.4079, "newusers": 3888, "totalusers": 4275}, {"date": "2026-02-20", "active_users": 4769, "sessions": 5406, "screen_page_views": 7855, "bounce_rate": 0.5098, "engagement_rate": 0.4902, "average_session_duration": 74.8128, "newusers": 4604, "totalusers": 5014}, {"date": "2026-02-21", "active_users": 4574, "sessions": 5104, "screen_page_views": 7574, "bounce_rate": 0.4702, "engagement_rate": 0.5298, "average_session_duration": 70.4525, "newusers": 4406, "totalusers": 4812}, {"date": "2026-02-22", "active_users": 4621, "sessions": 5149, "screen_page_views": 7402, "bounce_rate": 0.4809, "engagement_rate": 0.5191, "average_session_duration": 60.6433, "newusers": 4467, "totalusers": 4874}, {"date": "2026-02-23", "active_users": 3504, "sessions": 3925, "screen_page_views": 5885, "bounce_rate": 0.4494, "engagement_rate": 0.5506, "average_session_duration": 72.1623, "newusers": 3364, "totalusers": 3717}, {"date": "2026-02-24", "active_users": 7929, "sessions": 8372, "screen_page_views": 10644, "bounce_rate": 0.7033, "engagement_rate": 0.2967, "average_session_duration": 43.5468, "newusers": 7834, "totalusers": 8150}, {"date": "2026-02-25", "active_users": 22249, "sessions": 22749, "screen_page_views": 24909, "bounce_rate": 0.8828, "engagement_rate": 0.1172, "average_session_duration": 18.5019, "newusers": 22052, "totalusers": 22523}, {"date": "2026-02-26", "active_users": 4584, "sessions": 5068, "screen_page_views": 7281, "bounce_rate": 0.4919, "engagement_rate": 0.5081, "average_session_duration": 81.1014, "newusers": 4413, "totalusers": 4832}, {"date": "2026-02-27", "active_users": 4649, "sessions": 5190, "screen_page_views": 7612, "bounce_rate": 0.4759, "engagement_rate": 0.5241, "average_session_duration": 76.0161, "newusers": 4484, "totalusers": 4896}, {"date": "2026-02-28", "active_users": 4692, "sessions": 5421, "screen_page_views": 7850, "bounce_rate": 0.5064, "engagement_rate": 0.4936, "average_session_duration": 73.4726, "newusers": 4502, "totalusers": 4971}, {"date": "2026-03-01", "active_users": 4260, "sessions": 4851, "screen_page_views": 7063, "bounce_rate": 0.5028, "engagement_rate": 0.4972, "average_session_duration": 72.4167, "newusers": 4090, "totalusers": 4527}, {"date": "2026-03-02", "active_users": 3717, "sessions": 4216, "screen_page_views": 6062, "bounce_rate": 0.4929, "engagement_rate": 0.5071, "average_session_duration": 75.3648, "newusers": 3551, "totalusers": 3974}, {"date": "2026-03-03", "active_users": 3749, "sessions": 4304, "screen_page_views": 5998, "bounce_rate": 0.5137, "engagement_rate": 0.4863, "average_session_duration": 73.1497, "newusers": 3584, "totalusers": 3986}, {"date": "2026-03-04", "active_users": 3712, "sessions": 4245, "screen_page_views": 6293, "bounce_rate": 0.4707, "engagement_rate": 0.5293, "average_session_duration": 88.4313, "newusers": 3547, "totalusers": 3964}, {"date": "2026-03-05", "active_users": 4149, "sessions": 4622, "screen_page_views": 6750, "bounce_rate": 0.4913, "engagement_rate": 0.5087, "average_session_duration": 72.8527, "newusers": 3999, "totalusers": 4412}, {"date": "2026-03-06", "active_users": 4245, "sessions": 4763, "screen_page_views": 7015, "bounce_rate": 0.4921, "engagement_rate": 0.5079, "average_session_duration": 74.5893, "newusers": 4073, "totalusers": 4506}, {"date": "2026-03-07", "active_users": 4483, "sessions": 4952, "screen_page_views": 7466, "bounce_rate": 0.4752, "engagement_rate": 0.5248, "average_session_duration": 70.2957, "newusers": 4329, "totalusers": 4741}, {"date": "2026-03-08", "active_users": 10198, "sessions": 10828, "screen_page_views": 12931, "bounce_rate": 0.7118, "engagement_rate": 0.2882, "average_session_duration": 35.3312, "newusers": 10086, "totalusers": 10444}, {"date": "2026-03-09", "active_users": 3598, "sessions": 4274, "screen_page_views": 5724, "bounce_rate": 0.54, "engagement_rate": 0.46, "average_session_duration": 66.5928, "newusers": 3476, "totalusers": 3861}, {"date": "2026-03-10", "active_users": 3732, "sessions": 4296, "screen_page_views": 5963, "bounce_rate": 0.5116, "engagement_rate": 0.4884, "average_session_duration": 71.53, "newusers": 3599, "totalusers": 3992}, {"date": "2026-03-11", "active_users": 3773, "sessions": 4300, "screen_page_views": 6041, "bounce_rate": 0.5053, "engagement_rate": 0.4947, "average_session_duration": 73.2829, "newusers": 3629, "totalusers": 4028}, {"date": "2026-03-12", "active_users": 4322, "sessions": 4706, "screen_page_views": 6645, "bounce_rate": 0.5138, "engagement_rate": 0.4862, "average_session_duration": 65.5354, "newusers": 4140, "totalusers": 4524}, {"date": "2026-03-13", "active_users": 4447, "sessions": 4961, "screen_page_views": 7057, "bounce_rate": 0.5053, "engagement_rate": 0.4947, "average_session_duration": 76.3669, "newusers": 4271, "totalusers": 4707}, {"date": "2026-03-14", "active_users": 4593, "sessions": 5075, "screen_page_views": 7210, "bounce_rate": 0.5163, "engagement_rate": 0.4837, "average_session_duration": 72.576, "newusers": 4448, "totalusers": 4865}, {"date": "2026-03-15", "active_users": 3146, "sessions": 3597, "screen_page_views": 5019, "bounce_rate": 0.5466, "engagement_rate": 0.4534, "average_session_duration": 68.7432, "newusers": 3027, "totalusers": 3371}]}, "rows": [{"date": "2026-01-15", "active_users": 3790, "sessions": 4308, "screen_page_views": 6428, "bounce_rate": 0.5248, "engagement_rate": 0.4752, "average_session_duration": 86.8144, "newusers": 3673, "totalusers": 4040}, {"date": "2026-01-16", "active_users": 4456, "sessions": 4990, "screen_page_views": 7533, "bounce_rate": 0.5329, "engagement_rate": 0.4671, "average_session_duration": 78.1628, "newusers": 4332, "totalusers": 4713}, {"date": "2026-01-17", "active_users": 5560, "sessions": 6177, "screen_page_views": 8588, "bounce_rate": 0.6286, "engagement_rate": 0.3714, "average_session_duration": 63.4375, "newusers": 5404, "totalusers": 5824}, {"date": "2026-01-18", "active_users": 4483, "sessions": 5053, "screen_page_views": 7454, "bounce_rate": 0.5636, "engagement_rate": 0.4364, "average_session_duration": 72.1062, "newusers": 4356, "totalusers": 4754}, {"date": "2026-01-19", "active_users": 4225, "sessions": 4859, "screen_page_views": 6736, "bounce_rate": 0.5797, "engagement_rate": 0.4203, "average_session_duration": 75.4433, "newusers": 4104, "totalusers": 4500}, {"date": "2026-01-20", "active_users": 3804, "sessions": 4260, "screen_page_views": 6094, "bounce_rate": 0.5638, "engagement_rate": 0.4362, "average_session_duration": 66.3632, "newusers": 3676, "totalusers": 4029}, {"date": "2026-01-21", "active_users": 3803, "sessions": 4277, "screen_page_views": 6086, "bounce_rate": 0.5623, "engagement_rate": 0.4377, "average_session_duration": 69.5859, "newusers": 3678, "totalusers": 4043}, {"date": "2026-01-22", "active_users": 3776, "sessions": 4386, "screen_page_views": 6248, "bounce_rate": 0.5634, "engagement_rate": 0.4366, "average_session_duration": 77.9233, "newusers": 3659, "totalusers": 3984}, {"date": "2026-01-23", "active_users": 3870, "sessions": 4293, "screen_page_views": 6352, "bounce_rate": 0.5386, "engagement_rate": 0.4614, "average_session_duration": 79.8413, "newusers": 3722, "totalusers": 4106}, {"date": "2026-01-24", "active_users": 3952, "sessions": 4611, "screen_page_views": 6564, "bounce_rate": 0.5441, "engagement_rate": 0.4559, "average_session_duration": 81.2499, "newusers": 3820, "totalusers": 4209}, {"date": "2026-01-25", "active_users": 3388, "sessions": 3919, "screen_page_views": 5689, "bounce_rate": 0.5272, "engagement_rate": 0.4728, "average_session_duration": 69.6739, "newusers": 3294, "totalusers": 3641}, {"date": "2026-01-26", "active_users": 3210, "sessions": 3691, "screen_page_views": 5490, "bounce_rate": 0.5134, "engagement_rate": 0.4866, "average_session_duration": 83.393, "newusers": 3087, "totalusers": 3454}, {"date": "2026-01-27", "active_users": 3318, "sessions": 3790, "screen_page_views": 5597, "bounce_rate": 0.5058, "engagement_rate": 0.4942, "average_session_duration": 77.3065, "newusers": 3212, "totalusers": 3543}, {"date": "2026-01-28", "active_users": 3457, "sessions": 3994, "screen_page_views": 5928, "bounce_rate": 0.5008, "engagement_rate": 0.4992, "average_session_duration": 85.9648, "newusers": 3310, "totalusers": 3713}, {"date": "2026-01-29", "active_users": 3496, "sessions": 3923, "screen_page_views": 5885, "bounce_rate": 0.4971, "engagement_rate": 0.5029, "average_session_duration": 79.1314, "newusers": 3348, "totalusers": 3696}, {"date": "2026-01-30", "active_users": 3841, "sessions": 4416, "screen_page_views": 6730, "bounce_rate": 0.4957, "engagement_rate": 0.5043, "average_session_duration": 93.1396, "newusers": 3687, "totalusers": 4082}, {"date": "2026-01-31", "active_users": 4138, "sessions": 4920, "screen_page_views": 7078, "bounce_rate": 0.538, "engagement_rate": 0.462, "average_session_duration": 79.2085, "newusers": 3988, "totalusers": 4406}, {"date": "2026-02-01", "active_users": 3748, "sessions": 4386, "screen_page_views": 6395, "bounce_rate": 0.5233, "engagement_rate": 0.4767, "average_session_duration": 74.8413, "newusers": 3624, "totalusers": 4020}, {"date": "2026-02-02", "active_users": 3360, "sessions": 3923, "screen_page_views": 5668, "bounce_rate": 0.5315, "engagement_rate": 0.4685, "average_session_duration": 80.0586, "newusers": 3230, "totalusers": 3618}, {"date": "2026-02-03", "active_users": 3424, "sessions": 3906, "screen_page_views": 5798, "bounce_rate": 0.5133, "engagement_rate": 0.4867, "average_session_duration": 85.6976, "newusers": 3290, "totalusers": 3672}, {"date": "2026-02-04", "active_users": 3623, "sessions": 4193, "screen_page_views": 6116, "bounce_rate": 0.5156, "engagement_rate": 0.4844, "average_session_duration": 81.5492, "newusers": 3476, "totalusers": 3870}, {"date": "2026-02-05", "active_users": 3851, "sessions": 4470, "screen_page_views": 6593, "bounce_rate": 0.519, "engagement_rate": 0.481, "average_session_duration": 81.8251, "newusers": 3744, "totalusers": 4101}, {"date": "2026-02-06", "active_users": 4329, "sessions": 4934, "screen_page_views": 7208, "bounce_rate": 0.5197, "engagement_rate": 0.4803, "average_session_duration": 115.8371, "newusers": 4182, "totalusers": 4579}, {"date": "2026-02-07", "active_users": 4549, "sessions": 5106, "screen_page_views": 7641, "bounce_rate": 0.4816, "engagement_rate": 0.5184, "average_session_duration": 73.6142, "newusers": 4404, "totalusers": 4826}, {"date": "2026-02-08", "active_users": 4438, "sessions": 5020, "screen_page_views": 7289, "bounce_rate": 0.5373, "engagement_rate": 0.4627, "average_session_duration": 73.3766, "newusers": 4281, "totalusers": 4750}, {"date": "2026-02-09", "active_users": 3649, "sessions": 4126, "screen_page_views": 6042, "bounce_rate": 0.493, "engagement_rate": 0.507, "average_session_duration": 72.4558, "newusers": 3536, "totalusers": 3846}, {"date": "2026-02-10", "active_users": 3428, "sessions": 3952, "screen_page_views": 5936, "bounce_rate": 0.4701, "engagement_rate": 0.5299, "average_session_duration": 87.0097, "newusers": 3260, "totalusers": 3641}, {"date": "2026-02-11", "active_users": 3483, "sessions": 3966, "screen_page_views": 6061, "bounce_rate": 0.4448, "engagement_rate": 0.5552, "average_session_duration": 78.76, "newusers": 3355, "totalusers": 3707}, {"date": "2026-02-12", "active_users": 3760, "sessions": 4206, "screen_page_views": 6444, "bounce_rate": 0.4425, "engagement_rate": 0.5575, "average_session_duration": 82.6389, "newusers": 3587, "totalusers": 3976}, {"date": "2026-02-13", "active_users": 4186, "sessions": 4763, "screen_page_views": 7047, "bounce_rate": 0.4608, "engagement_rate": 0.5392, "average_session_duration": 78.2659, "newusers": 3995, "totalusers": 4405}, {"date": "2026-02-14", "active_users": 4601, "sessions": 5235, "screen_page_views": 7789, "bounce_rate": 0.4701, "engagement_rate": 0.5299, "average_session_duration": 73.6167, "newusers": 4415, "totalusers": 4824}, {"date": "2026-02-15", "active_users": 4156, "sessions": 4817, "screen_page_views": 7008, "bounce_rate": 0.4939, "engagement_rate": 0.5061, "average_session_duration": 73.4282, "newusers": 3999, "totalusers": 4424}, {"date": "2026-02-16", "active_users": 3820, "sessions": 4387, "screen_page_views": 6422, "bounce_rate": 0.4775, "engagement_rate": 0.5225, "average_session_duration": 97.7137, "newusers": 3647, "totalusers": 4064}, {"date": "2026-02-17", "active_users": 3740, "sessions": 4197, "screen_page_views": 6377, "bounce_rate": 0.4589, "engagement_rate": 0.5411, "average_session_duration": 85.9745, "newusers": 3576, "totalusers": 3971}, {"date": "2026-02-18", "active_users": 4893, "sessions": 5411, "screen_page_views": 7592, "bounce_rate": 0.5866, "engagement_rate": 0.4134, "average_session_duration": 58.3978, "newusers": 4746, "totalusers": 5119}, {"date": "2026-02-19", "active_users": 4068, "sessions": 4537, "screen_page_views": 6781, "bounce_rate": 0.4823, "engagement_rate": 0.5177, "average_session_duration": 79.4079, "newusers": 3888, "totalusers": 4275}, {"date": "2026-02-20", "active_users": 4769, "sessions": 5406, "screen_page_views": 7855, "bounce_rate": 0.5098, "engagement_rate": 0.4902, "average_session_duration": 74.8128, "newusers": 4604, "totalusers": 5014}, {"date": "2026-02-21", "active_users": 4574, "sessions": 5104, "screen_page_views": 7574, "bounce_rate": 0.4702, "engagement_rate": 0.5298, "average_session_duration": 70.4525, "newusers": 4406, "totalusers": 4812}, {"date": "2026-02-22", "active_users": 4621, "sessions": 5149, "screen_page_views": 7402, "bounce_rate": 0.4809, "engagement_rate": 0.5191, "average_session_duration": 60.6433, "newusers": 4467, "totalusers": 4874}, {"date": "2026-02-23", "active_users": 3504, "sessions": 3925, "screen_page_views": 5885, "bounce_rate": 0.4494, "engagement_rate": 0.5506, "average_session_duration": 72.1623, "newusers": 3364, "totalusers": 3717}, {"date": "2026-02-24", "active_users": 7929, "sessions": 8372, "screen_page_views": 10644, "bounce_rate": 0.7033, "engagement_rate": 0.2967, "average_session_duration": 43.5468, "newusers": 7834, "totalusers": 8150}, {"date": "2026-02-25", "active_users": 22249, "sessions": 22749, "screen_page_views": 24909, "bounce_rate": 0.8828, "engagement_rate": 0.1172, "average_session_duration": 18.5019, "newusers": 22052, "totalusers": 22523}, {"date": "2026-02-26", "active_users": 4584, "sessions": 5068, "screen_page_views": 7281, "bounce_rate": 0.4919, "engagement_rate": 0.5081, "average_session_duration": 81.1014, "newusers": 4413, "totalusers": 4832}, {"date": "2026-02-27", "active_users": 4649, "sessions": 5190, "screen_page_views": 7612, "bounce_rate": 0.4759, "engagement_rate": 0.5241, "average_session_duration": 76.0161, "newusers": 4484, "totalusers": 4896}, {"date": "2026-02-28", "active_users": 4692, "sessions": 5421, "screen_page_views": 7850, "bounce_rate": 0.5064, "engagement_rate": 0.4936, "average_session_duration": 73.4726, "newusers": 4502, "totalusers": 4971}, {"date": "2026-03-01", "active_users": 4260, "sessions": 4851, "screen_page_views": 7063, "bounce_rate": 0.5028, "engagement_rate": 0.4972, "average_session_duration": 72.4167, "newusers": 4090, "totalusers": 4527}, {"date": "2026-03-02", "active_users": 3717, "sessions": 4216, "screen_page_views": 6062, "bounce_rate": 0.4929, "engagement_rate": 0.5071, "average_session_duration": 75.3648, "newusers": 3551, "totalusers": 3974}, {"date": "2026-03-03", "active_users": 3749, "sessions": 4304, "screen_page_views": 5998, "bounce_rate": 0.5137, "engagement_rate": 0.4863, "average_session_duration": 73.1497, "newusers": 3584, "totalusers": 3986}, {"date": "2026-03-04", "active_users": 3712, "sessions": 4245, "screen_page_views": 6293, "bounce_rate": 0.4707, "engagement_rate": 0.5293, "average_session_duration": 88.4313, "newusers": 3547, "totalusers": 3964}, {"date": "2026-03-05", "active_users": 4149, "sessions": 4622, "screen_page_views": 6750, "bounce_rate": 0.4913, "engagement_rate": 0.5087, "average_session_duration": 72.8527, "newusers": 3999, "totalusers": 4412}, {"date": "2026-03-06", "active_users": 4245, "sessions": 4763, "screen_page_views": 7015, "bounce_rate": 0.4921, "engagement_rate": 0.5079, "average_session_duration": 74.5893, "newusers": 4073, "totalusers": 4506}, {"date": "2026-03-07", "active_users": 4483, "sessions": 4952, "screen_page_views": 7466, "bounce_rate": 0.4752, "engagement_rate": 0.5248, "average_session_duration": 70.2957, "newusers": 4329, "totalusers": 4741}, {"date": "2026-03-08", "active_users": 10198, "sessions": 10828, "screen_page_views": 12931, "bounce_rate": 0.7118, "engagement_rate": 0.2882, "average_session_duration": 35.3312, "newusers": 10086, "totalusers": 10444}, {"date": "2026-03-09", "active_users": 3598, "sessions": 4274, "screen_page_views": 5724, "bounce_rate": 0.54, "engagement_rate": 0.46, "average_session_duration": 66.5928, "newusers": 3476, "totalusers": 3861}, {"date": "2026-03-10", "active_users": 3732, "sessions": 4296, "screen_page_views": 5963, "bounce_rate": 0.5116, "engagement_rate": 0.4884, "average_session_duration": 71.53, "newusers": 3599, "totalusers": 3992}, {"date": "2026-03-11", "active_users": 3773, "sessions": 4300, "screen_page_views": 6041, "bounce_rate": 0.5053, "engagement_rate": 0.4947, "average_session_duration": 73.2829, "newusers": 3629, "totalusers": 4028}, {"date": "2026-03-12", "active_users": 4322, "sessions": 4706, "screen_page_views": 6645, "bounce_rate": 0.5138, "engagement_rate": 0.4862, "average_session_duration": 65.5354, "newusers": 4140, "totalusers": 4524}, {"date": "2026-03-13", "active_users": 4447, "sessions": 4961, "screen_page_views": 7057, "bounce_rate": 0.5053, "engagement_rate": 0.4947, "average_session_duration": 76.3669, "newusers": 4271, "totalusers": 4707}, {"date": "2026-03-14", "active_users": 4593, "sessions": 5075, "screen_page_views": 7210, "bounce_rate": 0.5163, "engagement_rate": 0.4837, "average_session_duration": 72.576, "newusers": 4448, "totalusers": 4865}, {"date": "2026-03-15", "active_users": 3146, "sessions": 3597, "screen_page_views": 5019, "bounce_rate": 0.5466, "engagement_rate": 0.4534, "average_session_duration": 68.7432, "newusers": 3027, "totalusers": 3371}], "last_updated": "2026-03-16"}, "gsc_daily": {"raw": {"domain": "grubbio.com", "account_id": "sc-domain:grubbio.com", "last_updated": "2026-03-16", "data_range": {"from": "2026-01-15", "to": "2026-03-14"}, "rows": [{"date": "2026-01-15", "clicks": 659, "impressions": 63864, "ctr": 0.0103, "position": 8.2122}, {"date": "2026-01-16", "clicks": 631, "impressions": 72439, "ctr": 0.0087, "position": 8.3297}, {"date": "2026-01-17", "clicks": 742, "impressions": 76308, "ctr": 0.0097, "position": 8.1329}, {"date": "2026-01-18", "clicks": 677, "impressions": 69699, "ctr": 0.0097, "position": 8.8218}, {"date": "2026-01-19", "clicks": 567, "impressions": 60908, "ctr": 0.0093, "position": 8.9914}, {"date": "2026-01-20", "clicks": 576, "impressions": 60119, "ctr": 0.0096, "position": 9.1668}, {"date": "2026-01-21", "clicks": 552, "impressions": 61013, "ctr": 0.009, "position": 9.2821}, {"date": "2026-01-22", "clicks": 592, "impressions": 65644, "ctr": 0.009, "position": 9.0481}, {"date": "2026-01-23", "clicks": 645, "impressions": 76120, "ctr": 0.0085, "position": 8.5097}, {"date": "2026-01-24", "clicks": 662, "impressions": 82289, "ctr": 0.008, "position": 8.4385}, {"date": "2026-01-25", "clicks": 588, "impressions": 72224, "ctr": 0.0081, "position": 8.7814}, {"date": "2026-01-26", "clicks": 490, "impressions": 63303, "ctr": 0.0077, "position": 9.0453}, {"date": "2026-01-27", "clicks": 564, "impressions": 64713, "ctr": 0.0087, "position": 8.7221}, {"date": "2026-01-28", "clicks": 635, "impressions": 74437, "ctr": 0.0085, "position": 8.3868}, {"date": "2026-01-29", "clicks": 645, "impressions": 96787, "ctr": 0.0067, "position": 7.5651}, {"date": "2026-01-30", "clicks": 809, "impressions": 84980, "ctr": 0.0095, "position": 8.5476}, {"date": "2026-01-31", "clicks": 912, "impressions": 94552, "ctr": 0.0096, "position": 8.2946}, {"date": "2026-02-01", "clicks": 744, "impressions": 91537, "ctr": 0.0081, "position": 8.516}, {"date": "2026-02-02", "clicks": 634, "impressions": 78609, "ctr": 0.0081, "position": 8.7243}, {"date": "2026-02-03", "clicks": 689, "impressions": 85169, "ctr": 0.0081, "position": 8.1554}, {"date": "2026-02-04", "clicks": 751, "impressions": 90636, "ctr": 0.0083, "position": 8.1701}, {"date": "2026-02-05", "clicks": 833, "impressions": 103750, "ctr": 0.008, "position": 8.344}, {"date": "2026-02-06", "clicks": 946, "impressions": 117032, "ctr": 0.0081, "position": 7.9643}, {"date": "2026-02-07", "clicks": 1066, "impressions": 125950, "ctr": 0.0085, "position": 7.7437}, {"date": "2026-02-08", "clicks": 819, "impressions": 109363, "ctr": 0.0075, "position": 7.8321}, {"date": "2026-02-09", "clicks": 756, "impressions": 99497, "ctr": 0.0076, "position": 7.7167}, {"date": "2026-02-10", "clicks": 824, "impressions": 100696, "ctr": 0.0082, "position": 8.0146}, {"date": "2026-02-11", "clicks": 829, "impressions": 103373, "ctr": 0.008, "position": 8.1598}, {"date": "2026-02-12", "clicks": 892, "impressions": 108976, "ctr": 0.0082, "position": 8.0238}, {"date": "2026-02-13", "clicks": 986, "impressions": 131930, "ctr": 0.0075, "position": 7.7383}, {"date": "2026-02-14", "clicks": 1202, "impressions": 140918, "ctr": 0.0085, "position": 7.7968}, {"date": "2026-02-15", "clicks": 906, "impressions": 110851, "ctr": 0.0082, "position": 7.8635}, {"date": "2026-02-16", "clicks": 822, "impressions": 102459, "ctr": 0.008, "position": 8.1046}, {"date": "2026-02-17", "clicks": 915, "impressions": 102109, "ctr": 0.009, "position": 8.3788}, {"date": "2026-02-18", "clicks": 913, "impressions": 102484, "ctr": 0.0089, "position": 8.1749}, {"date": "2026-02-19", "clicks": 967, "impressions": 105387, "ctr": 0.0092, "position": 8.2475}, {"date": "2026-02-20", "clicks": 1051, "impressions": 118941, "ctr": 0.0088, "position": 8.1681}, {"date": "2026-02-21", "clicks": 1109, "impressions": 126635, "ctr": 0.0088, "position": 8.2157}, {"date": "2026-02-22", "clicks": 941, "impressions": 110487, "ctr": 0.0085, "position": 8.3002}, {"date": "2026-02-23", "clicks": 743, "impressions": 96772, "ctr": 0.0077, "position": 8.3742}, {"date": "2026-02-24", "clicks": 923, "impressions": 102961, "ctr": 0.009, "position": 8.6578}, {"date": "2026-02-25", "clicks": 958, "impressions": 107600, "ctr": 0.0089, "position": 8.6239}, {"date": "2026-02-26", "clicks": 1089, "impressions": 116980, "ctr": 0.0093, "position": 8.227}, {"date": "2026-02-27", "clicks": 1164, "impressions": 133031, "ctr": 0.0087, "position": 8.1468}, {"date": "2026-02-28", "clicks": 1095, "impressions": 129946, "ctr": 0.0084, "position": 7.9571}, {"date": "2026-03-01", "clicks": 909, "impressions": 113095, "ctr": 0.008, "position": 8.272}, {"date": "2026-03-02", "clicks": 750, "impressions": 89515, "ctr": 0.0084, "position": 8.6862}, {"date": "2026-03-03", "clicks": 803, "impressions": 95576, "ctr": 0.0084, "position": 8.6749}, {"date": "2026-03-04", "clicks": 800, "impressions": 95039, "ctr": 0.0084, "position": 8.6375}, {"date": "2026-03-05", "clicks": 873, "impressions": 101446, "ctr": 0.0086, "position": 8.6448}, {"date": "2026-03-06", "clicks": 972, "impressions": 116494, "ctr": 0.0083, "position": 8.6683}, {"date": "2026-03-07", "clicks": 1032, "impressions": 124026, "ctr": 0.0083, "position": 8.5967}, {"date": "2026-03-08", "clicks": 907, "impressions": 109243, "ctr": 0.0083, "position": 8.6205}, {"date": "2026-03-09", "clicks": 716, "impressions": 87204, "ctr": 0.0082, "position": 8.5055}, {"date": "2026-03-10", "clicks": 731, "impressions": 91154, "ctr": 0.008, "position": 8.8728}, {"date": "2026-03-11", "clicks": 701, "impressions": 95807, "ctr": 0.0073, "position": 8.8985}, {"date": "2026-03-12", "clicks": 789, "impressions": 99567, "ctr": 0.0079, "position": 8.5495}, {"date": "2026-03-13", "clicks": 958, "impressions": 115827, "ctr": 0.0083, "position": 8.6169}, {"date": "2026-03-14", "clicks": 954, "impressions": 122026, "ctr": 0.0078, "position": 8.5696}]}, "rows": [{"date": "2026-01-15", "clicks": 659, "impressions": 63864, "ctr": 0.0103, "position": 8.2122}, {"date": "2026-01-16", "clicks": 631, "impressions": 72439, "ctr": 0.0087, "position": 8.3297}, {"date": "2026-01-17", "clicks": 742, "impressions": 76308, "ctr": 0.0097, "position": 8.1329}, {"date": "2026-01-18", "clicks": 677, "impressions": 69699, "ctr": 0.0097, "position": 8.8218}, {"date": "2026-01-19", "clicks": 567, "impressions": 60908, "ctr": 0.0093, "position": 8.9914}, {"date": "2026-01-20", "clicks": 576, "impressions": 60119, "ctr": 0.0096, "position": 9.1668}, {"date": "2026-01-21", "clicks": 552, "impressions": 61013, "ctr": 0.009, "position": 9.2821}, {"date": "2026-01-22", "clicks": 592, "impressions": 65644, "ctr": 0.009, "position": 9.0481}, {"date": "2026-01-23", "clicks": 645, "impressions": 76120, "ctr": 0.0085, "position": 8.5097}, {"date": "2026-01-24", "clicks": 662, "impressions": 82289, "ctr": 0.008, "position": 8.4385}, {"date": "2026-01-25", "clicks": 588, "impressions": 72224, "ctr": 0.0081, "position": 8.7814}, {"date": "2026-01-26", "clicks": 490, "impressions": 63303, "ctr": 0.0077, "position": 9.0453}, {"date": "2026-01-27", "clicks": 564, "impressions": 64713, "ctr": 0.0087, "position": 8.7221}, {"date": "2026-01-28", "clicks": 635, "impressions": 74437, "ctr": 0.0085, "position": 8.3868}, {"date": "2026-01-29", "clicks": 645, "impressions": 96787, "ctr": 0.0067, "position": 7.5651}, {"date": "2026-01-30", "clicks": 809, "impressions": 84980, "ctr": 0.0095, "position": 8.5476}, {"date": "2026-01-31", "clicks": 912, "impressions": 94552, "ctr": 0.0096, "position": 8.2946}, {"date": "2026-02-01", "clicks": 744, "impressions": 91537, "ctr": 0.0081, "position": 8.516}, {"date": "2026-02-02", "clicks": 634, "impressions": 78609, "ctr": 0.0081, "position": 8.7243}, {"date": "2026-02-03", "clicks": 689, "impressions": 85169, "ctr": 0.0081, "position": 8.1554}, {"date": "2026-02-04", "clicks": 751, "impressions": 90636, "ctr": 0.0083, "position": 8.1701}, {"date": "2026-02-05", "clicks": 833, "impressions": 103750, "ctr": 0.008, "position": 8.344}, {"date": "2026-02-06", "clicks": 946, "impressions": 117032, "ctr": 0.0081, "position": 7.9643}, {"date": "2026-02-07", "clicks": 1066, "impressions": 125950, "ctr": 0.0085, "position": 7.7437}, {"date": "2026-02-08", "clicks": 819, "impressions": 109363, "ctr": 0.0075, "position": 7.8321}, {"date": "2026-02-09", "clicks": 756, "impressions": 99497, "ctr": 0.0076, "position": 7.7167}, {"date": "2026-02-10", "clicks": 824, "impressions": 100696, "ctr": 0.0082, "position": 8.0146}, {"date": "2026-02-11", "clicks": 829, "impressions": 103373, "ctr": 0.008, "position": 8.1598}, {"date": "2026-02-12", "clicks": 892, "impressions": 108976, "ctr": 0.0082, "position": 8.0238}, {"date": "2026-02-13", "clicks": 986, "impressions": 131930, "ctr": 0.0075, "position": 7.7383}, {"date": "2026-02-14", "clicks": 1202, "impressions": 140918, "ctr": 0.0085, "position": 7.7968}, {"date": "2026-02-15", "clicks": 906, "impressions": 110851, "ctr": 0.0082, "position": 7.8635}, {"date": "2026-02-16", "clicks": 822, "impressions": 102459, "ctr": 0.008, "position": 8.1046}, {"date": "2026-02-17", "clicks": 915, "impressions": 102109, "ctr": 0.009, "position": 8.3788}, {"date": "2026-02-18", "clicks": 913, "impressions": 102484, "ctr": 0.0089, "position": 8.1749}, {"date": "2026-02-19", "clicks": 967, "impressions": 105387, "ctr": 0.0092, "position": 8.2475}, {"date": "2026-02-20", "clicks": 1051, "impressions": 118941, "ctr": 0.0088, "position": 8.1681}, {"date": "2026-02-21", "clicks": 1109, "impressions": 126635, "ctr": 0.0088, "position": 8.2157}, {"date": "2026-02-22", "clicks": 941, "impressions": 110487, "ctr": 0.0085, "position": 8.3002}, {"date": "2026-02-23", "clicks": 743, "impressions": 96772, "ctr": 0.0077, "position": 8.3742}, {"date": "2026-02-24", "clicks": 923, "impressions": 102961, "ctr": 0.009, "position": 8.6578}, {"date": "2026-02-25", "clicks": 958, "impressions": 107600, "ctr": 0.0089, "position": 8.6239}, {"date": "2026-02-26", "clicks": 1089, "impressions": 116980, "ctr": 0.0093, "position": 8.227}, {"date": "2026-02-27", "clicks": 1164, "impressions": 133031, "ctr": 0.0087, "position": 8.1468}, {"date": "2026-02-28", "clicks": 1095, "impressions": 129946, "ctr": 0.0084, "position": 7.9571}, {"date": "2026-03-01", "clicks": 909, "impressions": 113095, "ctr": 0.008, "position": 8.272}, {"date": "2026-03-02", "clicks": 750, "impressions": 89515, "ctr": 0.0084, "position": 8.6862}, {"date": "2026-03-03", "clicks": 803, "impressions": 95576, "ctr": 0.0084, "position": 8.6749}, {"date": "2026-03-04", "clicks": 800, "impressions": 95039, "ctr": 0.0084, "position": 8.6375}, {"date": "2026-03-05", "clicks": 873, "impressions": 101446, "ctr": 0.0086, "position": 8.6448}, {"date": "2026-03-06", "clicks": 972, "impressions": 116494, "ctr": 0.0083, "position": 8.6683}, {"date": "2026-03-07", "clicks": 1032, "impressions": 124026, "ctr": 0.0083, "position": 8.5967}, {"date": "2026-03-08", "clicks": 907, "impressions": 109243, "ctr": 0.0083, "position": 8.6205}, {"date": "2026-03-09", "clicks": 716, "impressions": 87204, "ctr": 0.0082, "position": 8.5055}, {"date": "2026-03-10", "clicks": 731, "impressions": 91154, "ctr": 0.008, "position": 8.8728}, {"date": "2026-03-11", "clicks": 701, "impressions": 95807, "ctr": 0.0073, "position": 8.8985}, {"date": "2026-03-12", "clicks": 789, "impressions": 99567, "ctr": 0.0079, "position": 8.5495}, {"date": "2026-03-13", "clicks": 958, "impressions": 115827, "ctr": 0.0083, "position": 8.6169}, {"date": "2026-03-14", "clicks": 954, "impressions": 122026, "ctr": 0.0078, "position": 8.5696}], "last_updated": "2026-03-16"}, "gsc_keywords": {"raw": {"domain": "grubbio.com", "last_updated": "2026-03-16", "rows": [{"query": "dockside boot key harbor", "clicks": 118, "impressions": 1490, "ctr": 0.0792, "position": 3.553}, {"query": "brooklyn boys pizzeria & restaurant menu", "clicks": 116, "impressions": 614, "ctr": 0.1889, "position": 2.798}, {"query": "dockside boot key harbor menu", "clicks": 91, "impressions": 639, "ctr": 0.1424, "position": 2.1283}, {"query": "la madalena guadalajara menu", "clicks": 79, "impressions": 1271, "ctr": 0.0622, "position": 3.0559}, {"query": "bodes", "clicks": 77, "impressions": 1522, "ctr": 0.0506, "position": 3.726}, {"query": "hacker's grill menu", "clicks": 72, "impressions": 290, "ctr": 0.2483, "position": 2.1966}, {"query": "los tules", "clicks": 69, "impressions": 1631, "ctr": 0.0423, "position": 5.0742}, {"query": "los tules menu", "clicks": 61, "impressions": 474, "ctr": 0.1287, "position": 2.6013}, {"query": "the original henry's menu", "clicks": 61, "impressions": 919, "ctr": 0.0664, "position": 3.3972}, {"query": "h & w drive in menu", "clicks": 55, "impressions": 688, "ctr": 0.0799, "position": 2.8765}, {"query": "cafe peri", "clicks": 54, "impressions": 6813, "ctr": 0.0079, "position": 5.5381}, {"query": "f street station", "clicks": 52, "impressions": 1554, "ctr": 0.0335, "position": 4.4569}, {"query": "aroma essen", "clicks": 51, "impressions": 1648, "ctr": 0.0309, "position": 5.2506}, {"query": "spain inn", "clicks": 51, "impressions": 1802, "ctr": 0.0283, "position": 5.7397}]}, "rows": [{"query": "dockside boot key harbor", "clicks": 118, "impressions": 1490, "ctr": 0.0792, "position": 3.553}, {"query": "brooklyn boys pizzeria & restaurant menu", "clicks": 116, "impressions": 614, "ctr": 0.1889, "position": 2.798}, {"query": "dockside boot key harbor menu", "clicks": 91, "impressions": 639, "ctr": 0.1424, "position": 2.1283}, {"query": "la madalena guadalajara menu", "clicks": 79, "impressions": 1271, "ctr": 0.0622, "position": 3.0559}, {"query": "bodes", "clicks": 77, "impressions": 1522, "ctr": 0.0506, "position": 3.726}, {"query": "hacker's grill menu", "clicks": 72, "impressions": 290, "ctr": 0.2483, "position": 2.1966}, {"query": "los tules", "clicks": 69, "impressions": 1631, "ctr": 0.0423, "position": 5.0742}, {"query": "los tules menu", "clicks": 61, "impressions": 474, "ctr": 0.1287, "position": 2.6013}, {"query": "the original henry's menu", "clicks": 61, "impressions": 919, "ctr": 0.0664, "position": 3.3972}, {"query": "h & w drive in menu", "clicks": 55, "impressions": 688, "ctr": 0.0799, "position": 2.8765}, {"query": "cafe peri", "clicks": 54, "impressions": 6813, "ctr": 0.0079, "position": 5.5381}, {"query": "f street station", "clicks": 52, "impressions": 1554, "ctr": 0.0335, "position": 4.4569}, {"query": "aroma essen", "clicks": 51, "impressions": 1648, "ctr": 0.0309, "position": 5.2506}, {"query": "spain inn", "clicks": 51, "impressions": 1802, "ctr": 0.0283, "position": 5.7397}], "last_updated": "2026-03-16"}, "gsc_pages": {"raw": {"domain": "grubbio.com", "last_updated": "2026-03-16", "rows": [{"page": "https://dockside-boot-key-harbor.grubbio.com/", "clicks": 288, "impressions": 8024, "ctr": 0.0359, "position": 6.912}, {"page": "https://bodes-corn-beef-house.grubbio.com/", "clicks": 278, "impressions": 7524, "ctr": 0.0369, "position": 4.4988}, {"page": "https://la-madalena-guadalajara.grubbio.com/menu", "clicks": 215, "impressions": 5769, "ctr": 0.0373, "position": 6.1482}, {"page": "https://brooklyn-boys-pizzeria-restaurant.grubbio.com/menu", "clicks": 155, "impressions": 1734, "ctr": 0.0894, "position": 4.2503}, {"page": "https://dockside-boot-key-harbor.grubbio.com/menu", "clicks": 146, "impressions": 4152, "ctr": 0.0352, "position": 4.875}, {"page": "https://bodes-corn-beef-house.grubbio.com/menu", "clicks": 139, "impressions": 5546, "ctr": 0.0251, "position": 4.4151}, {"page": "https://cafe-peri.grubbio.com/", "clicks": 130, "impressions": 13884, "ctr": 0.0094, "position": 5.5344}, {"page": "https://aroma-vietnamese-kitchen-sushi-bar.grubbio.com/", "clicks": 128, "impressions": 4352, "ctr": 0.0294, "position": 5.1951}, {"page": "https://cat-coras-taproom.grubbio.com/", "clicks": 123, "impressions": 1893, "ctr": 0.065, "position": 10.1749}, {"page": "https://woojung.grubbio.com/", "clicks": 116, "impressions": 3118, "ctr": 0.0372, "position": 6.1264}, {"page": "https://hackers-grill-apache-junction.grubbio.com/menu", "clicks": 113, "impressions": 1443, "ctr": 0.0783, "position": 3.4137}, {"page": "https://los-tules.grubbio.com/menu", "clicks": 99, "impressions": 2757, "ctr": 0.0359, "position": 5.1694}, {"page": "https://f-street-station.grubbio.com/", "clicks": 97, "impressions": 3970, "ctr": 0.0244, "position": 5.1426}, {"page": "https://skt-peders-bageri.grubbio.com/", "clicks": 95, "impressions": 7128, "ctr": 0.0133, "position": 6.8298}, {"page": "https://los-tules.grubbio.com/", "clicks": 94, "impressions": 2837, "ctr": 0.0331, "position": 5.7251}, {"page": "https://cafe-brettle.grubbio.com/", "clicks": 90, "impressions": 3441, "ctr": 0.0262, "position": 6.601}, {"page": "https://shea-schats-bakery.grubbio.com/", "clicks": 89, "impressions": 2368, "ctr": 0.0376, "position": 6.7099}, {"page": "https://cross-grain-brewhouse.grubbio.com/", "clicks": 88, "impressions": 2144, "ctr": 0.041, "position": 6.9464}, {"page": "https://spicy-chef-100am.grubbio.com/", "clicks": 88, "impressions": 1872, "ctr": 0.047, "position": 4.7858}, {"page": "https://gusto-trattoria-toscana.grubbio.com/", "clicks": 87, "impressions": 1217, "ctr": 0.0715, "position": 2.6902}, {"page": "https://h-w-drive-in.grubbio.com/menu", "clicks": 85, "impressions": 1563, "ctr": 0.0544, "position": 4.2495}, {"page": "https://hackers-grill-apache-junction.grubbio.com/", "clicks": 85, "impressions": 2230, "ctr": 0.0381, "position": 5.2013}, {"page": "https://le-grenier-de-notre-dame.grubbio.com/", "clicks": 84, "impressions": 4481, "ctr": 0.0187, "position": 4.9527}, {"page": "https://brooklyn-boys-pizzeria-restaurant.grubbio.com/", "clicks": 83, "impressions": 1421, "ctr": 0.0584, "position": 5.1013}, {"page": "https://wooden-nickel-bar-grill.grubbio.com/", "clicks": 83, "impressions": 2573, "ctr": 0.0323, "position": 5.595}, {"page": "https://odollys-lounge-and-restaurant.grubbio.com/", "clicks": 81, "impressions": 3493, "ctr": 0.0232, "position": 3.9175}, {"page": "https://bayou-bar-grill.grubbio.com/", "clicks": 80, "impressions": 1885, "ctr": 0.0424, "position": 5.7942}, {"page": "https://the-original-henrys.grubbio.com/", "clicks": 79, "impressions": 3885, "ctr": 0.0203, "position": 5.9537}, {"page": "https://little-daves-restaurant-pizza.grubbio.com/", "clicks": 78, "impressions": 2202, "ctr": 0.0354, "position": 3.9355}, {"page": "https://geriks-ole-czech-bakery-deli.grubbio.com/", "clicks": 76, "impressions": 1956, "ctr": 0.0389, "position": 6.6825}, {"page": "https://ginos.grubbio.com/", "clicks": 76, "impressions": 3760, "ctr": 0.0202, "position": 5.0388}, {"page": "https://duffys-tavern.grubbio.com/", "clicks": 75, "impressions": 4863, "ctr": 0.0154, "position": 6.5497}, {"page": "https://chadwick-co-coffee-house-ktchen.grubbio.com/", "clicks": 74, "impressions": 1179, "ctr": 0.0628, "position": 6.7837}, {"page": "https://restaurante-moya-brunch.grubbio.com/", "clicks": 74, "impressions": 2975, "ctr": 0.0249, "position": 5.6464}, {"page": "https://jf-caribbean-delight.grubbio.com/", "clicks": 72, "impressions": 4980, "ctr": 0.0145, "position": 5.3568}, {"page": "https://pizza-loco.grubbio.com/", "clicks": 71, "impressions": 1275, "ctr": 0.0557, "position": 3.7208}, {"page": "https://kiremit-restaurant.grubbio.com/", "clicks": 67, "impressions": 1341, "ctr": 0.05, "position": 3.2401}, {"page": "https://chubbies-pub-and-grub.grubbio.com/menu", "clicks": 66, "impressions": 1542, "ctr": 0.0428, "position": 5.57}, {"page": "https://the-original-henrys.grubbio.com/menu", "clicks": 66, "impressions": 1607, "ctr": 0.0411, "position": 7.1462}, {"page": "https://jumbo-house.grubbio.com/menu", "clicks": 65, "impressions": 1637, "ctr": 0.0397, "position": 5.8253}, {"page": "https://tan-hotpot.grubbio.com/", "clicks": 65, "impressions": 1898, "ctr": 0.0342, "position": 7.4046}, {"page": "https://bar-xeito.grubbio.com/", "clicks": 64, "impressions": 1192, "ctr": 0.0537, "position": 5.307}, {"page": "https://parkside-grill-lounge.grubbio.com/", "clicks": 62, "impressions": 1643, "ctr": 0.0377, "position": 7.5411}, {"page": "https://nikos-grill.grubbio.com/menu", "clicks": 61, "impressions": 2672, "ctr": 0.0228, "position": 6.5225}, {"page": "https://spain-inn.grubbio.com/", "clicks": 58, "impressions": 3482, "ctr": 0.0167, "position": 6.6005}, {"page": "https://the-undertow.grubbio.com/", "clicks": 58, "impressions": 3820, "ctr": 0.0152, "position": 5.5003}, {"page": "https://benjies-jamaican-restaurant.grubbio.com/", "clicks": 57, "impressions": 2996, "ctr": 0.019, "position": 5.0334}, {"page": "https://moes-bar-grill.grubbio.com/", "clicks": 57, "impressions": 1904, "ctr": 0.0299, "position": 6.0903}, {"page": "https://puzzlers-pub.grubbio.com/menu", "clicks": 57, "impressions": 928, "ctr": 0.0614, "position": 3.8362}, {"page": "https://thelmas-restaurant.grubbio.com/", "clicks": 57, "impressions": 2739, "ctr": 0.0208, "position": 5.9887}, {"page": "https://panorama-fisheries.grubbio.com/", "clicks": 55, "impressions": 2395, "ctr": 0.023, "position": 3.633}]}, "rows": [{"page": "https://dockside-boot-key-harbor.grubbio.com/", "clicks": 288, "impressions": 8024, "ctr": 0.0359, "position": 6.912}, {"page": "https://bodes-corn-beef-house.grubbio.com/", "clicks": 278, "impressions": 7524, "ctr": 0.0369, "position": 4.4988}, {"page": "https://la-madalena-guadalajara.grubbio.com/menu", "clicks": 215, "impressions": 5769, "ctr": 0.0373, "position": 6.1482}, {"page": "https://brooklyn-boys-pizzeria-restaurant.grubbio.com/menu", "clicks": 155, "impressions": 1734, "ctr": 0.0894, "position": 4.2503}, {"page": "https://dockside-boot-key-harbor.grubbio.com/menu", "clicks": 146, "impressions": 4152, "ctr": 0.0352, "position": 4.875}, {"page": "https://bodes-corn-beef-house.grubbio.com/menu", "clicks": 139, "impressions": 5546, "ctr": 0.0251, "position": 4.4151}, {"page": "https://cafe-peri.grubbio.com/", "clicks": 130, "impressions": 13884, "ctr": 0.0094, "position": 5.5344}, {"page": "https://aroma-vietnamese-kitchen-sushi-bar.grubbio.com/", "clicks": 128, "impressions": 4352, "ctr": 0.0294, "position": 5.1951}, {"page": "https://cat-coras-taproom.grubbio.com/", "clicks": 123, "impressions": 1893, "ctr": 0.065, "position": 10.1749}, {"page": "https://woojung.grubbio.com/", "clicks": 116, "impressions": 3118, "ctr": 0.0372, "position": 6.1264}, {"page": "https://hackers-grill-apache-junction.grubbio.com/menu", "clicks": 113, "impressions": 1443, "ctr": 0.0783, "position": 3.4137}, {"page": "https://los-tules.grubbio.com/menu", "clicks": 99, "impressions": 2757, "ctr": 0.0359, "position": 5.1694}, {"page": "https://f-street-station.grubbio.com/", "clicks": 97, "impressions": 3970, "ctr": 0.0244, "position": 5.1426}, {"page": "https://skt-peders-bageri.grubbio.com/", "clicks": 95, "impressions": 7128, "ctr": 0.0133, "position": 6.8298}, {"page": "https://los-tules.grubbio.com/", "clicks": 94, "impressions": 2837, "ctr": 0.0331, "position": 5.7251}, {"page": "https://cafe-brettle.grubbio.com/", "clicks": 90, "impressions": 3441, "ctr": 0.0262, "position": 6.601}, {"page": "https://shea-schats-bakery.grubbio.com/", "clicks": 89, "impressions": 2368, "ctr": 0.0376, "position": 6.7099}, {"page": "https://cross-grain-brewhouse.grubbio.com/", "clicks": 88, "impressions": 2144, "ctr": 0.041, "position": 6.9464}, {"page": "https://spicy-chef-100am.grubbio.com/", "clicks": 88, "impressions": 1872, "ctr": 0.047, "position": 4.7858}, {"page": "https://gusto-trattoria-toscana.grubbio.com/", "clicks": 87, "impressions": 1217, "ctr": 0.0715, "position": 2.6902}, {"page": "https://h-w-drive-in.grubbio.com/menu", "clicks": 85, "impressions": 1563, "ctr": 0.0544, "position": 4.2495}, {"page": "https://hackers-grill-apache-junction.grubbio.com/", "clicks": 85, "impressions": 2230, "ctr": 0.0381, "position": 5.2013}, {"page": "https://le-grenier-de-notre-dame.grubbio.com/", "clicks": 84, "impressions": 4481, "ctr": 0.0187, "position": 4.9527}, {"page": "https://brooklyn-boys-pizzeria-restaurant.grubbio.com/", "clicks": 83, "impressions": 1421, "ctr": 0.0584, "position": 5.1013}, {"page": "https://wooden-nickel-bar-grill.grubbio.com/", "clicks": 83, "impressions": 2573, "ctr": 0.0323, "position": 5.595}, {"page": "https://odollys-lounge-and-restaurant.grubbio.com/", "clicks": 81, "impressions": 3493, "ctr": 0.0232, "position": 3.9175}, {"page": "https://bayou-bar-grill.grubbio.com/", "clicks": 80, "impressions": 1885, "ctr": 0.0424, "position": 5.7942}, {"page": "https://the-original-henrys.grubbio.com/", "clicks": 79, "impressions": 3885, "ctr": 0.0203, "position": 5.9537}, {"page": "https://little-daves-restaurant-pizza.grubbio.com/", "clicks": 78, "impressions": 2202, "ctr": 0.0354, "position": 3.9355}, {"page": "https://geriks-ole-czech-bakery-deli.grubbio.com/", "clicks": 76, "impressions": 1956, "ctr": 0.0389, "position": 6.6825}, {"page": "https://ginos.grubbio.com/", "clicks": 76, "impressions": 3760, "ctr": 0.0202, "position": 5.0388}, {"page": "https://duffys-tavern.grubbio.com/", "clicks": 75, "impressions": 4863, "ctr": 0.0154, "position": 6.5497}, {"page": "https://chadwick-co-coffee-house-ktchen.grubbio.com/", "clicks": 74, "impressions": 1179, "ctr": 0.0628, "position": 6.7837}, {"page": "https://restaurante-moya-brunch.grubbio.com/", "clicks": 74, "impressions": 2975, "ctr": 0.0249, "position": 5.6464}, {"page": "https://jf-caribbean-delight.grubbio.com/", "clicks": 72, "impressions": 4980, "ctr": 0.0145, "position": 5.3568}, {"page": "https://pizza-loco.grubbio.com/", "clicks": 71, "impressions": 1275, "ctr": 0.0557, "position": 3.7208}, {"page": "https://kiremit-restaurant.grubbio.com/", "clicks": 67, "impressions": 1341, "ctr": 0.05, "position": 3.2401}, {"page": "https://chubbies-pub-and-grub.grubbio.com/menu", "clicks": 66, "impressions": 1542, "ctr": 0.0428, "position": 5.57}, {"page": "https://the-original-henrys.grubbio.com/menu", "clicks": 66, "impressions": 1607, "ctr": 0.0411, "position": 7.1462}, {"page": "https://jumbo-house.grubbio.com/menu", "clicks": 65, "impressions": 1637, "ctr": 0.0397, "position": 5.8253}, {"page": "https://tan-hotpot.grubbio.com/", "clicks": 65, "impressions": 1898, "ctr": 0.0342, "position": 7.4046}, {"page": "https://bar-xeito.grubbio.com/", "clicks": 64, "impressions": 1192, "ctr": 0.0537, "position": 5.307}, {"page": "https://parkside-grill-lounge.grubbio.com/", "clicks": 62, "impressions": 1643, "ctr": 0.0377, "position": 7.5411}, {"page": "https://nikos-grill.grubbio.com/menu", "clicks": 61, "impressions": 2672, "ctr": 0.0228, "position": 6.5225}, {"page": "https://spain-inn.grubbio.com/", "clicks": 58, "impressions": 3482, "ctr": 0.0167, "position": 6.6005}, {"page": "https://the-undertow.grubbio.com/", "clicks": 58, "impressions": 3820, "ctr": 0.0152, "position": 5.5003}, {"page": "https://benjies-jamaican-restaurant.grubbio.com/", "clicks": 57, "impressions": 2996, "ctr": 0.019, "position": 5.0334}, {"page": "https://moes-bar-grill.grubbio.com/", "clicks": 57, "impressions": 1904, "ctr": 0.0299, "position": 6.0903}, {"page": "https://puzzlers-pub.grubbio.com/menu", "clicks": 57, "impressions": 928, "ctr": 0.0614, "position": 3.8362}, {"page": "https://thelmas-restaurant.grubbio.com/", "clicks": 57, "impressions": 2739, "ctr": 0.0208, "position": 5.9887}, {"page": "https://panorama-fisheries.grubbio.com/", "clicks": 55, "impressions": 2395, "ctr": 0.023, "position": 3.633}], "last_updated": "2026-03-16"}, "comparison": {"ga4": {"sessions": {"last_30": {"total": 168958, "avg": 5631.933333333333, "min": 3597, "max": 22749, "stdev": 3508.18815534933}, "prev_30": {"total": 132818, "avg": 4427.266666666666, "min": 3691, "max": 6177, "stdev": 535.3110557767153}, "pct_change": 27.210167296601362}, "active_users": {"last_30": {"total": 152973, "avg": 5099.1, "min": 3146, "max": 22249, "stdev": 3508.5973752169557}, "prev_30": {"total": 116395, "avg": 3879.8333333333335, "min": 3210, "max": 5560, "stdev": 495.5136021191118}, "pct_change": 31.425748528716866}, "screen_page_views": {"last_30": {"total": 232218, "avg": 7740.6, "min": 5019, "max": 24909, "stdev": 3564.7033691942484}, "prev_30": {"total": 194718, "avg": 6490.6, "min": 5490, "max": 8588, "stdev": 724.1472321241748}, "pct_change": 19.258620158382893}, "newusers": {"last_30": {"total": 148246, "avg": 4941.533333333334, "min": 3027, "max": 22052, "stdev": 3505.605715120435}, "prev_30": {"total": 112314, "avg": 3743.8, "min": 3087, "max": 5404, "stdev": 489.43890464419593}, "pct_change": 31.99244973912424}, "bounce_rate": {"last_30_avg": 0.52431, "prev_30_avg": 0.5210766666666666, "pct_change": 0.6205100976823797}, "engagement_rate": {"last_30_avg": 0.47569, "prev_30_avg": 0.4789233333333333, "pct_change": -0.6751254550136717}}, "gsc_daily": {"clicks": {"last_30": {"total": 26693, "avg": 920.448275862069, "min": 701, "max": 1202, "stdev": 135.78122798060556}, "prev_30": {"total": 21715, "avg": 723.8333333333334, "min": 490, "max": 1066, "stdev": 142.77546474563945}, "pct_change": 22.92424591296339}, "impressions": {"last_30": {"total": 3163580, "avg": 109088.96551724138, "min": 87204, "max": 140918, "stdev": 13668.394901280102}, "prev_30": {"total": 2585917, "avg": 86197.23333333334, "min": 60119, "max": 131930, "stdev": 20196.45840356983}, "pct_change": 22.33880669797213}, "ctr": {"last_30_avg": 0.008417241379310344, "prev_30_avg": 0.008493333333333334, "pct_change": -0.8959021274292319}, "position": {"last_30_avg": 8.415537931034482, "prev_30_avg": 8.379306666666666, "pct_change": 0.43238976456065825}}}, "anomalies": []};
+        
+        function toggleMode() {
+            const body = document.body;
+            const btn = event.target;
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                btn.textContent = 'Chế độ tối';
+            } else {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                btn.textContent = 'Chế độ sáng';
+            }
+        }
+        
+        function formatNumber(num) {
+            return num.toLocaleString('vi-VN');
+        }
+        
+        function formatPercent(num) {
+            return (num * 100).toFixed(2) + '%';
+        }
+        
+        // Populate KPIs
+        function populateKPIs() {
+            const comp = domainData.comparison;
+            const kpis = [];
+            
+            if (comp.ga4 && comp.ga4.sessions) {
+                kpis.push({
+                    label: 'Phiên',
+                    value: formatNumber(comp.ga4.sessions.last_30.total),
+                    change: comp.ga4.sessions.pct_change
+                });
+            }
+            
+            if (comp.ga4 && comp.ga4.active_users) {
+                kpis.push({
+                    label: 'Người dùng',
+                    value: formatNumber(comp.ga4.active_users.last_30.total),
+                    change: comp.ga4.active_users.pct_change
+                });
+            }
+            
+            if (comp.gsc_daily && comp.gsc_daily.clicks) {
+                kpis.push({
+                    label: 'Nhấp',
+                    value: formatNumber(comp.gsc_daily.clicks.last_30.total),
+                    change: comp.gsc_daily.clicks.pct_change
+                });
+            }
+            
+            if (comp.gsc_daily && comp.gsc_daily.impressions) {
+                kpis.push({
+                    label: 'Lần hiển thị',
+                    value: formatNumber(comp.gsc_daily.impressions.last_30.total),
+                    change: 0
+                });
+            }
+            
+            if (comp.gsc_daily && comp.gsc_daily.position) {
+                kpis.push({
+                    label: 'Vị trí',
+                    value: comp.gsc_daily.position.last_30_avg.toFixed(2),
+                    change: 0
+                });
+            }
+            
+            const grid = document.getElementById('kpiGrid');
+            kpis.forEach(k => {
+                const color = k.change > 5 ? '#10b981' : (k.change < -5 ? '#ef4444' : '#6b7280');
+                grid.innerHTML += `
+                    <div class="kpi-card">
+                        <div class="kpi-label">${k.label}</div>
+                        <div class="kpi-value">${k.value}</div>
+                        <div class="kpi-change" style="color: ${color};">${k.change > 0 ? '+' : ''}${k.change.toFixed(1)}%</div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Populate keywords table
+        function populateKeywords() {
+            const keywords = domainData.gsc_keywords.rows || [];
+            const tbody = document.getElementById('keywordsBody');
+            
+            if (keywords.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">Chưa có dữ liệu</td></tr>';
+                return;
+            }
+            
+            keywords.slice(0, 10).forEach(k => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${k.query}</td>
+                        <td>${formatNumber(k.clicks)}</td>
+                        <td>${formatNumber(k.impressions)}</td>
+                        <td>${formatPercent(k.ctr)}</td>
+                        <td>${k.position.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        // Populate pages table
+        function populatePages() {
+            const pages = domainData.gsc_pages.rows || [];
+            const tbody = document.getElementById('pagesBody');
+            
+            if (pages.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">Chưa có dữ liệu</td></tr>';
+                return;
+            }
+            
+            pages.slice(0, 10).forEach(p => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">${p.page}</td>
+                        <td>${formatNumber(p.clicks)}</td>
+                        <td>${formatNumber(p.impressions)}</td>
+                        <td>${formatPercent(p.ctr)}</td>
+                        <td>${p.position.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        // Create charts
+        function createCharts() {
+            const ga4 = domainData.ga4.rows || [];
+            const gsc = domainData.gsc_daily.rows || [];
+            
+            const gaLast30 = ga4.slice(-30);
+            const gscLast30 = gsc.slice(-30);
+            
+            const gaDateLabels = gaLast30.map(r => r.date);
+            const gscDateLabels = gscLast30.map(r => r.date);
+            
+            // Sessions chart
+            if (gaLast30.length > 0) {
+                new Chart(document.getElementById('sessionsChart'), {
+                    type: 'line',
+                    data: {
+                        labels: gaDateLabels,
+                        datasets: [{
+                            label: 'Phiên',
+                            data: gaLast30.map(r => r.sessions),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true }, },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+            
+            // Bounce rate chart
+            if (gaLast30.length > 0) {
+                new Chart(document.getElementById('bounceChart'), {
+                    type: 'line',
+                    data: {
+                        labels: gaDateLabels,
+                        datasets: [{
+                            label: 'Tỷ lệ thoát (%)',
+                            data: gaLast30.map(r => r.bounce_rate * 100),
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            }
+            
+            // Clicks chart
+            if (gscLast30.length > 0) {
+                new Chart(document.getElementById('clicksChart'), {
+                    type: 'line',
+                    data: {
+                        labels: gscDateLabels,
+                        datasets: [{
+                            label: 'Nhấp',
+                            data: gscLast30.map(r => r.clicks),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+            
+            // Position chart (reversed Y axis - lower is better)
+            if (gscLast30.length > 0) {
+                new Chart(document.getElementById('positionChart'), {
+                    type: 'line',
+                    data: {
+                        labels: gscDateLabels,
+                        datasets: [{
+                            label: 'Vị trí (thấp = tốt)',
+                            data: gscLast30.map(r => r.position),
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                reverse: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        populateKPIs();
+        populateKeywords();
+        populatePages();
+        createCharts();
+    </script>
+</body>
+</html>
