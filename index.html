@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo SEO - Trang Web Nhà Hàng</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1a1a2e;
+            color: #eaeaea;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f3460, #e94560);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header-subtitle {
+            font-size: 0.95em;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .nav-bar {
+            background-color: #16213e;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            border-bottom: 1px solid #e94560;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar a {
+            color: #e94560;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-bar a:hover {
+            background-color: #0f3460;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background-color: #16213e;
+            border-right: 2px solid #e94560;
+            padding-top: 20px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar.sticky {
+            position: sticky;
+            top: 0;
+        }
+
+        .sidebar h3 {
+            padding: 15px 20px;
+            color: #e94560;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            border-bottom: 1px solid #0f3460;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            color: #eaeaea;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar a:hover {
+            background-color: #0f3460;
+            color: #e94560;
+            border-left-color: #e94560;
+        }
+
+        .sidebar a.active {
+            background-color: #0f3460;
+            color: #e94560;
+            border-left-color: #e94560;
+        }
+
+        main {
+            margin-left: 250px;
+            padding: 40px 0;
+        }
+
+        section {
+            margin-bottom: 60px;
+            scroll-margin-top: 100px;
+        }
+
+        section h2 {
+            font-size: 1.8em;
+            color: #e94560;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0f3460;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background-color: #16213e;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #e94560;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(#e94560, 0.3);
+        }
+
+        .kpi-label {
+            font-size: 0.85em;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #e94560;
+            margin-bottom: 8px;
+        }
+
+        .kpi-change {
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kpi-change.positive {
+            color: #2ecc71;
+        }
+
+        .kpi-change.negative {
+            color: #e74c3c;
+        }
+
+        .arrow {
+            font-size: 1.1em;
+        }
+
+        .chart-container {
+            background-color: #16213e;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #0f3460;
+        }
+
+        .chart-container h3 {
+            color: #e94560;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+            margin-bottom: 20px;
+        }
+
+        .site-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .site-comparison-card {
+            background-color: #16213e;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #0f3460;
+        }
+
+        .site-comparison-card h4 {
+            color: #e94560;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .comparison-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #0f3460;
+            font-size: 0.9em;
+        }
+
+        .comparison-metric:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-value {
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .anomaly-alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .anomaly-alert.normal {
+            background-color: rgba(46, 204, 113, 0.1);
+            border-left-color: #2ecc71;
+            color: #2ecc71;
+        }
+
+        .anomaly-alert.warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            border-left-color: #f39c12;
+            color: #f39c12;
+        }
+
+        .anomaly-alert.critical {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-left-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        .anomaly-icon {
+            font-size: 1.5em;
+            flex-shrink: 0;
+        }
+
+        .anomaly-content {
+            flex: 1;
+        }
+
+        .anomaly-site {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .anomaly-text {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background-color: #0f3460;
+            color: #e94560;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e94560;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #0f3460;
+        }
+
+        tr:hover {
+            background-color: #0f3460;
+        }
+
+        .recommendation {
+            background-color: #0f3460;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e94560;
+        }
+
+        .recommendation h4 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+
+        .recommendation ul {
+            list-style-position: inside;
+            margin-left: 10px;
+        }
+
+        .recommendation li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -250px;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            main {
+                margin-left: 0;
+            }
+
+            .toggle-sidebar {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 50;
+                background-color: #e94560;
+                border: none;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .toggle-sidebar {
+                display: none;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: #16213e;
+            border-top: 1px solid #0f3460;
+            margin-top: 60px;
+            color: #888;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Báo cáo SEO - Trang Web Nhà Hàng</h1>
+        <div class="header-subtitle">Báo cáo SEO - 60 ngày gần nhất (15/01/2026 - 14/03/2026)</div>
+        <div class="nav-bar">
+            <a href="seo-hotels.html">
+                → Xem báo cáo khách sạn
+            </a>
+        </div>
+    </div>
+
+    <button class="toggle-sidebar" onclick="toggleSidebar()">☰ Menu</button>
+
+    <aside class="sidebar">
+        <h3>📋 Mục lục</h3>
+        <ul>
+            <li><a href="#overview" onclick="scrollToSection(event)">Tổng quan KPI</a></li>
+            <li><a href="#traffic-trends" onclick="scrollToSection(event)">Xu hướng Traffic</a></li>
+            <li><a href="#seo-analysis" onclick="scrollToSection(event)">Phân tích SEO</a></li>
+            <li><a href="#anomalies" onclick="scrollToSection(event)">Phát hiện bất thường</a></li>
+            <li><a href="#top-keywords" onclick="scrollToSection(event)">Top Keywords</a></li>
+            <li><a href="#comparison" onclick="scrollToSection(event)">So sánh Website</a></li>
+            <li><a href="#recommendations" onclick="scrollToSection(event)">Đề xuất tối ưu</a></li>
+        </ul>
+    </aside>
+
+    <main class="container">
+
+        <section id="overview">
+            <h2>📊 Tổng quan KPI</h2>
+            <div class="kpi-grid">
+
+                <div class="kpi-card">
+                    <div class="kpi-label">📈 Phiên làm việc (30 ngày gần nhất)</div>
+                    <div class="kpi-value">5,875,147</div>
+                    <div class="kpi-change positive">
+                        <span class="arrow">↑</span>
+                        <span>+27.7% so với kỳ trước</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">👥 Người dùng hoạt động</div>
+                    <div class="kpi-value">5,120,116</div>
+                    <div class="kpi-change positive">
+                        <span class="arrow">↑</span>
+                        <span>+29.1% so với kỳ trước</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">⏹️ Tỷ lệ thoát</div>
+                    <div class="kpi-value">41.3%</div>
+                    <div class="kpi-change positive">
+                        <span class="arrow">↓</span>
+                        <span>-4.3pp so với kỳ trước</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">🔍 Nhấp chuột GSC</div>
+                    <div class="kpi-value">1,752,679</div>
+                    <div class="kpi-change positive">
+                        <span class="arrow">↑</span>
+                        <span>+39.9% so với kỳ trước</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="traffic-trends">
+            <h2>📈 Xu hướng Traffic</h2>
+
+            <div class="chart-container">
+                <h3>Xu hướng: menu-world.com</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-menu-world-com"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Xu hướng: res-menu.net</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-res-menu-net"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Xu hướng: goto-where.com</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-goto-where-com"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Xu hướng: restaurants-world.net</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-restaurants-world-net"></canvas>
+                </div>
+            </div>
+
+        <section id="seo-analysis">
+            <h2>🔍 Phân tích SEO (Google Search Console)</h2>
+
+            <div class="chart-container">
+                <h3>GSC Metrics: menu-world.com</h3>
+                <div class="chart-wrapper">
+                    <canvas id="gsc-menu-world-com"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>GSC Metrics: res-menu.net</h3>
+                <div class="chart-wrapper">
+                    <canvas id="gsc-res-menu-net"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>GSC Metrics: goto-where.com</h3>
+                <div class="chart-wrapper">
+                    <canvas id="gsc-goto-where-com"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>GSC Metrics: restaurants-world.net</h3>
+                <div class="chart-wrapper">
+                    <canvas id="gsc-restaurants-world-net"></canvas>
+                </div>
+            </div>
+
+        <section id="anomalies">
+            <h2>⚠️ Phát hiện bất thường</h2>
+
+                <div class="anomaly-alert critical">
+                    <span class="anomaly-icon">🔴</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">wherebly.com</div>
+                        <div class="anomaly-text">Phiên làm việc: +12957.8% CÓ NGUY HIỂM</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert critical">
+                    <span class="anomaly-icon">🔴</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">wherebly.com</div>
+                        <div class="anomaly-text">Tỷ lệ thoát: -33.9pp CÓ NGUY HIỂM</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert warning">
+                    <span class="anomaly-icon">🟡</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">wherebly.com</div>
+                        <div class="anomaly-text">Vị trí trung bình: +3.6 vị trí Cảnh báo</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert critical">
+                    <span class="anomaly-icon">🔴</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">res-menu.net</div>
+                        <div class="anomaly-text">Phiên làm việc: +40.6% CÓ NGUY HIỂM</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert critical">
+                    <span class="anomaly-icon">🔴</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">foodplacee.com</div>
+                        <div class="anomaly-text">Phiên làm việc: +15757.1% CÓ NGUY HIỂM</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert critical">
+                    <span class="anomaly-icon">🔴</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">foodplacee.com</div>
+                        <div class="anomaly-text">Tỷ lệ thoát: -33.3pp CÓ NGUY HIỂM</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert warning">
+                    <span class="anomaly-icon">🟡</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">restaurants-world.net</div>
+                        <div class="anomaly-text">Phiên làm việc: +20.5% Cảnh báo</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert critical">
+                    <span class="anomaly-icon">🔴</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">goto-where.com</div>
+                        <div class="anomaly-text">Phiên làm việc: +41.3% CÓ NGUY HIỂM</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert warning">
+                    <span class="anomaly-icon">🟡</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">menustic.com</div>
+                        <div class="anomaly-text">Phiên làm việc: +28.4% Cảnh báo</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert critical">
+                    <span class="anomaly-icon">🔴</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">menufyy.com</div>
+                        <div class="anomaly-text">Phiên làm việc: +51.0% CÓ NGUY HIỂM</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert critical">
+                    <span class="anomaly-icon">🔴</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">wherevi.com</div>
+                        <div class="anomaly-text">Phiên làm việc: +114.9% CÓ NGUY HIỂM</div>
+                    </div>
+                </div>
+
+                <div class="anomaly-alert warning">
+                    <span class="anomaly-icon">🟡</span>
+                    <div class="anomaly-content">
+                        <div class="anomaly-site">wherevi.com</div>
+                        <div class="anomaly-text">Tỷ lệ thoát: -23.6pp Cảnh báo</div>
+                    </div>
+                </div>
+
+        <section id="top-keywords">
+            <h2>🔑 Top Keywords (Google Search Console)</h2>
+
+            <h3>localoria.com</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Từ khóa</th>
+                        <th>Nhấp chuột</th>
+                        <th>Lần hiển thị</th>
+                        <th>CTR (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td>restaurant near me</td>
+                        <td>1,250</td>
+                        <td>15,200</td>
+                        <td>8.20%</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>food delivery</td>
+                        <td>980</td>
+                        <td>12,400</td>
+                        <td>7.90%</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>best restaurants</td>
+                        <td>750</td>
+                        <td>9,800</td>
+                        <td>7.60%</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td>menu online</td>
+                        <td>620</td>
+                        <td>8,500</td>
+                        <td>7.30%</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td>order food</td>
+                        <td>580</td>
+                        <td>7,200</td>
+                        <td>8.00%</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td>restaurant reviews</td>
+                        <td>420</td>
+                        <td>5,600</td>
+                        <td>7.50%</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td>local dining</td>
+                        <td>350</td>
+                        <td>4,800</td>
+                        <td>7.30%</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td>food near me</td>
+                        <td>290</td>
+                        <td>3,900</td>
+                        <td>7.40%</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <h3>wherebly.com</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Từ khóa</th>
+                        <th>Nhấp chuột</th>
+                        <th>Lần hiển thị</th>
+                        <th>CTR (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td>restaurant directory</td>
+                        <td>45</td>
+                        <td>2,100</td>
+                        <td>2.10%</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>find restaurants</td>
+                        <td>38</td>
+                        <td>1,800</td>
+                        <td>2.10%</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>food guide</td>
+                        <td>28</td>
+                        <td>1,200</td>
+                        <td>2.30%</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td>restaurant listings</td>
+                        <td>18</td>
+                        <td>950</td>
+                        <td>1.90%</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <h3>res-menu.net</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Từ khóa</th>
+                        <th>Nhấp chuột</th>
+                        <th>Lần hiển thị</th>
+                        <th>CTR (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td>restaurant menu</td>
+                        <td>45,200</td>
+                        <td>1,850,000</td>
+                        <td>2.40%</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>food delivery services</td>
+                        <td>28,900</td>
+                        <td>1,200,000</td>
+                        <td>2.40%</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>restaurants worldwide</td>
+                        <td>18,500</td>
+                        <td>950,000</td>
+                        <td>1.90%</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td>dining guide</td>
+                        <td>15,600</td>
+                        <td>850,000</td>
+                        <td>1.80%</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td>food restaurant</td>
+                        <td>12,400</td>
+                        <td>750,000</td>
+                        <td>1.70%</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <h3>foodplacee.com</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Từ khóa</th>
+                        <th>Nhấp chuột</th>
+                        <th>Lần hiển thị</th>
+                        <th>CTR (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td>restaurant finder</td>
+                        <td>52</td>
+                        <td>2,800</td>
+                        <td>1.90%</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>food delivery online</td>
+                        <td>38</td>
+                        <td>1,950</td>
+                        <td>1.90%</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>best food places</td>
+                        <td>28</td>
+                        <td>1,400</td>
+                        <td>2.00%</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <h3>restaurants-world.net</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Từ khóa</th>
+                        <th>Nhấp chuột</th>
+                        <th>Lần hiển thị</th>
+                        <th>CTR (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td>world restaurants</td>
+                        <td>22,500</td>
+                        <td>850,000</td>
+                        <td>2.60%</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>international dining</td>
+                        <td>18,900</td>
+                        <td>720,000</td>
+                        <td>2.60%</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>restaurant guide</td>
+                        <td>15,600</td>
+                        <td>650,000</td>
+                        <td>2.40%</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td>food world</td>
+                        <td>12,400</td>
+                        <td>580,000</td>
+                        <td>2.10%</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <h3>goto-where.com</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Từ khóa</th>
+                        <th>Nhấp chuột</th>
+                        <th>Lần hiển thị</th>
+                        <th>CTR (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td>where to eat</td>
+                        <td>28,500</td>
+                        <td>1,250,000</td>
+                        <td>2.30%</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>restaurant location</td>
+                        <td>22,100</td>
+                        <td>980,000</td>
+                        <td>2.30%</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>go to restaurant</td>
+                        <td>18,900</td>
+                        <td>850,000</td>
+                        <td>2.20%</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td>dining location</td>
+                        <td>15,200</td>
+                        <td>750,000</td>
+                        <td>2.00%</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+        <section id="comparison">
+            <h2>📊 So sánh Website</h2>
+            <div class="site-comparison">
+
+            <div class="site-comparison-card">
+                <h4>menu-world.com</h4>
+                <div class="comparison-metric">
+                    <span>Phiên làm việc (30 ngày)</span>
+                    <span class="comparison-value">1,750,000 (+4.2%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Người dùng hoạt động</span>
+                    <span class="comparison-value">1,500,000 (+5.6%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Tỷ lệ thoát</span>
+                    <span class="comparison-value">38.0% (-9.5pp)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Nhấp chuột GSC</span>
+                    <span class="comparison-value">780,000 (+39.3%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Vị trí trung bình</span>
+                    <span class="comparison-value">8.7</span>
+                </div>
+            </div>
+
+            <div class="site-comparison-card">
+                <h4>res-menu.net</h4>
+                <div class="comparison-metric">
+                    <span>Phiên làm việc (30 ngày)</span>
+                    <span class="comparison-value">1,350,000 (+40.6%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Người dùng hoạt động</span>
+                    <span class="comparison-value">1,180,000 (+43.9%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Tỷ lệ thoát</span>
+                    <span class="comparison-value">37.0% (-2.6pp)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Nhấp chuột GSC</span>
+                    <span class="comparison-value">290,000 (+23.9%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Vị trí trung bình</span>
+                    <span class="comparison-value">9.5</span>
+                </div>
+            </div>
+
+            <div class="site-comparison-card">
+                <h4>goto-where.com</h4>
+                <div class="comparison-metric">
+                    <span>Phiên làm việc (30 ngày)</span>
+                    <span class="comparison-value">890,000 (+41.3%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Người dùng hoạt động</span>
+                    <span class="comparison-value">780,000 (+39.3%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Tỷ lệ thoát</span>
+                    <span class="comparison-value">48.0% (+2.1pp)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Nhấp chuột GSC</span>
+                    <span class="comparison-value">210,000 (+41.9%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Vị trí trung bình</span>
+                    <span class="comparison-value">8.5</span>
+                </div>
+            </div>
+
+            <div class="site-comparison-card">
+                <h4>restaurants-world.net</h4>
+                <div class="comparison-metric">
+                    <span>Phiên làm việc (30 ngày)</span>
+                    <span class="comparison-value">612,000 (+20.5%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Người dùng hoạt động</span>
+                    <span class="comparison-value">540,000 (+21.4%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Tỷ lệ thoát</span>
+                    <span class="comparison-value">45.0% (+7.1pp)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Nhấp chuột GSC</span>
+                    <span class="comparison-value">225,000 (+30.8%)</span>
+                </div>
+                <div class="comparison-metric">
+                    <span>Vị trí trung bình</span>
+                    <span class="comparison-value">9.3</span>
+                </div>
+            </div>
+
+            </div>
+        </section>
+
+        <section id="recommendations">
+            <h2>💡 Đề xuất tối ưu</h2>
+
+            <div class="recommendation">
+                <h4>🎯 Tối ưu hóa từ khóa</h4>
+                <ul>
+<li>Tập trung vào từ khóa có mục đích cao (cao conversion rate)</li>
+<li>Tạo nội dung cho các từ khóa phụ có tìm kiếm cao</li>
+<li>Cải thiện CTR bằng tiêu đề và mô tả hấp dẫn</li>
+<li>Nhắm mục tiêu vào vị trí 1-3 trên SERP</li>
+
+                </ul>
+            </div>
+
+            <div class="recommendation">
+                <h4>📱 Cải thiện UX</h4>
+                <ul>
+<li>Giảm tỷ lệ thoát bằng cách cải thiện tốc độ trang</li>
+<li>Tối ưu hóa cho thiết bị di động</li>
+<li>Cải thiện navigability (cấu trúc URL rõ ràng)</li>
+<li>Tăng thời gian trên trang với nội dung chất lượng</li>
+
+                </ul>
+            </div>
+
+            <div class="recommendation">
+                <h4>🔗 Xây dựng liên kết</h4>
+                <ul>
+<li>Tìm cơ hội liên kết từ các trang danh mục cao</li>
+<li>Tạo nội dung liên kết được (infographics, case studies)</li>
+<li>Xây dựng mối quan hệ với các trang web liên quan</li>
+<li>Sửa các liên kết bị hỏng trên trang web của bạn</li>
+
+                </ul>
+            </div>
+
+            <div class="recommendation">
+                <h4>📝 Chiến lược nội dung</h4>
+                <ul>
+<li>Tạo nội dung vào khoảng thời gian lưu lượng cao</li>
+<li>Cập nhật nội dung cũ với dữ liệu mới</li>
+<li>Tạo các bài viết dài hơn để đánh bại các đối thủ</li>
+<li>Tối ưu hóa nội dung hiện có cho các từ khóa phụ</li>
+
+                </ul>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <p>Báo cáo này được tạo tự động từ Google Analytics 4 và Google Search Console</p>
+        <p>Thời gian báo cáo: 15/01/2026 - 14/03/2026</p>
+    </footer>
+
+    <script>
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Smooth scroll and highlight section
+        function scrollToSection(event) {
+            event.preventDefault();
+            const target = event.target.getAttribute('href').substring(1);
+            const section = document.getElementById(target);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+                document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+                event.target.classList.add('active');
+            }
+        }
+
+        // Intersection Observer for active sidebar
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+                    const activeLink = document.querySelector(`.sidebar a[href="#${entry.target.id}"]`);
+                    if (activeLink) activeLink.classList.add('active');
+                }
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('section').forEach(section => observer.observe(section));
+
+        // Chart configurations
+        const chartColors = {
+            accent: '#e94560',
+            secondary: '#0f3460',
+            grid: 'rgba(234, 234, 234, 0.1)',
+            bg: '#16213e',
+        };
+
+        const commonChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#eaeaea', font: { size: 12 } }
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: chartColors.grid, drawBorder: false },
+                    ticks: { color: '#b0b0b0' },
+                    beginAtZero: true,
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#b0b0b0' }
+                }
+            }
+        };
+
+
+        // Chart for menu-world.com
+        const ctxmenu_world_com = document.getElementById('chart-menu-world-com').getContext('2d');
+        new Chart(ctxmenu_world_com, {
+            type: 'line',
+            data: {
+                labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4', 'Tuần 5', 'Tuần 6', 'Tuần 7', 'Tuần 8'],
+                datasets: [
+                    {
+                        label: 'Phiên làm việc',
+                        data: [420000, 442755, 460762, 470142, 469099, 458383, 441138, 422153],
+                        borderColor: chartColors.accent,
+                        backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                    },
+                    {
+                        label: 'Người dùng',
+                        data: [355000, 375013, 391067, 399837, 399747, 391386, 377394, 361845],
+                        borderColor: chartColors.secondary,
+                        backgroundColor: 'rgba(15, 52, 96, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: commonChartOptions
+        });
+
+        const gscCtxmenu_world_com = document.getElementById('gsc-menu-world-com').getContext('2d');
+        new Chart(gscCtxmenu_world_com, {
+            type: 'bar',
+            data: {
+                labels: ['Kỳ trước (30 ngày)', 'Kỳ gần nhất (30 ngày)'],
+                datasets: [
+                    {
+                        label: 'Nhấp chuột',
+                        data: [560000, 780000],
+                        backgroundColor: chartColors.accent,
+                        borderColor: chartColors.accent,
+                        borderWidth: 2,
+                    },
+                    {
+                        label: 'Lần hiển thị (÷100)',
+                        data: [560000, 680000],
+                        backgroundColor: chartColors.secondary,
+                        borderColor: chartColors.secondary,
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: commonChartOptions
+        });
+
+
+        // Chart for res-menu.net
+        const ctxres_menu_net = document.getElementById('chart-res-menu-net').getContext('2d');
+        new Chart(ctxres_menu_net, {
+            type: 'line',
+            data: {
+                labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4', 'Tuần 5', 'Tuần 6', 'Tuần 7', 'Tuần 8'],
+                datasets: [
+                    {
+                        label: 'Phiên làm việc',
+                        data: [240000, 266102, 290396, 309893, 322603, 328174, 328137, 325661],
+                        borderColor: chartColors.accent,
+                        backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                    },
+                    {
+                        label: 'Người dùng',
+                        data: [205000, 228301, 250128, 267867, 279745, 285401, 286124, 284651],
+                        borderColor: chartColors.secondary,
+                        backgroundColor: 'rgba(15, 52, 96, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: commonChartOptions
+        });
+
+        const gscCtxres_menu_net = document.getElementById('gsc-res-menu-net').getContext('2d');
+        new Chart(gscCtxres_menu_net, {
+            type: 'bar',
+            data: {
+                labels: ['Kỳ trước (30 ngày)', 'Kỳ gần nhất (30 ngày)'],
+                datasets: [
+                    {
+                        label: 'Nhấp chuột',
+                        data: [234000, 290000],
+                        backgroundColor: chartColors.accent,
+                        borderColor: chartColors.accent,
+                        borderWidth: 2,
+                    },
+                    {
+                        label: 'Lần hiển thị (÷100)',
+                        data: [225000, 285000],
+                        backgroundColor: chartColors.secondary,
+                        borderColor: chartColors.secondary,
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: commonChartOptions
+        });
+
+
+        // Chart for goto-where.com
+        const ctxgoto_where_com = document.getElementById('chart-goto-where-com').getContext('2d');
+        new Chart(ctxgoto_where_com, {
+            type: 'line',
+            data: {
+                labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4', 'Tuần 5', 'Tuần 6', 'Tuần 7', 'Tuần 8'],
+                datasets: [
+                    {
+                        label: 'Phiên làm việc',
+                        data: [157500, 174781, 190887, 203846, 212341, 216133, 216223, 214695],
+                        borderColor: chartColors.accent,
+                        backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                    },
+                    {
+                        label: 'Người dùng',
+                        data: [140000, 154945, 168817, 179887, 187016, 190015, 189783, 188159],
+                        borderColor: chartColors.secondary,
+                        backgroundColor: 'rgba(15, 52, 96, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: commonChartOptions
+        });
+
+        const gscCtxgoto_where_com = document.getElementById('gsc-goto-where-com').getContext('2d');
+        new Chart(gscCtxgoto_where_com, {
+            type: 'bar',
+            data: {
+                labels: ['Kỳ trước (30 ngày)', 'Kỳ gần nhất (30 ngày)'],
+                datasets: [
+                    {
+                        label: 'Nhấp chuột',
+                        data: [148000, 210000],
+                        backgroundColor: chartColors.accent,
+                        borderColor: chartColors.accent,
+                        borderWidth: 2,
+                    },
+                    {
+                        label: 'Lần hiển thị (÷100)',
+                        data: [260000, 350000],
+                        backgroundColor: chartColors.secondary,
+                        borderColor: chartColors.secondary,
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: commonChartOptions
+        });
+
+
+        // Chart for restaurants-world.net
+        const ctxrestaurants_world_net = document.getElementById('chart-restaurants-world-net').getContext('2d');
+        new Chart(ctxrestaurants_world_net, {
+            type: 'line',
+            data: {
+                labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4', 'Tuần 5', 'Tuần 6', 'Tuần 7', 'Tuần 8'],
+                datasets: [
+                    {
+                        label: 'Phiên làm việc',
+                        data: [127000, 136981, 145740, 151922, 154756, 154283, 151392, 147633],
+                        borderColor: chartColors.accent,
+                        backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                    },
+                    {
+                        label: 'Người dùng',
+                        data: [111250, 120139, 127968, 133541, 136171, 135887, 133464, 130264],
+                        borderColor: chartColors.secondary,
+                        backgroundColor: 'rgba(15, 52, 96, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: commonChartOptions
+        });
+
+        const gscCtxrestaurants_world_net = document.getElementById('gsc-restaurants-world-net').getContext('2d');
+        new Chart(gscCtxrestaurants_world_net, {
+            type: 'bar',
+            data: {
+                labels: ['Kỳ trước (30 ngày)', 'Kỳ gần nhất (30 ngày)'],
+                datasets: [
+                    {
+                        label: 'Nhấp chuột',
+                        data: [172000, 225000],
+                        backgroundColor: chartColors.accent,
+                        borderColor: chartColors.accent,
+                        borderWidth: 2,
+                    },
+                    {
+                        label: 'Lần hiển thị (÷100)',
+                        data: [162000, 205000],
+                        backgroundColor: chartColors.secondary,
+                        borderColor: chartColors.secondary,
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: commonChartOptions
+        });
+
+    </script>
+</body>
+</html>
