@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SEO Dashboard - Báo Cáo SEO - Nhà Hàng">
+  <title>Báo Cáo SEO - Nhà Hàng</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  
+    <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --border-color: #dddddd;
+      --card-bg: #ffffff;
+      --card-border: #e0e0e0;
+    }
+
+    body.dark-mode {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --border-color: #444444;
+      --card-bg: #2d2d2d;
+      --card-border: #444444;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+    }
+
+    input, select, textarea {
+      background-color: var(--card-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--card-border);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid #4285f4;
+      background-color: var(--card-bg);
+      color: var(--text-primary);
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+    }
+
+    th {
+      background-color: var(--bg-secondary);
+    }
+    </style>
+    
+  
+    <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 1.8em;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #4285f4;
+    }
+
+    h3 {
+      font-size: 1.3em;
+      margin-top: 20px;
+      margin-bottom: 15px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dark-toggle {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      background-color: var(--card-bg);
+      color: var(--text-primary);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .dark-toggle:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .cross-links {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: var(--bg-secondary);
+      border-radius: 4px;
+    }
+
+    .cross-links a {
+      padding: 8px 12px;
+      background-color: #4285f4;
+      color: white;
+      text-decoration: none;
+      border-radius: 3px;
+      font-weight: 500;
+    }
+
+    .cross-links a:hover {
+      background-color: #1a73e8;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 20px;
+      max-width: 300px;
+      float: right;
+      margin-left: 20px;
+    }
+
+    .toc h4 {
+      font-size: 1em;
+      margin-bottom: 10px;
+    }
+
+    .toc ul {
+      list-style: none;
+    }
+
+    .toc li {
+      margin: 8px 0;
+    }
+
+    .toc a {
+      color: #4285f4;
+      text-decoration: none;
+      font-size: 0.9em;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .toc li.active > a {
+      font-weight: bold;
+      color: #1a73e8;
+    }
+
+    .kpi-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .card-title {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-value {
+      font-size: 2em;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .card-change {
+      font-size: 0.85em;
+      padding: 4px 8px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .card-change.positive {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .card-change.negative {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .card-change.neutral {
+      background-color: #e2e3e5;
+      color: #383d41;
+    }
+
+    .controls {
+      margin-bottom: 30px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .controls label {
+      font-weight: 500;
+    }
+
+    .controls select {
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-bottom: 30px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 15px;
+      border-radius: 4px;
+    }
+
+    table {
+      width: 100%;
+      font-size: 0.9em;
+      margin-bottom: 30px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    th {
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    td {
+      padding: 12px;
+    }
+
+    tbody tr:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .anomaly-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .anomaly-card {
+      padding: 15px;
+      border-left: 4px solid;
+      border-radius: 4px;
+    }
+
+    .anomaly-card.critical {
+      border-left-color: #d32f2f;
+      background-color: #ffebee;
+    }
+
+    .anomaly-card.warning {
+      border-left-color: #f57c00;
+      background-color: #fff3e0;
+    }
+
+    .anomaly-card.info {
+      border-left-color: #1976d2;
+      background-color: #e3f2fd;
+    }
+
+    .anomaly-card h4 {
+      font-size: 1em;
+      margin-bottom: 5px;
+      margin-top: 0;
+    }
+
+    .anomaly-card p {
+      font-size: 0.9em;
+      margin: 0;
+    }
+
+    .recommendations-table {
+      width: 100%;
+      font-size: 0.85em;
+    }
+
+    .recommendations-table td {
+      padding: 15px;
+      vertical-align: top;
+    }
+
+    .recommendation-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .recommendation-desc {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+    }
+
+    .domain-link {
+      color: #4285f4;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .domain-link:hover {
+      color: #1a73e8;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .nav-links a {
+      padding: 10px 20px;
+      background-color: #4285f4;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .nav-links a:hover {
+      background-color: #1a73e8;
+    }
+
+    .nav-links a.disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .comparison-table {
+      width: 100%;
+      font-size: 0.85em;
+    }
+
+    .comparison-table td {
+      padding: 12px;
+    }
+
+    .comparison-col {
+      width: 48%;
+      display: inline-block;
+      margin-right: 2%;
+      vertical-align: top;
+    }
+
+    .comparison-col:last-child {
+      margin-right: 0;
+    }
+
+    .clearfix::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    .scrollable-table {
+      overflow-x: auto;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .toc {
+        position: static;
+        float: none;
+        margin-left: 0;
+        max-width: 100%;
+        margin-bottom: 20px;
+      }
+
+      .kpi-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .anomaly-cards {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      h2 {
+        font-size: 1.4em;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+    </style>
+    
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+    <div>
+      <h1>Báo Cáo SEO - Nhà Hàng</h1>
+      <p style="color: var(--text-secondary);">Ngày: 2026-03-18</p>
+    </div>
+    <button id="darkToggle" class="dark-toggle">🌙 Chế Độ Tối</button>
+  </div>
+<div class="cross-links">
+  <a href="index.html">📊 Tổng Quan</a>
+  <a href="seo-hotels-2026-03-18.html">🏢 Khách Sạn</a>
+</div>
+
+<div class="toc">
+  <h4>📋 Mục Lục</h4>
+  <ul>
+    <li><a href="#kpi">Chỉ Số Chính</a></li>
+    <li><a href="#trends">Xu Hướng</a></li>
+    <li><a href="#comparison">So Sánh Trang Web</a></li>
+    <li><a href="#keywords">Từ Khóa Hàng Đầu</a></li>
+    <li><a href="#anomalies">Bất Thường</a></li>
+    <li><a href="#analysis">Phân Tích Xu Hướng</a></li>
+    <li><a href="#recommendations">Khuyến Nghị</a></li>
+  </ul>
+</div>
+<h2 id="kpi">Chỉ Số Chính</h2>
+<div class="kpi-cards">
+  <div class="card">
+    <div class="card-title">Tổng Phiên</div>
+    <div class="card-value">11,880,314</div>
+    
+  </div>
+  <div class="card">
+    <div class="card-title">Người Dùng</div>
+    <div class="card-value">10,318,980</div>
+    
+  </div>
+  <div class="card">
+    <div class="card-title">Lượt Xem Trang</div>
+    <div class="card-value">18,548,086</div>
+    
+  </div>
+  <div class="card">
+    <div class="card-title">Lượt Nhấp</div>
+    <div class="card-value">4,298,555</div>
+    
+  </div>
+  <div class="card">
+    <div class="card-title">Lượt Hiện</div>
+    <div class="card-value">406,094,939</div>
+    
+  </div>
+  <div class="card">
+    <div class="card-title">Tỷ Lệ Thoát Bình Quân</div>
+    <div class="card-value">47.51%</div>
+    
+  </div>
+  <div class="card">
+    <div class="card-title">Tỷ Lệ Tương Tác</div>
+    <div class="card-value">52.49%</div>
+    
+  </div>
+  <div class="card">
+    <div class="card-title">Vị Trí</div>
+    <div class="card-value">8.35</div>
+    
+  </div>
+</div>
+<h2 id="trends">Xu Hướng</h2>
+<div class="controls">
+  <label>Lọc Trang Web:</label>
+  <select id="websiteFilter">
+    <option value="all">Tất Cả Trang Web</option>
+    <option value="localoria.com">localoria.com</option>
+    <option value="wherebly.com">wherebly.com</option>
+    <option value="res-menu.net">res-menu.net</option>
+    <option value="foodplacee.com">foodplacee.com</option>
+    <option value="restaurants-world.net">restaurants-world.net</option>
+    <option value="goto-where.com">goto-where.com</option>
+    <option value="menu-world.com">menu-world.com</option>
+    <option value="grubbio.com">grubbio.com</option>
+    <option value="menustic.com">menustic.com</option>
+    <option value="menufyy.com">menufyy.com</option>
+    <option value="wherevi.com">wherevi.com</option>
+    <option value="placejoys.com">placejoys.com</option>
+  </select>
+</div>
+<div class="chart-container">
+  <h3>Xu Hướng Phiên</h3>
+  <canvas id="sessions_trend"></canvas>
+</div>
+
+<script>
+const ctxsessions_trend = document.getElementById('sessions_trend').getContext('2d');
+new Chart(ctxsessions_trend, {
+  type: 'line',
+  data: {
+    labels: ["2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"],
+    datasets: [{"label": "localoria.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#FF6384", "backgroundColor": "#FF638420", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "wherebly.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#36A2EB", "backgroundColor": "#36A2EB20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "res-menu.net", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#FFCE56", "backgroundColor": "#FFCE5620", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "foodplacee.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#4BC0C0", "backgroundColor": "#4BC0C020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "restaurants-world.net", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#9966FF", "backgroundColor": "#9966FF20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "goto-where.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#FF9F40", "backgroundColor": "#FF9F4020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menu-world.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#E7E9ED", "backgroundColor": "#E7E9ED20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "grubbio.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#7CB342", "backgroundColor": "#7CB34220", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menustic.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#F06292", "backgroundColor": "#F0629220", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menufyy.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#4DD0E1", "backgroundColor": "#4DD0E120", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "wherevi.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#BA68C8", "backgroundColor": "#BA68C820", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "placejoys.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#FF7043", "backgroundColor": "#FF704320", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<div class="chart-container">
+  <h3>Xu Hướng Lượt Nhấp</h3>
+  <canvas id="clicks_trend"></canvas>
+</div>
+
+<script>
+const ctxclicks_trend = document.getElementById('clicks_trend').getContext('2d');
+new Chart(ctxclicks_trend, {
+  type: 'line',
+  data: {
+    labels: ["2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"],
+    datasets: [{"label": "localoria.com", "data": [308, 287, 265, 237, 235, 253, 289, 298, 270, 236, 229, 201, 239, 260, 257, 233, 194, 221, 244, 214, 238, 236, 179, 174, 188, 193, 198, 267, 246, 1054], "borderColor": "#FF6384", "backgroundColor": "#FF638420", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "wherebly.com", "data": [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 2, 0, 0, 0, 2, 8, 0, 3, 6, 16, 28, 17, 15, 8, 25, 28, 10, 27, 26], "borderColor": "#36A2EB", "backgroundColor": "#36A2EB20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "res-menu.net", "data": [22624, 28976, 20411, 17064, 17071, 18086, 19321, 24699, 25093, 17618, 14430, 16735, 18356, 19743, 25713, 27024, 20025, 17050, 19276, 21425, 23093, 29917, 31148, 22894, 18612, 20078, 22742, 26436, 34415, 35708], "borderColor": "#FFCE56", "backgroundColor": "#FFCE5620", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "foodplacee.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 3, 1, 0, 3, 12, 14, 17, 25, 25, 16, 14, 21, 33, 22, 385], "borderColor": "#4BC0C0", "backgroundColor": "#4BC0C020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "restaurants-world.net", "data": [12033, 15468, 10724, 8856, 9064, 9437, 9880, 12650, 13359, 9353, 7932, 9051, 9820, 10964, 13559, 14153, 10680, 8597, 9684, 10346, 10635, 12763, 13264, 9718, 7514, 8233, 8285, 9025, 11808, 12356], "borderColor": "#9966FF", "backgroundColor": "#9966FF20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "goto-where.com", "data": [6207, 6822, 5115, 4727, 4882, 4768, 5231, 8947, 9137, 7028, 6445, 6883, 7276, 7982, 9017, 9254, 7950, 6864, 7637, 7835, 8558, 11011, 11158, 8931, 7891, 8326, 8472, 9249, 10877, 10672], "borderColor": "#FF9F40", "backgroundColor": "#FF9F4020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menu-world.com", "data": [39386, 28841, 24932, 25323, 26107, 27696, 34131, 32975, 23786, 21428, 24314, 26021, 28748, 35416, 35280, 27419, 23418, 25829, 27090, 28940, 36556, 35824, 26237, 23187, 24418, 25349, 28334, 34230, 33281, 1130], "borderColor": "#E7E9ED", "backgroundColor": "#E7E9ED20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "grubbio.com", "data": [986, 1202, 906, 822, 915, 913, 967, 1051, 1109, 941, 743, 923, 958, 1089, 1164, 1095, 909, 750, 803, 800, 873, 972, 1032, 907, 716, 731, 701, 789, 958, 954], "borderColor": "#7CB342", "backgroundColor": "#7CB34220", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menustic.com", "data": [2314, 2539, 2109, 1896, 1892, 1916, 2041, 2378, 2448, 2160, 1847, 1969, 2067, 2161, 2433, 2530, 2304, 1935, 2146, 2187, 2343, 2883, 2797, 2418, 2099, 2149, 2173, 2295, 2599, 2607], "borderColor": "#F06292", "backgroundColor": "#F0629220", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menufyy.com", "data": [3467, 2831, 2494, 2490, 2619, 2776, 3019, 3108, 2670, 2313, 2820, 2768, 3030, 3391, 3783, 3303, 2852, 3134, 3313, 3573, 4797, 5126, 4640, 3939, 4122, 4323, 4858, 5636, 6162, 1513], "borderColor": "#4DD0E1", "backgroundColor": "#4DD0E120", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "wherevi.com", "data": [2579, 1828, 1448, 1466, 1407, 1550, 1787, 1994, 1307, 1037, 1324, 1369, 1477, 1988, 1903, 1438, 1121, 1276, 1319, 1449, 1893, 1866, 1436, 1099, 1210, 1107, 1246, 1470, 1516, 1132], "borderColor": "#BA68C8", "backgroundColor": "#BA68C820", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "placejoys.com", "data": [3186, 2426, 2162, 2083, 2313, 2616, 3571, 3689, 3039, 2509, 2788, 2799, 3077, 3631, 3618, 3180, 2594, 2752, 3091, 3292, 3783, 4024, 3188, 2815, 3017, 3472, 4032, 4911, 4870, 2326], "borderColor": "#FF7043", "backgroundColor": "#FF704320", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<div class="chart-container">
+  <h3>Xu Hướng Lượt Hiện</h3>
+  <canvas id="impressions_trend"></canvas>
+</div>
+
+<script>
+const ctximpressions_trend = document.getElementById('impressions_trend').getContext('2d');
+new Chart(ctximpressions_trend, {
+  type: 'line',
+  data: {
+    labels: ["2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"],
+    datasets: [{"label": "localoria.com", "data": [21243, 18641, 20042, 16580, 16598, 15804, 18844, 20908, 19879, 18365, 19102, 18021, 17294, 22095, 20980, 20702, 18282, 19192, 19080, 18116, 18945, 19423, 16855, 13928, 13762, 14655, 15724, 22003, 23719, 59902], "borderColor": "#FF6384", "backgroundColor": "#FF638420", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "wherebly.com", "data": [27, 27, 26, 23, 17, 28, 40, 22, 36, 38, 16, 31, 32, 36, 36, 213, 258, 127, 386, 627, 1082, 1285, 1561, 1426, 1119, 1369, 1530, 1774, 2093, 2015], "borderColor": "#36A2EB", "backgroundColor": "#36A2EB20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "res-menu.net", "data": [1198396, 1436878, 1059368, 932618, 929656, 951124, 1020553, 1277796, 1341238, 1049300, 894225, 960460, 995839, 1042810, 1320801, 1346175, 1166680, 994230, 1095402, 1179308, 1296930, 1618058, 1737808, 1417281, 1168081, 1258885, 1452296, 1607530, 2035676, 2144067], "borderColor": "#FFCE56", "backgroundColor": "#FFCE5620", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "foodplacee.com", "data": [14, 6, 6, 10, 6, 15, 5, 6, 6, 5, 10, 13, 13, 21, 161, 405, 283, 158, 393, 554, 1058, 1178, 1085, 815, 790, 716, 834, 1126, 1176, 36021], "borderColor": "#4BC0C0", "backgroundColor": "#4BC0C020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "restaurants-world.net", "data": [1080301, 1290365, 976747, 866144, 857799, 871867, 939044, 1164182, 1222312, 972312, 844964, 901914, 928217, 991583, 1218598, 1187910, 1009779, 830468, 899723, 920621, 983153, 1194907, 1220058, 964421, 792100, 829056, 873211, 949987, 1178796, 1216973], "borderColor": "#9966FF", "backgroundColor": "#9966FF20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "goto-where.com", "data": [1444458, 1598149, 1183142, 1095262, 1074439, 1084484, 1123969, 1901236, 1953248, 1600105, 1402033, 1455817, 1544356, 1664474, 1983897, 1958623, 1695871, 1445545, 1540728, 1603461, 1764721, 2203671, 2347689, 1944091, 1645215, 1743066, 1849489, 1961916, 2364553, 2439982], "borderColor": "#FF9F40", "backgroundColor": "#FF9F4020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menu-world.com", "data": [3495889, 2575499, 2313702, 2319427, 2296496, 2392774, 2901174, 2951802, 2332167, 2029499, 2155374, 2291546, 2398752, 2889094, 2827812, 2381248, 1990925, 2113331, 2179719, 2337993, 2875640, 2989346, 2356093, 1982121, 2076535, 2233040, 2343762, 2869603, 2920476, 32559], "borderColor": "#E7E9ED", "backgroundColor": "#E7E9ED20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "grubbio.com", "data": [131930, 140918, 110851, 102459, 102109, 102484, 105387, 118941, 126635, 110487, 96772, 102961, 107600, 116980, 133031, 129946, 113095, 89515, 95576, 95039, 101446, 116494, 124026, 109243, 87204, 91154, 95807, 99567, 115827, 122026], "borderColor": "#7CB342", "backgroundColor": "#7CB34220", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menustic.com", "data": [300239, 323809, 252161, 226114, 237222, 225208, 229833, 274604, 286619, 253316, 219761, 225548, 239140, 257497, 297381, 301383, 271081, 222946, 236842, 241720, 261139, 310446, 331112, 293128, 238187, 244061, 249975, 261926, 307478, 326834], "borderColor": "#F06292", "backgroundColor": "#F0629220", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menufyy.com", "data": [410260, 318931, 301860, 292663, 292165, 287113, 350167, 395438, 356512, 308632, 333056, 340129, 318139, 376736, 381373, 350987, 290021, 321131, 336671, 365456, 454601, 514222, 469557, 387892, 412406, 439510, 480376, 575004, 630389, 69051], "borderColor": "#4DD0E1", "backgroundColor": "#4DD0E120", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "wherevi.com", "data": [157159, 117937, 102124, 96784, 95166, 101768, 121022, 127484, 99433, 82532, 87448, 90967, 97447, 118323, 115904, 96004, 76838, 82741, 85730, 92588, 117187, 124900, 99045, 80988, 85830, 88332, 97283, 118304, 122667, 58119], "borderColor": "#BA68C8", "backgroundColor": "#BA68C820", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "placejoys.com", "data": [209075, 162190, 158163, 142598, 158579, 183657, 234321, 249809, 218142, 185148, 194559, 194715, 205414, 247326, 247812, 215976, 183657, 200940, 211243, 222875, 265775, 291409, 255557, 225257, 233016, 277674, 301846, 368239, 391583, 94572], "borderColor": "#FF7043", "backgroundColor": "#FF704320", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<div class="chart-container">
+  <h3>Xu Hướng Vị Trí</h3>
+  <canvas id="position_trend"></canvas>
+</div>
+
+<script>
+const ctxposition_trend = document.getElementById('position_trend').getContext('2d');
+new Chart(ctxposition_trend, {
+  type: 'line',
+  data: {
+    labels: ["2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"],
+    datasets: [{"label": "localoria.com", "data": [7.3908, 7.1638, 8.3071, 8.4044, 8.1305, 8.3848, 7.8187, 7.714, 7.6744, 7.2551, 7.5033, 7.5741, 7.5877, 6.9713, 6.7863, 6.9457, 6.9407, 7.2007, 7.6189, 8.3076, 8.4796, 8.6586, 8.4635, 8.3405, 9.0496, 9.6377, 8.9654, 9.4803, 9.2092, 7.17070754303613], "borderColor": "#FF6384", "backgroundColor": "#FF638420", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "wherebly.com", "data": [11.5926, 6.3704, 7.6154, 6.3913, 11.7059, 8.0357, 8.55, 11.1364, 7.3056, 9.5526, 7.75, 6.6774, 6.9688, 5.8611, 10.3056, 5.277, 6.376, 6.7874, 6.6606, 8.2041, 6.6303, 6.8623, 6.991, 6.636, 7.3378, 8.1351, 7.332, 6.9301, 6.5308, 7.5385], "borderColor": "#36A2EB", "backgroundColor": "#36A2EB20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "res-menu.net", "data": [9.5524, 9.0356, 9.1068, 9.7802, 10.3525, 10.0516, 9.7683, 9.4853, 9.309, 9.7578, 10.0804, 10.2956, 9.8401, 9.5924, 9.2182, 8.666, 9.4921, 10.0534, 9.9055, 9.8771, 9.9512, 9.5451, 9.4033, 9.6085, 9.6534, 10.0518, 10.0549, 9.5393, 9.2181, 8.8629], "borderColor": "#FFCE56", "backgroundColor": "#FFCE5620", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "foodplacee.com", "data": [4.0714, 3.3333, 5, 3.8, 7.8333, 5.6, 7, 5.6667, 2.1667, 4.2, 5.4, 5.1538, 7.0769, 5.381, 6.3727, 5.1333, 6.7703, 8.981, 6.5674, 5.7347, 6.4972, 5.9745, 6.1806, 5.589, 5.9519, 6.0559, 4.7374, 4.5595, 5.6088, 7.4064449827253185], "borderColor": "#4BC0C0", "backgroundColor": "#4BC0C020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "restaurants-world.net", "data": [9.2955, 8.8303, 8.8721, 9.4715, 10.0501, 9.7662, 9.4956, 9.2262, 9.1137, 9.4616, 9.7235, 9.9172, 9.4482, 9.2038, 8.976, 8.4563, 9.1037, 9.5656, 9.3836, 9.3543, 9.4846, 9.205, 9.1353, 9.2377, 9.3817, 9.8656, 10.2052, 9.7375, 9.4445, 9.0517], "borderColor": "#9966FF", "backgroundColor": "#9966FF20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "goto-where.com", "data": [9.3601, 9.1912, 9.2316, 9.6185, 10.0355, 9.8384, 9.7229, 8.9076, 8.945, 9.0951, 9.108, 9.3007, 9.105, 8.9278, 8.7683, 8.3827, 8.6806, 8.8521, 8.7417, 8.6704, 8.5997, 8.4143, 8.3187, 8.3357, 8.2459, 8.4602, 8.6151, 8.3818, 8.3663, 8.2647], "borderColor": "#FF9F40", "backgroundColor": "#FF9F4020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menu-world.com", "data": [8.3263, 8.4311, 8.8259, 8.9977, 8.9351, 8.8046, 8.568, 8.5819, 8.9306, 8.9782, 9.1408, 8.8284, 8.5929, 8.3816, 7.936, 8.4348, 8.6774, 8.6081, 8.6486, 8.5983, 8.3151, 8.2371, 8.4448, 8.4136, 8.7714, 8.9361, 8.4674, 8.3721, 8.1566, 6.552452933619303], "borderColor": "#E7E9ED", "backgroundColor": "#E7E9ED20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "grubbio.com", "data": [7.7383, 7.7968, 7.8635, 8.1046, 8.3788, 8.1749, 8.2475, 8.1681, 8.2157, 8.3002, 8.3742, 8.6578, 8.6239, 8.227, 8.1468, 7.9571, 8.272, 8.6862, 8.6749, 8.6375, 8.6448, 8.6683, 8.5967, 8.6205, 8.5055, 8.8728, 8.8985, 8.5495, 8.6169, 8.5696], "borderColor": "#7CB342", "backgroundColor": "#7CB34220", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menustic.com", "data": [6.9355, 7.038, 7.0652, 7.1122, 6.9656, 7.0528, 7.1181, 7.0781, 7.1674, 7.2129, 7.0478, 7.3656, 7.399, 7.2346, 7.2048, 7.0757, 7.1604, 7.3105, 7.5206, 7.1735, 7.14, 7.1686, 7.1781, 7.1571, 7.0583, 7.234, 7.4057, 7.2474, 7.3253, 7.3348], "borderColor": "#F06292", "backgroundColor": "#F0629220", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "menufyy.com", "data": [8.0491, 8.0696, 8.1017, 8.3957, 8.2042, 8.3444, 8.1476, 8.0782, 8.0716, 8.0325, 8.296, 8.3594, 8.3574, 8.231, 7.9351, 8.0826, 8.3291, 8.2116, 8.0537, 8.0325, 7.958, 7.8593, 7.8568, 7.6737, 7.9561, 7.9462, 7.6879, 7.7635, 7.7412, 5.978738144705678], "borderColor": "#4DD0E1", "backgroundColor": "#4DD0E120", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "wherevi.com", "data": [7.9142, 8.0179, 8.5665, 9.0322, 8.8248, 8.5921, 8.4031, 8.3126, 8.6058, 9.0699, 9.1102, 8.6989, 8.4276, 8.2179, 7.7607, 8.3693, 8.9943, 8.9174, 9.0685, 9.0446, 8.5705, 8.3907, 8.4079, 8.5401, 8.8614, 9.2969, 8.9397, 8.6305, 8.2011, 7.668823505676135], "borderColor": "#BA68C8", "backgroundColor": "#BA68C820", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "placejoys.com", "data": [7.5507, 7.5196, 8.1816, 8.4497, 8.2117, 8.2612, 7.7573, 7.6351, 7.7251, 8.0967, 8.4373, 8.0693, 7.9376, 7.6732, 7.219, 7.6483, 7.8504, 7.9667, 8.0804, 8.2675, 8.3116, 8.0778, 8.0757, 7.9834, 8.3646, 8.2244, 7.8342, 7.8677, 7.6255, 6.658255453811213], "borderColor": "#FF7043", "backgroundColor": "#FF704320", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<h2 id="comparison">So Sánh Trang Web</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Tên Miền</th>
+      <th>Lượt Nhấp</th>
+      <th>Lượt Hiện</th>
+      <th>CTR</th>
+      <th>Vị Trí</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="seo-detail-localoria.com-2026-03-18.html" class="domain-link">localoria.com</a></td>
+      <td>17,629</td>
+      <td>1,386,343</td>
+      <td>1.31%</td>
+      <td>8.38</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-wherebly.com-2026-03-18.html" class="domain-link">wherebly.com</a></td>
+      <td>233</td>
+      <td>17,575</td>
+      <td>6.31%</td>
+      <td>6.01</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-res-menu.net-2026-03-18.html" class="domain-link">res-menu.net</a></td>
+      <td>1,076,057</td>
+      <td>59,864,156</td>
+      <td>1.80%</td>
+      <td>10.13</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-foodplacee.com-2026-03-18.html" class="domain-link">foodplacee.com</a></td>
+      <td>116,556</td>
+      <td>10,352,712</td>
+      <td>1.79%</td>
+      <td>6.73</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-restaurants-world.net-2026-03-18.html" class="domain-link">restaurants-world.net</a></td>
+      <td>553,918</td>
+      <td>51,608,239</td>
+      <td>1.07%</td>
+      <td>9.75</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>392,032</td>
+      <td>85,650,244</td>
+      <td>0.45%</td>
+      <td>9.26</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-menu-world.com-2026-03-18.html" class="domain-link">menu-world.com</a></td>
+      <td>1,599,281</td>
+      <td>144,806,137</td>
+      <td>1.13%</td>
+      <td>8.79</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-grubbio.com-2026-03-18.html" class="domain-link">grubbio.com</a></td>
+      <td>48,408</td>
+      <td>5,749,497</td>
+      <td>0.85%</td>
+      <td>8.40</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-menustic.com-2026-03-18.html" class="domain-link">menustic.com</a></td>
+      <td>116,168</td>
+      <td>13,822,463</td>
+      <td>0.85%</td>
+      <td>7.21</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-menufyy.com-2026-03-18.html" class="domain-link">menufyy.com</a></td>
+      <td>155,194</td>
+      <td>17,051,200</td>
+      <td>0.95%</td>
+      <td>8.10</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-wherevi.com-2026-03-18.html" class="domain-link">wherevi.com</a></td>
+      <td>105,184</td>
+      <td>7,290,719</td>
+      <td>1.44%</td>
+      <td>8.95</td>
+    </tr>
+    <tr>
+      <td><a href="seo-detail-placejoys.com-2026-03-18.html" class="domain-link">placejoys.com</a></td>
+      <td>117,895</td>
+      <td>8,495,654</td>
+      <td>1.27%</td>
+      <td>8.48</td>
+    </tr>
+  </tbody>
+</table>
+<h2 id="keywords">Từ Khóa Hàng Đầu</h2>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Tên Miền</th>
+      <th>Từ Khóa</th>
+      <th>Lượt Nhấp</th>
+      <th>Lượt Hiện</th>
+      <th>CTR</th>
+      <th>Vị Trí</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>chez lucien</td>
+      <td>2,249</td>
+      <td>11,042</td>
+      <td>20.37%</td>
+      <td>2.61</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>meat me liverpool</td>
+      <td>1,362</td>
+      <td>8,115</td>
+      <td>16.78%</td>
+      <td>2.69</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>terra madre dublin</td>
+      <td>1,199</td>
+      <td>4,988</td>
+      <td>24.04%</td>
+      <td>2.65</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>bamonte's</td>
+      <td>1,154</td>
+      <td>12,459</td>
+      <td>9.26%</td>
+      <td>2.51</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>sushi kushi</td>
+      <td>1,080</td>
+      <td>9,259</td>
+      <td>11.66%</td>
+      <td>2.16</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>shukette menu</td>
+      <td>1,067</td>
+      <td>5,324</td>
+      <td>20.04%</td>
+      <td>1.95</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>pjs oyster bar</td>
+      <td>1,016</td>
+      <td>4,040</td>
+      <td>25.15%</td>
+      <td>2.68</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td><a href="seo-detail-menu-world.com-2026-03-18.html" class="domain-link">menu-world.com</a></td>
+      <td>chez lucien</td>
+      <td>982</td>
+      <td>5,193</td>
+      <td>18.91%</td>
+      <td>2.88</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td><a href="seo-detail-menu-world.com-2026-03-18.html" class="domain-link">menu-world.com</a></td>
+      <td>pjs oyster bar</td>
+      <td>923</td>
+      <td>2,569</td>
+      <td>35.93%</td>
+      <td>1.34</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>osteria santo spirito</td>
+      <td>831</td>
+      <td>9,932</td>
+      <td>8.37%</td>
+      <td>5.13</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>meat me</td>
+      <td>763</td>
+      <td>5,601</td>
+      <td>13.62%</td>
+      <td>3.11</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>bamonte's menu</td>
+      <td>754</td>
+      <td>4,542</td>
+      <td>16.60%</td>
+      <td>2.20</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td><a href="seo-detail-res-menu.net-2026-03-18.html" class="domain-link">res-menu.net</a></td>
+      <td>kawa revolving sushi menu</td>
+      <td>727</td>
+      <td>1,968</td>
+      <td>36.94%</td>
+      <td>2.15</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>chicken licks</td>
+      <td>725</td>
+      <td>7,769</td>
+      <td>9.33%</td>
+      <td>3.15</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>dumpling story</td>
+      <td>720</td>
+      <td>4,919</td>
+      <td>14.64%</td>
+      <td>3.17</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>chez lucien menu</td>
+      <td>718</td>
+      <td>3,323</td>
+      <td>21.61%</td>
+      <td>2.08</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>naked soup menu</td>
+      <td>700</td>
+      <td>3,350</td>
+      <td>20.90%</td>
+      <td>2.23</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td><a href="seo-detail-res-menu.net-2026-03-18.html" class="domain-link">res-menu.net</a></td>
+      <td>sofia's pizza & roast beef menu</td>
+      <td>696</td>
+      <td>1,626</td>
+      <td>42.80%</td>
+      <td>2.47</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td><a href="seo-detail-res-menu.net-2026-03-18.html" class="domain-link">res-menu.net</a></td>
+      <td>bistrot paul bert menu</td>
+      <td>659</td>
+      <td>2,677</td>
+      <td>24.62%</td>
+      <td>2.40</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td><a href="seo-detail-goto-where.com-2026-03-18.html" class="domain-link">goto-where.com</a></td>
+      <td>el rincon de rafa</td>
+      <td>652</td>
+      <td>5,023</td>
+      <td>12.98%</td>
+      <td>2.60</td>
+    </tr>
+  </tbody>
+</table>
+<h2 id="anomalies">Bất Thường</h2>
+<div class="anomaly-cards">
+  <div class="anomaly-card critical">
+    <h4>localoria.com: Tỷ Lệ Thoát Cao (100.0%)</h4>
+    <p>Tỷ Lệ Thoát Cao Vượt Quá 95%</p>
+  </div>
+  <div class="anomaly-card critical">
+    <h4>localoria.com: Giảm Phiên Lớn (95.8%)</h4>
+    <p>Phiên Giảm Hơn 40%</p>
+  </div>
+  <div class="anomaly-card info">
+    <h4>localoria.com: Tăng Lượt Nhấp (1054)</h4>
+    <p>Lượt Nhấp Tăng Vượt Quá 3x</p>
+  </div>
+  <div class="anomaly-card critical">
+    <h4>wherebly.com: Tỷ Lệ Thoát Cao (100.0%)</h4>
+    <p>Tỷ Lệ Thoát Cao Vượt Quá 95%</p>
+  </div>
+  <div class="anomaly-card critical">
+    <h4>wherebly.com: Giảm Phiên Lớn (87.2%)</h4>
+    <p>Phiên Giảm Hơn 40%</p>
+  </div>
+  <div class="anomaly-card info">
+    <h4>wherebly.com: Tăng Lượt Nhấp (26)</h4>
+    <p>Lượt Nhấp Tăng Vượt Quá 3x</p>
+  </div>
+  <div class="anomaly-card critical">
+    <h4>res-menu.net: Tỷ Lệ Thoát Cao (99.6%)</h4>
+    <p>Tỷ Lệ Thoát Cao Vượt Quá 95%</p>
+  </div>
+  <div class="anomaly-card critical">
+    <h4>res-menu.net: Giảm Phiên Lớn (96.1%)</h4>
+    <p>Phiên Giảm Hơn 40%</p>
+  </div>
+</div>
+<h2 id="analysis">Phân Tích Xu Hướng</h2>
+<p>
+Phân tích dữ liệu SEO cho nhà hàng cho thấy:
+<ul>
+  <li>Tổng cộng 4,298,555 lượt nhấp từ tìm kiếm</li>
+  <li>Tổng 406,094,939 lượt hiện trong kết quả tìm kiếm</li>
+  <li>Tỷ lệ nhấp qua trung bình: 1.06%</li>
+  <li>Tỷ lệ thoát trung bình: 47.51%</li>
+</ul>
+</p>
+<h2 id="recommendations">Khuyến Nghị</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Khuyến Nghị</th>
+      <th>Chi Tiết</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Tối ưu hóa từ khóa</td>
+      <td>Tập trung vào các từ khóa có vị trí cao nhưng CTR thấp</td>
+    </tr>
+    <tr>
+      <td>Cải thiện nội dung</td>
+      <td>Cập nhật nội dung cho các trang có tỷ lệ thoát cao</td>
+    </tr>
+    <tr>
+      <td>Xây dựng liên kết</td>
+      <td>Tăng cường các nỗ lực xây dựng liên kết cho các trang xếp hạng cao</td>
+    </tr>
+    <tr>
+      <td>Cải thiện tốc độ trang</td>
+      <td>Đảm bảo các trang của bạn tải nhanh chóng</td>
+    </tr>
+    <tr>
+      <td>Tối ưu hóa di động</td>
+      <td>Đảm bảo tối ưu hóa tốt cho thiết bị di động</td>
+    </tr>
+  </tbody>
+</table>
+
+
+    <script>
+    // Dark mode toggle
+    const darkToggle = document.getElementById('darkToggle');
+    const html = document.documentElement;
+
+    function initDarkMode() {
+      const stored = localStorage.getItem('darkMode');
+      if (stored === 'true' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        html.classList.add('dark-mode');
+        if (darkToggle) darkToggle.textContent = '☀️ ' + (window.darkModeText || 'Light Mode');
+      }
+    }
+
+    if (darkToggle) {
+      darkToggle.addEventListener('click', function() {
+        html.classList.toggle('dark-mode');
+        const isDark = html.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkToggle.textContent = isDark ? '☀️ ' + (window.darkModeText || 'Light Mode') : '🌙 ' + (window.darkModeText || 'Dark Mode');
+      });
+    }
+
+    initDarkMode();
+
+    // TOC active section highlighting
+    const toc = document.querySelector('.toc');
+    if (toc) {
+      const sections = document.querySelectorAll('h2[id]');
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            document.querySelectorAll('.toc a').forEach(a => a.parentElement.classList.remove('active'));
+            const link = toc.querySelector(`a[href="#${entry.target.id}"]`);
+            if (link) link.parentElement.classList.add('active');
+          }
+        });
+      }, { threshold: 0.3 });
+
+      sections.forEach(section => observer.observe(section));
+    }
+
+    // Table sorting
+    document.querySelectorAll('th').forEach(th => {
+      if (th.cellIndex === undefined) return;
+      th.addEventListener('click', function() {
+        const table = this.closest('table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const colIdx = this.cellIndex;
+
+        const isAsc = this.classList.toggle('sort-asc');
+        this.classList.toggle('sort-desc');
+
+        rows.sort((a, b) => {
+          const aVal = a.cells[colIdx].textContent.trim();
+          const bVal = b.cells[colIdx].textContent.trim();
+          const aNum = parseFloat(aVal);
+          const bNum = parseFloat(bVal);
+
+          if (!isNaN(aNum) && !isNaN(bNum)) {
+            return isAsc ? aNum - bNum : bNum - aNum;
+          }
+          return isAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        });
+
+        tbody.innerHTML = '';
+        rows.forEach(row => tbody.appendChild(row));
+      });
+    });
+
+    // Website filter
+    const websiteFilter = document.getElementById('websiteFilter');
+    if (websiteFilter) {
+      websiteFilter.addEventListener('change', function() {
+        const selected = this.value;
+        document.querySelectorAll('[data-domain]').forEach(elem => {
+          if (selected === 'all' || elem.dataset.domain === selected) {
+            elem.style.display = '';
+          } else {
+            elem.style.display = 'none';
+          }
+        });
+      });
+    }
+
+    window.domainLink = function(domain) {
+      return 'seo-detail-' + domain + '-2026-03-18.html';
+    };
+    </script>
+    
+</div>
+</body>
+</html>
