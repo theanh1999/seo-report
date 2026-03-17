@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SEO Dashboard - Báo Cáo SEO - goto-where.com">
+  <title>Báo Cáo SEO - goto-where.com</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  
+    <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --border-color: #dddddd;
+      --card-bg: #ffffff;
+      --card-border: #e0e0e0;
+    }
+
+    body.dark-mode {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --border-color: #444444;
+      --card-bg: #2d2d2d;
+      --card-border: #444444;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+    }
+
+    input, select, textarea {
+      background-color: var(--card-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--card-border);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid #4285f4;
+      background-color: var(--card-bg);
+      color: var(--text-primary);
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+    }
+
+    th {
+      background-color: var(--bg-secondary);
+    }
+    </style>
+    
+  
+    <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 1.8em;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #4285f4;
+    }
+
+    h3 {
+      font-size: 1.3em;
+      margin-top: 20px;
+      margin-bottom: 15px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dark-toggle {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      background-color: var(--card-bg);
+      color: var(--text-primary);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .dark-toggle:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .cross-links {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: var(--bg-secondary);
+      border-radius: 4px;
+    }
+
+    .cross-links a {
+      padding: 8px 12px;
+      background-color: #4285f4;
+      color: white;
+      text-decoration: none;
+      border-radius: 3px;
+      font-weight: 500;
+    }
+
+    .cross-links a:hover {
+      background-color: #1a73e8;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 20px;
+      max-width: 300px;
+      float: right;
+      margin-left: 20px;
+    }
+
+    .toc h4 {
+      font-size: 1em;
+      margin-bottom: 10px;
+    }
+
+    .toc ul {
+      list-style: none;
+    }
+
+    .toc li {
+      margin: 8px 0;
+    }
+
+    .toc a {
+      color: #4285f4;
+      text-decoration: none;
+      font-size: 0.9em;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .toc li.active > a {
+      font-weight: bold;
+      color: #1a73e8;
+    }
+
+    .kpi-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .card-title {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-value {
+      font-size: 2em;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .card-change {
+      font-size: 0.85em;
+      padding: 4px 8px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .card-change.positive {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .card-change.negative {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .card-change.neutral {
+      background-color: #e2e3e5;
+      color: #383d41;
+    }
+
+    .controls {
+      margin-bottom: 30px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .controls label {
+      font-weight: 500;
+    }
+
+    .controls select {
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-bottom: 30px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 15px;
+      border-radius: 4px;
+    }
+
+    table {
+      width: 100%;
+      font-size: 0.9em;
+      margin-bottom: 30px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    th {
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    td {
+      padding: 12px;
+    }
+
+    tbody tr:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .anomaly-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .anomaly-card {
+      padding: 15px;
+      border-left: 4px solid;
+      border-radius: 4px;
+    }
+
+    .anomaly-card.critical {
+      border-left-color: #d32f2f;
+      background-color: #ffebee;
+    }
+
+    .anomaly-card.warning {
+      border-left-color: #f57c00;
+      background-color: #fff3e0;
+    }
+
+    .anomaly-card.info {
+      border-left-color: #1976d2;
+      background-color: #e3f2fd;
+    }
+
+    .anomaly-card h4 {
+      font-size: 1em;
+      margin-bottom: 5px;
+      margin-top: 0;
+    }
+
+    .anomaly-card p {
+      font-size: 0.9em;
+      margin: 0;
+    }
+
+    .recommendations-table {
+      width: 100%;
+      font-size: 0.85em;
+    }
+
+    .recommendations-table td {
+      padding: 15px;
+      vertical-align: top;
+    }
+
+    .recommendation-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .recommendation-desc {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+    }
+
+    .domain-link {
+      color: #4285f4;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .domain-link:hover {
+      color: #1a73e8;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .nav-links a {
+      padding: 10px 20px;
+      background-color: #4285f4;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .nav-links a:hover {
+      background-color: #1a73e8;
+    }
+
+    .nav-links a.disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .comparison-table {
+      width: 100%;
+      font-size: 0.85em;
+    }
+
+    .comparison-table td {
+      padding: 12px;
+    }
+
+    .comparison-col {
+      width: 48%;
+      display: inline-block;
+      margin-right: 2%;
+      vertical-align: top;
+    }
+
+    .comparison-col:last-child {
+      margin-right: 0;
+    }
+
+    .clearfix::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    .scrollable-table {
+      overflow-x: auto;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .toc {
+        position: static;
+        float: none;
+        margin-left: 0;
+        max-width: 100%;
+        margin-bottom: 20px;
+      }
+
+      .kpi-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .anomaly-cards {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      h2 {
+        font-size: 1.4em;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+    </style>
+    
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+    <div>
+      <h1>Báo Cáo SEO - goto-where.com</h1>
+      <p style="color: var(--text-secondary);">Ngày: 2026-03-18</p>
+    </div>
+    <button id="darkToggle" class="dark-toggle">🌙 Chế Độ Tối</button>
+  </div>
+<div class="nav-links">
+<a href="index.html">📊 Tổng Quan</a>
+<a href="seo-restaurants-2026-03-18.html">📋 Nhà Hàng</a>
+<a href="seo-detail-restaurants-world.net-2026-03-18.html">◀ Trước</a>
+<a href="seo-detail-menu-world.com-2026-03-18.html">Tiếp Theo ▶</a>
+</div>
+<div class="toc">
+  <h4>📋 Mục Lục</h4>
+  <ul>
+    <li><a href="#kpi">Chỉ Số Chính</a></li>
+    <li><a href="#ga4_trends">Xu Hướng GA4</a></li>
+    <li><a href="#gsc_trends">Xu Hướng GSC</a></li>
+    <li><a href="#daily">Chi Tiết Hàng Ngày</a></li>
+    <li><a href="#keywords">Từ Khóa Hàng Đầu</a></li>
+    <li><a href="#pages">Trang Hàng Đầu</a></li>
+    <li><a href="#anomalies">Bất Thường</a></li>
+    <li><a href="#comparison">30 Thay Đổi</a></li>
+    <li><a href="#recommendations">Khuyến Nghị</a></li>
+  </ul>
+</div>
+<h2 id="kpi">Chỉ Số Chính</h2>
+<div class="kpi-cards">
+  <div class="card">
+    <div class="card-title">Tổng Phiên</div>
+    <div class="card-value">1,067,058</div>
+    <span class="card-change positive">+66.4%</span>
+  </div>
+  <div class="card">
+    <div class="card-title">Người Dùng</div>
+    <div class="card-value">974,318</div>
+    <span class="card-change neutral">0.0%</span>
+  </div>
+  <div class="card">
+    <div class="card-title">Lượt Xem Trang</div>
+    <div class="card-value">1,405,899</div>
+    <span class="card-change neutral">0.0%</span>
+  </div>
+  <div class="card">
+    <div class="card-title">Lượt Nhấp</div>
+    <div class="card-value">235,152</div>
+    <span class="card-change neutral">0.0%</span>
+  </div>
+  <div class="card">
+    <div class="card-title">Lượt Hiện</div>
+    <div class="card-value">50,617,690</div>
+    <span class="card-change neutral">0.0%</span>
+  </div>
+  <div class="card">
+    <div class="card-title">Tỷ Lệ Thoát Bình Quân</div>
+    <div class="card-value">50.17%</div>
+    
+  </div>
+  <div class="card">
+    <div class="card-title">Tỷ Lệ Tương Tác</div>
+    <div class="card-value">49.83%</div>
+    
+  </div>
+  <div class="card">
+    <div class="card-title">Vị Trí</div>
+    <div class="card-value">8.88</div>
+    
+  </div>
+</div>
+<h2 id="ga4_trends">Xu Hướng GA4</h2>
+<div class="chart-container">
+  <h3>Phiên & Người Dùng</h3>
+  <canvas id="ga4_sessions_users"></canvas>
+</div>
+
+<script>
+const ctxga4_sessions_users = document.getElementById('ga4_sessions_users').getContext('2d');
+new Chart(ctxga4_sessions_users, {
+  type: 'line',
+  data: {
+    labels: ["2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16"],
+    datasets: [{"label": "T\u1ed5ng Phi\u00ean", "data": [22911, 21124, 19626, 19631, 20695, 27620, 29114, 25266, 23757, 25860, 32900, 26506, 31043, 54996, 57261, 23910, 24653, 27825, 27820, 31407, 32436, 154957, 133654, 31624, 25432, 23628, 29654, 31992, 29199, 557], "borderColor": "#36A2EB", "backgroundColor": "#36A2EB20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "Ng\u01b0\u1eddi D\u00f9ng", "data": [19115, 17819, 16753, 16655, 18368, 23986, 24867, 22022, 20999, 22624, 30226, 22813, 27667, 51706, 55895, 20932, 21693, 24583, 24238, 27386, 28727, 154829, 131038, 28069, 21971, 20493, 26111, 27306, 24958, 469], "borderColor": "#FF6384", "backgroundColor": "#FF638420", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<div class="chart-container">
+  <h3>Thoát & Tương Tác</h3>
+  <canvas id="ga4_bounce_engagement"></canvas>
+</div>
+
+<script>
+const ctxga4_bounce_engagement = document.getElementById('ga4_bounce_engagement').getContext('2d');
+new Chart(ctxga4_bounce_engagement, {
+  type: 'line',
+  data: {
+    labels: ["2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16"],
+    datasets: [{"label": "T\u1ef7 L\u1ec7 Tho\u00e1t B\u00ecnh Qu\u00e2n", "data": [0.4517, 0.4682, 0.4365, 0.4324, 0.4225, 0.4109, 0.4499, 0.4864, 0.5227, 0.5361, 0.6209, 0.4674, 0.4897, 0.7111, 0.7537, 0.4938, 0.4728, 0.5116, 0.4861, 0.4406, 0.4595, 0.6804, 0.625, 0.3757, 0.4541, 0.4645, 0.4314, 0.4621, 0.4799, 0.5548], "borderColor": "#FF9F40", "backgroundColor": "#FF9F4020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "T\u1ef7 L\u1ec7 T\u01b0\u01a1ng T\u00e1c", "data": [0.5483, 0.5318, 0.5635, 0.5676, 0.5775, 0.5891, 0.5501, 0.5136, 0.4773, 0.4639, 0.3791, 0.5326, 0.5103, 0.2889, 0.2463, 0.5062, 0.5272, 0.4884, 0.5139, 0.5594, 0.5405, 0.3196, 0.375, 0.6243, 0.5459, 0.5355, 0.5686, 0.5379, 0.5201, 0.4452], "borderColor": "#4BC0C0", "backgroundColor": "#4BC0C020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<div class="chart-container">
+  <h3>Lượt Xem Trang</h3>
+  <canvas id="ga4_pageviews"></canvas>
+</div>
+
+<script>
+const ctxga4_pageviews = document.getElementById('ga4_pageviews').getContext('2d');
+new Chart(ctxga4_pageviews, {
+  type: 'bar',
+  data: {
+    labels: ["2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16"],
+    datasets: [{"label": "L\u01b0\u1ee3t Xem Trang", "data": [34019, 30419, 29140, 29348, 31881, 41876, 42872, 36933, 33643, 35857, 43746, 37242, 44839, 69327, 70724, 33737, 35646, 38438, 39952, 46725, 48259, 168233, 143907, 41413, 35521, 33010, 42681, 45157, 40630, 724], "backgroundColor": "#FFCE56", "borderColor": "#FFC53600", "borderWidth": 1}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<div class="chart-container">
+  <h3>Thời Gian Trung Bình</h3>
+  <canvas id="ga4_duration"></canvas>
+</div>
+
+<script>
+const ctxga4_duration = document.getElementById('ga4_duration').getContext('2d');
+new Chart(ctxga4_duration, {
+  type: 'line',
+  data: {
+    labels: ["2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16"],
+    datasets: [{"label": "Th\u1eddi Gian Trung B\u00ecnh", "data": [85.032, 86.8011, 93.4118, 89.0179, 90.4511, 98.4596, 92.7044, 78.978, 80.6957, 74.9392, 65.9182, 81.7098, 93.3776, 49.7886, 42.7542, 79.9743, 82.3787, 76.1036, 82.7275, 92.1453, 84.4966, 21.3317, 22.8377, 70.6603, 84.6813, 83.778, 91.3946, 84.5677, 81.3933, 72.8443], "borderColor": "#9966FF", "backgroundColor": "#9966FF20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<h2 id="gsc_trends">Xu Hướng GSC</h2>
+<div class="chart-container">
+  <h3>Xu Hướng Lượt Nhấp</h3>
+  <canvas id="gsc_clicks_impressions"></canvas>
+</div>
+
+<script>
+const ctxgsc_clicks_impressions = document.getElementById('gsc_clicks_impressions').getContext('2d');
+new Chart(ctxgsc_clicks_impressions, {
+  type: 'line',
+  data: {
+    labels: ["2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14"],
+    datasets: [{"label": "L\u01b0\u1ee3t Nh\u1ea5p", "data": [6207, 6822, 5115, 4727, 4882, 4768, 5231, 8947, 9137, 7028, 6445, 6883, 7276, 7982, 9017, 9254, 7950, 6864, 7637, 7835, 8558, 11011, 11158, 8931, 7891, 8326, 8472, 9249, 10877, 10672], "borderColor": "#36A2EB", "backgroundColor": "#36A2EB20", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}, {"label": "L\u01b0\u1ee3t Hi\u1ec7n", "data": [1444458, 1598149, 1183142, 1095262, 1074439, 1084484, 1123969, 1901236, 1953248, 1600105, 1402033, 1455817, 1544356, 1664474, 1983897, 1958623, 1695871, 1445545, 1540728, 1603461, 1764721, 2203671, 2347689, 1944091, 1645215, 1743066, 1849489, 1961916, 2364553, 2439982], "borderColor": "#FFCE56", "backgroundColor": "#FFCE5620", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<div class="chart-container">
+  <h3>Xu Hướng CTR</h3>
+  <canvas id="gsc_ctr"></canvas>
+</div>
+
+<script>
+const ctxgsc_ctr = document.getElementById('gsc_ctr').getContext('2d');
+new Chart(ctxgsc_ctr, {
+  type: 'line',
+  data: {
+    labels: ["2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14"],
+    datasets: [{"label": "CTR", "data": [0.0043, 0.0043, 0.0043, 0.0043, 0.0045, 0.0044, 0.0047, 0.0047, 0.0047, 0.0044, 0.0046, 0.0047, 0.0047, 0.0048, 0.0045, 0.0047, 0.0047, 0.0047, 0.005, 0.0049, 0.0048, 0.005, 0.0048, 0.0046, 0.0048, 0.0048, 0.0046, 0.0047, 0.0046, 0.0044], "borderColor": "#4BC0C0", "backgroundColor": "#4BC0C020", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<div class="chart-container">
+  <h3>Xu Hướng Vị Trí</h3>
+  <canvas id="gsc_position"></canvas>
+</div>
+
+<script>
+const ctxgsc_position = document.getElementById('gsc_position').getContext('2d');
+new Chart(ctxgsc_position, {
+  type: 'line',
+  data: {
+    labels: ["2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14"],
+    datasets: [{"label": "V\u1ecb Tr\u00ed", "data": [9.3601, 9.1912, 9.2316, 9.6185, 10.0355, 9.8384, 9.7229, 8.9076, 8.945, 9.0951, 9.108, 9.3007, 9.105, 8.9278, 8.7683, 8.3827, 8.6806, 8.8521, 8.7417, 8.6704, 8.5997, 8.4143, 8.3187, 8.3357, 8.2459, 8.4602, 8.6151, 8.3818, 8.3663, 8.2647], "borderColor": "#FF6384", "backgroundColor": "#FF638420", "fill": false, "borderWidth": 2, "pointRadius": 3, "tension": 0.4}]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+<h2 id="daily">Chi Tiết Hàng Ngày</h2>
+<div class="scrollable-table">
+<table>
+  <thead>
+    <tr>
+      <th>Ngày</th>
+      <th>Lượt Nhấp</th>
+      <th>Lượt Hiện</th>
+      <th>CTR</th>
+      <th>Vị Trí</th>
+      <th>Tổng Phiên</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-02-13</td>
+      <td>6,207</td>
+      <td>1,444,458</td>
+      <td>0.43%</td>
+      <td>9.36</td>
+      <td>22,391</td>
+    </tr>
+    <tr>
+      <td>2026-02-14</td>
+      <td>6,822</td>
+      <td>1,598,149</td>
+      <td>0.43%</td>
+      <td>9.19</td>
+      <td>27,436</td>
+    </tr>
+    <tr>
+      <td>2026-02-15</td>
+      <td>5,115</td>
+      <td>1,183,142</td>
+      <td>0.43%</td>
+      <td>9.23</td>
+      <td>22,911</td>
+    </tr>
+    <tr>
+      <td>2026-02-16</td>
+      <td>4,727</td>
+      <td>1,095,262</td>
+      <td>0.43%</td>
+      <td>9.62</td>
+      <td>21,124</td>
+    </tr>
+    <tr>
+      <td>2026-02-17</td>
+      <td>4,882</td>
+      <td>1,074,439</td>
+      <td>0.45%</td>
+      <td>10.04</td>
+      <td>19,626</td>
+    </tr>
+    <tr>
+      <td>2026-02-18</td>
+      <td>4,768</td>
+      <td>1,084,484</td>
+      <td>0.44%</td>
+      <td>9.84</td>
+      <td>19,631</td>
+    </tr>
+    <tr>
+      <td>2026-02-19</td>
+      <td>5,231</td>
+      <td>1,123,969</td>
+      <td>0.47%</td>
+      <td>9.72</td>
+      <td>20,695</td>
+    </tr>
+    <tr>
+      <td>2026-02-20</td>
+      <td>8,947</td>
+      <td>1,901,236</td>
+      <td>0.47%</td>
+      <td>8.91</td>
+      <td>27,620</td>
+    </tr>
+    <tr>
+      <td>2026-02-21</td>
+      <td>9,137</td>
+      <td>1,953,248</td>
+      <td>0.47%</td>
+      <td>8.95</td>
+      <td>29,114</td>
+    </tr>
+    <tr>
+      <td>2026-02-22</td>
+      <td>7,028</td>
+      <td>1,600,105</td>
+      <td>0.44%</td>
+      <td>9.10</td>
+      <td>25,266</td>
+    </tr>
+    <tr>
+      <td>2026-02-23</td>
+      <td>6,445</td>
+      <td>1,402,033</td>
+      <td>0.46%</td>
+      <td>9.11</td>
+      <td>23,757</td>
+    </tr>
+    <tr>
+      <td>2026-02-24</td>
+      <td>6,883</td>
+      <td>1,455,817</td>
+      <td>0.47%</td>
+      <td>9.30</td>
+      <td>25,860</td>
+    </tr>
+    <tr>
+      <td>2026-02-25</td>
+      <td>7,276</td>
+      <td>1,544,356</td>
+      <td>0.47%</td>
+      <td>9.11</td>
+      <td>32,900</td>
+    </tr>
+    <tr>
+      <td>2026-02-26</td>
+      <td>7,982</td>
+      <td>1,664,474</td>
+      <td>0.48%</td>
+      <td>8.93</td>
+      <td>26,506</td>
+    </tr>
+    <tr>
+      <td>2026-02-27</td>
+      <td>9,017</td>
+      <td>1,983,897</td>
+      <td>0.45%</td>
+      <td>8.77</td>
+      <td>31,043</td>
+    </tr>
+    <tr>
+      <td>2026-02-28</td>
+      <td>9,254</td>
+      <td>1,958,623</td>
+      <td>0.47%</td>
+      <td>8.38</td>
+      <td>54,996</td>
+    </tr>
+    <tr>
+      <td>2026-03-01</td>
+      <td>7,950</td>
+      <td>1,695,871</td>
+      <td>0.47%</td>
+      <td>8.68</td>
+      <td>57,261</td>
+    </tr>
+    <tr>
+      <td>2026-03-02</td>
+      <td>6,864</td>
+      <td>1,445,545</td>
+      <td>0.47%</td>
+      <td>8.85</td>
+      <td>23,910</td>
+    </tr>
+    <tr>
+      <td>2026-03-03</td>
+      <td>7,637</td>
+      <td>1,540,728</td>
+      <td>0.50%</td>
+      <td>8.74</td>
+      <td>24,653</td>
+    </tr>
+    <tr>
+      <td>2026-03-04</td>
+      <td>7,835</td>
+      <td>1,603,461</td>
+      <td>0.49%</td>
+      <td>8.67</td>
+      <td>27,825</td>
+    </tr>
+    <tr>
+      <td>2026-03-05</td>
+      <td>8,558</td>
+      <td>1,764,721</td>
+      <td>0.48%</td>
+      <td>8.60</td>
+      <td>27,820</td>
+    </tr>
+    <tr>
+      <td>2026-03-06</td>
+      <td>11,011</td>
+      <td>2,203,671</td>
+      <td>0.50%</td>
+      <td>8.41</td>
+      <td>31,407</td>
+    </tr>
+    <tr>
+      <td>2026-03-07</td>
+      <td>11,158</td>
+      <td>2,347,689</td>
+      <td>0.48%</td>
+      <td>8.32</td>
+      <td>32,436</td>
+    </tr>
+    <tr>
+      <td>2026-03-08</td>
+      <td>8,931</td>
+      <td>1,944,091</td>
+      <td>0.46%</td>
+      <td>8.34</td>
+      <td>154,957</td>
+    </tr>
+    <tr>
+      <td>2026-03-09</td>
+      <td>7,891</td>
+      <td>1,645,215</td>
+      <td>0.48%</td>
+      <td>8.25</td>
+      <td>133,654</td>
+    </tr>
+    <tr>
+      <td>2026-03-10</td>
+      <td>8,326</td>
+      <td>1,743,066</td>
+      <td>0.48%</td>
+      <td>8.46</td>
+      <td>31,624</td>
+    </tr>
+    <tr>
+      <td>2026-03-11</td>
+      <td>8,472</td>
+      <td>1,849,489</td>
+      <td>0.46%</td>
+      <td>8.62</td>
+      <td>25,432</td>
+    </tr>
+    <tr>
+      <td>2026-03-12</td>
+      <td>9,249</td>
+      <td>1,961,916</td>
+      <td>0.47%</td>
+      <td>8.38</td>
+      <td>23,628</td>
+    </tr>
+    <tr>
+      <td>2026-03-13</td>
+      <td>10,877</td>
+      <td>2,364,553</td>
+      <td>0.46%</td>
+      <td>8.37</td>
+      <td>29,654</td>
+    </tr>
+    <tr>
+      <td>2026-03-14</td>
+      <td>10,672</td>
+      <td>2,439,982</td>
+      <td>0.44%</td>
+      <td>8.26</td>
+      <td>31,992</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<h2 id="keywords">Từ Khóa Hàng Đầu</h2>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Từ Khóa</th>
+      <th>Lượt Nhấp</th>
+      <th>Lượt Hiện</th>
+      <th>CTR</th>
+      <th>Vị Trí</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>chez lucien</td>
+      <td>2,249</td>
+      <td>11,042</td>
+      <td>20.37%</td>
+      <td>2.61</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>meat me liverpool</td>
+      <td>1,362</td>
+      <td>8,115</td>
+      <td>16.78%</td>
+      <td>2.69</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>terra madre dublin</td>
+      <td>1,199</td>
+      <td>4,988</td>
+      <td>24.04%</td>
+      <td>2.65</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>bamonte's</td>
+      <td>1,154</td>
+      <td>12,459</td>
+      <td>9.26%</td>
+      <td>2.51</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>sushi kushi</td>
+      <td>1,080</td>
+      <td>9,259</td>
+      <td>11.66%</td>
+      <td>2.16</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>shukette menu</td>
+      <td>1,067</td>
+      <td>5,324</td>
+      <td>20.04%</td>
+      <td>1.95</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>pjs oyster bar</td>
+      <td>1,016</td>
+      <td>4,040</td>
+      <td>25.15%</td>
+      <td>2.68</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>osteria santo spirito</td>
+      <td>831</td>
+      <td>9,932</td>
+      <td>8.37%</td>
+      <td>5.13</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>meat me</td>
+      <td>763</td>
+      <td>5,601</td>
+      <td>13.62%</td>
+      <td>3.11</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>bamonte's menu</td>
+      <td>754</td>
+      <td>4,542</td>
+      <td>16.60%</td>
+      <td>2.20</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>chicken licks</td>
+      <td>725</td>
+      <td>7,769</td>
+      <td>9.33%</td>
+      <td>3.15</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>dumpling story</td>
+      <td>720</td>
+      <td>4,919</td>
+      <td>14.64%</td>
+      <td>3.17</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>chez lucien menu</td>
+      <td>718</td>
+      <td>3,323</td>
+      <td>21.61%</td>
+      <td>2.08</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>naked soup menu</td>
+      <td>700</td>
+      <td>3,350</td>
+      <td>20.90%</td>
+      <td>2.23</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>el rincon de rafa</td>
+      <td>652</td>
+      <td>5,023</td>
+      <td>12.98%</td>
+      <td>2.60</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>dumpling story sf</td>
+      <td>647</td>
+      <td>2,667</td>
+      <td>24.26%</td>
+      <td>1.64</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>meat me lark lane menu</td>
+      <td>643</td>
+      <td>5,748</td>
+      <td>11.19%</td>
+      <td>2.29</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>come to chutneys</td>
+      <td>634</td>
+      <td>7,998</td>
+      <td>7.93%</td>
+      <td>1.40</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>liverpool house menu</td>
+      <td>632</td>
+      <td>4,005</td>
+      <td>15.78%</td>
+      <td>2.31</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>lopez grill</td>
+      <td>599</td>
+      <td>6,223</td>
+      <td>9.63%</td>
+      <td>2.23</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>grexicana</td>
+      <td>576</td>
+      <td>4,070</td>
+      <td>14.15%</td>
+      <td>2.30</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>come to chutneys menu</td>
+      <td>567</td>
+      <td>6,350</td>
+      <td>8.93%</td>
+      <td>2.09</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>haute coffee menu</td>
+      <td>567</td>
+      <td>1,672</td>
+      <td>33.91%</td>
+      <td>2.10</td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>street grill</td>
+      <td>565</td>
+      <td>7,539</td>
+      <td>7.49%</td>
+      <td>3.23</td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>bamontes</td>
+      <td>557</td>
+      <td>6,788</td>
+      <td>8.21%</td>
+      <td>3.20</td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>nouilles de lan zhou</td>
+      <td>557</td>
+      <td>6,348</td>
+      <td>8.77%</td>
+      <td>2.46</td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>viet huong</td>
+      <td>552</td>
+      <td>6,463</td>
+      <td>8.54%</td>
+      <td>2.83</td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>chez lucien ottawa</td>
+      <td>537</td>
+      <td>2,053</td>
+      <td>26.16%</td>
+      <td>2.73</td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td>chef kecik menu</td>
+      <td>525</td>
+      <td>2,461</td>
+      <td>21.33%</td>
+      <td>2.14</td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>sushi kushi menu</td>
+      <td>518</td>
+      <td>2,674</td>
+      <td>19.37%</td>
+      <td>2.44</td>
+    </tr>
+    <tr>
+      <td>31</td>
+      <td>keens steakhouse menu</td>
+      <td>499</td>
+      <td>13,095</td>
+      <td>3.81%</td>
+      <td>5.07</td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>meat me lark lane</td>
+      <td>488</td>
+      <td>3,763</td>
+      <td>12.97%</td>
+      <td>2.61</td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>potluck cafe</td>
+      <td>473</td>
+      <td>4,214</td>
+      <td>11.22%</td>
+      <td>2.79</td>
+    </tr>
+    <tr>
+      <td>34</td>
+      <td>makers social</td>
+      <td>470</td>
+      <td>13,715</td>
+      <td>3.43%</td>
+      <td>5.57</td>
+    </tr>
+    <tr>
+      <td>35</td>
+      <td>pj's oyster bar</td>
+      <td>459</td>
+      <td>1,575</td>
+      <td>29.14%</td>
+      <td>2.46</td>
+    </tr>
+    <tr>
+      <td>36</td>
+      <td>hunters westland</td>
+      <td>458</td>
+      <td>1,920</td>
+      <td>23.85%</td>
+      <td>3.24</td>
+    </tr>
+    <tr>
+      <td>37</td>
+      <td>the milkman edinburgh menu</td>
+      <td>458</td>
+      <td>1,002</td>
+      <td>45.71%</td>
+      <td>1.50</td>
+    </tr>
+    <tr>
+      <td>38</td>
+      <td>cali n tito's</td>
+      <td>456</td>
+      <td>6,896</td>
+      <td>6.61%</td>
+      <td>3.30</td>
+    </tr>
+    <tr>
+      <td>39</td>
+      <td>domo japanese country food restaurant menu</td>
+      <td>453</td>
+      <td>3,696</td>
+      <td>12.26%</td>
+      <td>2.99</td>
+    </tr>
+    <tr>
+      <td>40</td>
+      <td>tallow norwich menu</td>
+      <td>448</td>
+      <td>3,739</td>
+      <td>11.98%</td>
+      <td>2.57</td>
+    </tr>
+    <tr>
+      <td>41</td>
+      <td>benedict's pizzeria</td>
+      <td>447</td>
+      <td>3,122</td>
+      <td>14.32%</td>
+      <td>2.28</td>
+    </tr>
+    <tr>
+      <td>42</td>
+      <td>tikka lounge</td>
+      <td>440</td>
+      <td>12,334</td>
+      <td>3.57%</td>
+      <td>3.17</td>
+    </tr>
+    <tr>
+      <td>43</td>
+      <td>ashburner inn</td>
+      <td>424</td>
+      <td>3,926</td>
+      <td>10.80%</td>
+      <td>1.98</td>
+    </tr>
+    <tr>
+      <td>44</td>
+      <td>hanami izakaya</td>
+      <td>422</td>
+      <td>5,092</td>
+      <td>8.29%</td>
+      <td>2.53</td>
+    </tr>
+    <tr>
+      <td>45</td>
+      <td>goodness and grace menu</td>
+      <td>421</td>
+      <td>1,702</td>
+      <td>24.74%</td>
+      <td>2.04</td>
+    </tr>
+    <tr>
+      <td>46</td>
+      <td>cali n titos</td>
+      <td>418</td>
+      <td>4,084</td>
+      <td>10.24%</td>
+      <td>3.01</td>
+    </tr>
+    <tr>
+      <td>47</td>
+      <td>nudes barcelona</td>
+      <td>418</td>
+      <td>4,564</td>
+      <td>9.16%</td>
+      <td>3.83</td>
+    </tr>
+    <tr>
+      <td>48</td>
+      <td>kezar pub</td>
+      <td>411</td>
+      <td>3,872</td>
+      <td>10.61%</td>
+      <td>2.27</td>
+    </tr>
+    <tr>
+      <td>49</td>
+      <td>square cafe hingham menu</td>
+      <td>407</td>
+      <td>1,389</td>
+      <td>29.30%</td>
+      <td>2.02</td>
+    </tr>
+    <tr>
+      <td>50</td>
+      <td>bamonte's brooklyn</td>
+      <td>403</td>
+      <td>3,799</td>
+      <td>10.61%</td>
+      <td>2.18</td>
+    </tr>
+  </tbody>
+</table>
+<h2 id="pages">Trang Hàng Đầu</h2>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Trang</th>
+      <th>Lượt Nhấp</th>
+      <th>Lượt Hiện</th>
+      <th>CTR</th>
+      <th>Vị Trí</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td></td>
+      <td>896</td>
+      <td>11,854</td>
+      <td>7.56%</td>
+      <td>12.27</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td></td>
+      <td>718</td>
+      <td>9,382</td>
+      <td>7.65%</td>
+      <td>10.40</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td></td>
+      <td>701</td>
+      <td>12,099</td>
+      <td>5.79%</td>
+      <td>12.34</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td></td>
+      <td>665</td>
+      <td>4,746</td>
+      <td>14.01%</td>
+      <td>3.71</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td></td>
+      <td>576</td>
+      <td>9,649</td>
+      <td>5.97%</td>
+      <td>6.24</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td></td>
+      <td>412</td>
+      <td>12,633</td>
+      <td>3.26%</td>
+      <td>7.26</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td></td>
+      <td>399</td>
+      <td>11,771</td>
+      <td>3.39%</td>
+      <td>4.59</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td></td>
+      <td>331</td>
+      <td>8,512</td>
+      <td>3.89%</td>
+      <td>19.10</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td></td>
+      <td>323</td>
+      <td>10,246</td>
+      <td>3.15%</td>
+      <td>6.71</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td></td>
+      <td>301</td>
+      <td>9,599</td>
+      <td>3.14%</td>
+      <td>5.85</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td></td>
+      <td>288</td>
+      <td>9,896</td>
+      <td>2.91%</td>
+      <td>5.11</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td></td>
+      <td>284</td>
+      <td>6,098</td>
+      <td>4.66%</td>
+      <td>5.33</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td></td>
+      <td>278</td>
+      <td>8,585</td>
+      <td>3.24%</td>
+      <td>9.18</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td></td>
+      <td>275</td>
+      <td>7,582</td>
+      <td>3.63%</td>
+      <td>5.08</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td></td>
+      <td>262</td>
+      <td>23,055</td>
+      <td>1.14%</td>
+      <td>4.82</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td></td>
+      <td>259</td>
+      <td>6,687</td>
+      <td>3.87%</td>
+      <td>4.45</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td></td>
+      <td>248</td>
+      <td>6,199</td>
+      <td>4.00%</td>
+      <td>4.96</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td></td>
+      <td>238</td>
+      <td>6,723</td>
+      <td>3.54%</td>
+      <td>7.09</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td></td>
+      <td>232</td>
+      <td>4,293</td>
+      <td>5.40%</td>
+      <td>5.20</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>menu</td>
+      <td>229</td>
+      <td>8,103</td>
+      <td>2.83%</td>
+      <td>3.77</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>menu</td>
+      <td>226</td>
+      <td>3,380</td>
+      <td>6.69%</td>
+      <td>3.48</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td></td>
+      <td>220</td>
+      <td>7,854</td>
+      <td>2.80%</td>
+      <td>4.09</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td></td>
+      <td>217</td>
+      <td>4,229</td>
+      <td>5.13%</td>
+      <td>4.48</td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td></td>
+      <td>216</td>
+      <td>8,980</td>
+      <td>2.41%</td>
+      <td>5.16</td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>menu</td>
+      <td>213</td>
+      <td>3,664</td>
+      <td>5.81%</td>
+      <td>4.16</td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td></td>
+      <td>213</td>
+      <td>4,233</td>
+      <td>5.03%</td>
+      <td>5.16</td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td></td>
+      <td>207</td>
+      <td>8,610</td>
+      <td>2.40%</td>
+      <td>4.16</td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td></td>
+      <td>202</td>
+      <td>3,994</td>
+      <td>5.06%</td>
+      <td>2.96</td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td></td>
+      <td>201</td>
+      <td>9,727</td>
+      <td>2.07%</td>
+      <td>5.38</td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>menu</td>
+      <td>199</td>
+      <td>12,411</td>
+      <td>1.60%</td>
+      <td>5.88</td>
+    </tr>
+  </tbody>
+</table>
+<h2 id="anomalies">Bất Thường</h2>
+<div class="anomaly-cards">
+  <div class="anomaly-card critical">
+    <h4>Giảm Phiên Lớn (98.1%)</h4>
+    <p>Phiên Giảm Hơn 40%</p>
+  </div>
+</div>
+<h2 id="comparison">30 Thay Đổi</h2>
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>30 Ngày Gần Đây</th>
+      <th>30 Ngày Trước</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Tổng Phiên</td>
+      <td>1,067,058</td>
+      <td>641,345</td>
+      <td class="card-change positive">+66.4%</td>
+    </tr>
+    <tr>
+      <td>Lượt Nhấp</td>
+      <td>235,152</td>
+      <td>0</td>
+      <td class="card-change neutral">+0.0%</td>
+    </tr>
+    <tr>
+      <td>Lượt Xem Trang</td>
+      <td>1,405,899</td>
+      <td>958,470</td>
+      <td class="card-change positive">+46.7%</td>
+    </tr>
+    <tr>
+      <td>Lượt Hiện</td>
+      <td>50,617,690</td>
+      <td>0</td>
+      <td class="card-change neutral">+0.0%</td>
+    </tr>
+  </tbody>
+</table>
+<h2 id="recommendations">Khuyến Nghị</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Khuyến Nghị</th>
+      <th>Chi Tiết</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Tối ưu hóa từ khóa hàng đầu</td>
+      <td>Tập trung vào các từ khóa có số lượt nhấp cao nhưng vị trí thấp</td>
+    </tr>
+    <tr>
+      <td>Cải thiện nội dung trang đầu</td>
+      <td>Cập nhật và mở rộng nội dung cho các trang top</td>
+    </tr>
+    <tr>
+      <td>Xây dựng liên kết</td>
+      <td>Tìm cơ hội xây dựng liên kết từ các trang có liên quan</td>
+    </tr>
+    <tr>
+      <td>Tối ưu hóa tốc độ tải</td>
+      <td>Đảm bảo tất cả các trang tải trong < 3 giây</td>
+    </tr>
+    <tr>
+      <td>Tối ưu hóa di động</td>
+      <td>Kiểm tra và tối ưu hóa trải nghiệm di động</td>
+    </tr>
+  </tbody>
+</table>
+
+
+    <script>
+    // Dark mode toggle
+    const darkToggle = document.getElementById('darkToggle');
+    const html = document.documentElement;
+
+    function initDarkMode() {
+      const stored = localStorage.getItem('darkMode');
+      if (stored === 'true' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        html.classList.add('dark-mode');
+        if (darkToggle) darkToggle.textContent = '☀️ ' + (window.darkModeText || 'Light Mode');
+      }
+    }
+
+    if (darkToggle) {
+      darkToggle.addEventListener('click', function() {
+        html.classList.toggle('dark-mode');
+        const isDark = html.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkToggle.textContent = isDark ? '☀️ ' + (window.darkModeText || 'Light Mode') : '🌙 ' + (window.darkModeText || 'Dark Mode');
+      });
+    }
+
+    initDarkMode();
+
+    // TOC active section highlighting
+    const toc = document.querySelector('.toc');
+    if (toc) {
+      const sections = document.querySelectorAll('h2[id]');
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            document.querySelectorAll('.toc a').forEach(a => a.parentElement.classList.remove('active'));
+            const link = toc.querySelector(`a[href="#${entry.target.id}"]`);
+            if (link) link.parentElement.classList.add('active');
+          }
+        });
+      }, { threshold: 0.3 });
+
+      sections.forEach(section => observer.observe(section));
+    }
+
+    // Table sorting
+    document.querySelectorAll('th').forEach(th => {
+      if (th.cellIndex === undefined) return;
+      th.addEventListener('click', function() {
+        const table = this.closest('table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const colIdx = this.cellIndex;
+
+        const isAsc = this.classList.toggle('sort-asc');
+        this.classList.toggle('sort-desc');
+
+        rows.sort((a, b) => {
+          const aVal = a.cells[colIdx].textContent.trim();
+          const bVal = b.cells[colIdx].textContent.trim();
+          const aNum = parseFloat(aVal);
+          const bNum = parseFloat(bVal);
+
+          if (!isNaN(aNum) && !isNaN(bNum)) {
+            return isAsc ? aNum - bNum : bNum - aNum;
+          }
+          return isAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        });
+
+        tbody.innerHTML = '';
+        rows.forEach(row => tbody.appendChild(row));
+      });
+    });
+
+    // Website filter
+    const websiteFilter = document.getElementById('websiteFilter');
+    if (websiteFilter) {
+      websiteFilter.addEventListener('change', function() {
+        const selected = this.value;
+        document.querySelectorAll('[data-domain]').forEach(elem => {
+          if (selected === 'all' || elem.dataset.domain === selected) {
+            elem.style.display = '';
+          } else {
+            elem.style.display = 'none';
+          }
+        });
+      });
+    }
+
+    window.domainLink = function(domain) {
+      return 'seo-detail-' + domain + '-2026-03-18.html';
+    };
+    </script>
+    
+</div>
+</body>
+</html>
