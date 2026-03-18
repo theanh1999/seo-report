@@ -1,601 +1,89 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="SEO Dashboard - Báo Cáo SEO - Tổng Quan">
-  <title>Báo Cáo SEO - Tổng Quan</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-  
-    <style>
-    :root {
-      --bg-primary: #ffffff;
-      --bg-secondary: #f5f5f5;
-      --text-primary: #1a1a1a;
-      --text-secondary: #666666;
-      --border-color: #dddddd;
-      --card-bg: #ffffff;
-      --card-border: #e0e0e0;
-    }
-
-    body.dark-mode {
-      --bg-primary: #1a1a1a;
-      --bg-secondary: #2d2d2d;
-      --text-primary: #ffffff;
-      --text-secondary: #cccccc;
-      --border-color: #444444;
-      --card-bg: #2d2d2d;
-      --card-border: #444444;
-    }
-
-    body {
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-    }
-
-    input, select, textarea {
-      background-color: var(--card-bg);
-      color: var(--text-primary);
-      border: 1px solid var(--card-border);
-    }
-
-    input:focus, select:focus, textarea:focus {
-      outline: 2px solid #4285f4;
-      background-color: var(--card-bg);
-      color: var(--text-primary);
-    }
-
-    table {
-      border-collapse: collapse;
-    }
-
-    th, td {
-      border: 1px solid var(--border-color);
-      padding: 8px 12px;
-    }
-
-    th {
-      background-color: var(--bg-secondary);
-    }
-    </style>
-    
-  
-    <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      line-height: 1.6;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    header {
-      margin-bottom: 30px;
-    }
-
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-    }
-
-    h2 {
-      font-size: 1.8em;
-      margin-top: 40px;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #4285f4;
-    }
-
-    h3 {
-      font-size: 1.3em;
-      margin-top: 20px;
-      margin-bottom: 15px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .dark-toggle {
-      padding: 8px 16px;
-      border: 1px solid var(--border-color);
-      background-color: var(--card-bg);
-      color: var(--text-primary);
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9em;
-    }
-
-    .dark-toggle:hover {
-      background-color: var(--bg-secondary);
-    }
-
-    .cross-links {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-      padding: 15px;
-      background-color: var(--bg-secondary);
-      border-radius: 4px;
-    }
-
-    .cross-links a {
-      padding: 8px 12px;
-      background-color: #4285f4;
-      color: white;
-      text-decoration: none;
-      border-radius: 3px;
-      font-weight: 500;
-    }
-
-    .cross-links a:hover {
-      background-color: #1a73e8;
-    }
-
-    .toc {
-      position: sticky;
-      top: 20px;
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 4px;
-      padding: 15px;
-      margin-bottom: 20px;
-      max-width: 300px;
-      float: right;
-      margin-left: 20px;
-    }
-
-    .toc h4 {
-      font-size: 1em;
-      margin-bottom: 10px;
-    }
-
-    .toc ul {
-      list-style: none;
-    }
-
-    .toc li {
-      margin: 8px 0;
-    }
-
-    .toc a {
-      color: #4285f4;
-      text-decoration: none;
-      font-size: 0.9em;
-    }
-
-    .toc a:hover {
-      text-decoration: underline;
-    }
-
-    .toc li.active > a {
-      font-weight: bold;
-      color: #1a73e8;
-    }
-
-    .kpi-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-
-    .card {
-      padding: 20px;
-      border-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .card-title {
-      font-size: 0.9em;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .card-value {
-      font-size: 2em;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .card-change {
-      font-size: 0.85em;
-      padding: 4px 8px;
-      border-radius: 3px;
-      display: inline-block;
-    }
-
-    .card-change.positive {
-      background-color: #d4edda;
-      color: #155724;
-    }
-
-    .card-change.negative {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-
-    .card-change.neutral {
-      background-color: #e2e3e5;
-      color: #383d41;
-    }
-
-    .controls {
-      margin-bottom: 30px;
-      display: flex;
-      gap: 15px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .controls label {
-      font-weight: 500;
-    }
-
-    .controls select {
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-size: 1em;
-    }
-
-    .chart-container {
-      position: relative;
-      height: 300px;
-      margin-bottom: 30px;
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      padding: 15px;
-      border-radius: 4px;
-    }
-
-    table {
-      width: 100%;
-      font-size: 0.9em;
-      margin-bottom: 30px;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    th {
-      font-weight: 600;
-      text-align: left;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    th:hover {
-      background-color: var(--bg-secondary);
-    }
-
-    td {
-      padding: 12px;
-    }
-
-    tbody tr:hover {
-      background-color: var(--bg-secondary);
-    }
-
-    .anomaly-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-
-    .anomaly-card {
-      padding: 15px;
-      border-left: 4px solid;
-      border-radius: 4px;
-    }
-
-    .anomaly-card.critical {
-      border-left-color: #d32f2f;
-      background-color: #ffebee;
-    }
-
-    .anomaly-card.warning {
-      border-left-color: #f57c00;
-      background-color: #fff3e0;
-    }
-
-    .anomaly-card.info {
-      border-left-color: #1976d2;
-      background-color: #e3f2fd;
-    }
-
-    .anomaly-card h4 {
-      font-size: 1em;
-      margin-bottom: 5px;
-      margin-top: 0;
-    }
-
-    .anomaly-card p {
-      font-size: 0.9em;
-      margin: 0;
-    }
-
-    .recommendations-table {
-      width: 100%;
-      font-size: 0.85em;
-    }
-
-    .recommendations-table td {
-      padding: 15px;
-      vertical-align: top;
-    }
-
-    .recommendation-title {
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-
-    .recommendation-desc {
-      font-size: 0.9em;
-      color: var(--text-secondary);
-    }
-
-    .domain-link {
-      color: #4285f4;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .domain-link:hover {
-      color: #1a73e8;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .nav-links a {
-      padding: 10px 20px;
-      background-color: #4285f4;
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-    }
-
-    .nav-links a:hover {
-      background-color: #1a73e8;
-    }
-
-    .nav-links a.disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
-    }
-
-    .comparison-table {
-      width: 100%;
-      font-size: 0.85em;
-    }
-
-    .comparison-table td {
-      padding: 12px;
-    }
-
-    .comparison-col {
-      width: 48%;
-      display: inline-block;
-      margin-right: 2%;
-      vertical-align: top;
-    }
-
-    .comparison-col:last-child {
-      margin-right: 0;
-    }
-
-    .clearfix::after {
-      content: "";
-      display: table;
-      clear: both;
-    }
-
-    .scrollable-table {
-      overflow-x: auto;
-      margin-bottom: 30px;
-    }
-
-    @media (max-width: 768px) {
-      .toc {
-        position: static;
-        float: none;
-        margin-left: 0;
-        max-width: 100%;
-        margin-bottom: 20px;
-      }
-
-      .kpi-cards {
-        grid-template-columns: 1fr;
-      }
-
-      .anomaly-cards {
-        grid-template-columns: 1fr;
-      }
-
-      h1 {
-        font-size: 1.8em;
-      }
-
-      h2 {
-        font-size: 1.4em;
-      }
-
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-    </style>
-    
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Báo cáo SEO — Trang chủ</title>
+<style>
+* {margin:0;padding:0;box-sizing:border-box;}
+body {font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0f172a;color:#e5e7eb;line-height:1.6;}
+.container {max-width:1200px;margin:0 auto;padding:40px 20px;}
+h1 {font-size:2em;margin-bottom:8px;color:#3b82f6;}
+.subtitle {color:#9ca3af;margin-bottom:30px;}
+.section {background:#1e293b;padding:24px;border-radius:8px;margin-bottom:24px;}
+.section h2 {color:#3b82f6;margin-bottom:16px;}
+.main-links {display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px;}
+.main-card {background:#0f172a;padding:20px;border-radius:8px;text-decoration:none;border-left:4px solid #3b82f6;display:block;}
+.main-card:hover {background:#1e3a5f;}
+.main-card-title {font-size:1.1em;font-weight:bold;color:#3b82f6;}
+.main-card-desc {color:#d1d5db;font-size:0.9em;margin-top:4px;}
+.links {display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.link-card {background:#0f172a;padding:14px;border-radius:6px;text-decoration:none;border-left:3px solid #3b82f6;display:block;}
+.link-card:hover {background:#1e3a5f;}
+.link-title {font-weight:600;color:#3b82f6;font-size:0.9em;}
+.link-desc {font-size:0.8em;color:#9ca3af;}
+.badge {display:inline-block;background:#3b82f6;color:white;font-size:0.7em;padding:2px 8px;border-radius:10px;margin-left:8px;}
+footer {text-align:center;color:#475569;font-size:0.8em;margin-top:30px;padding-top:20px;border-top:1px solid #334155;}
+</style>
 </head>
 <body>
 <div class="container">
-  <div class="topbar">
-    <div>
-      <h1>Báo Cáo SEO - Tổng Quan</h1>
-      <p style="color: var(--text-secondary);">Ngày: 2026-03-18</p>
-    </div>
-    <button id="darkToggle" class="dark-toggle">🌙 Chế Độ Tối</button>
-  </div>
-<h2>Báo Cáo SEO - 2026-03-18</h2>
+<h1>📊 Báo cáo SEO</h1>
+<p class="subtitle">Hệ thống giám sát SEO đa website — Cập nhật 19/03/2026</p>
 
-<p>Chọn một báo cáo để xem chi tiết:</p>
+<div class="section">
+<h2>🗓️ Báo cáo hôm nay (19/03/2026) <span class="badge">Mới nhất</span></h2>
+<div class="main-links">
+<a href="seo-restaurants-2026-03-19.html" class="main-card">
+  <div class="main-card-title">🍽️ Mảng Nhà hàng</div>
+  <div class="main-card-desc">Tổng quan 12 website nhà hàng</div>
+</a>
+<a href="seo-hotels-2026-03-19.html" class="main-card">
+  <div class="main-card-title">🏨 Mảng Khách sạn</div>
+  <div class="main-card-desc">Tổng quan gohotelly.com</div>
+</a>
+</div>
+</div>
 
-<h3>📊 Báo Cáo Tổng Quan</h3>
-<ul>
-  <li><a href="google-index-report.html">📈 Google Index Report</a></li>
-        <li><a href="index-analysis.html">📊 Phân Tích Biến Động Index</a> - Theo dõi số trang index hàng ngày (25 websites)</li>
-  <li><a href="seo-restaurants-2026-03-18.html">🍽️ Tổng Quan Nhà Hàng</a> - Tổng hợp 12 trang web nhà hàng</li>
-  <li><a href="seo-hotels-2026-03-18.html">🏨 Tổng Quan Khách Sạn</a> - Tổng hợp khách sạn</li>
-</ul>
+<div class="section">
+<h2>🔍 Báo cáo chi tiết từng website — Nhà hàng</h2>
+<div class="links"><a href="seo-detail-localoria.com-2026-03-19.html" class="link-card"><div class="link-title">localoria.com</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-wherebly.com-2026-03-19.html" class="link-card"><div class="link-title">wherebly.com</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-res-menu.net-2026-03-19.html" class="link-card"><div class="link-title">res-menu.net</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-foodplacee.com-2026-03-19.html" class="link-card"><div class="link-title">foodplacee.com</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-restaurants-world.net-2026-03-19.html" class="link-card"><div class="link-title">restaurants-world.net</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-goto-where.com-2026-03-19.html" class="link-card"><div class="link-title">goto-where.com</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-menu-world.com-2026-03-19.html" class="link-card"><div class="link-title">menu-world.com</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-grubbio.com-2026-03-19.html" class="link-card"><div class="link-title">grubbio.com</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-menustic.com-2026-03-19.html" class="link-card"><div class="link-title">menustic.com</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-menufyy.com-2026-03-19.html" class="link-card"><div class="link-title">menufyy.com</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-wherevi.com-2026-03-19.html" class="link-card"><div class="link-title">wherevi.com</div><div class="link-desc">Xem phân tích chi tiết</div></a>
+<a href="seo-detail-placejoys.com-2026-03-19.html" class="link-card"><div class="link-title">placejoys.com</div><div class="link-desc">Xem phân tích chi tiết</div></a></div>
+</div>
 
-<h3>📄 Báo Cáo Chi Tiết Trang Web</h3>
+<div class="section">
+<h2>🏨 Báo cáo chi tiết — Khách sạn</h2>
+<div class="links">
+<a href="seo-detail-gohotelly.com-2026-03-19.html" class="link-card">
+  <div class="link-title">gohotelly.com</div>
+  <div class="link-desc">Xem phân tích chi tiết</div>
+</a>
+</div>
+</div>
 
-<h4>Nhà Hàng (12)</h4>
-<ul>
-  <li><a href="seo-detail-localoria.com-2026-03-18.html">localoria.com</a></li>
-  <li><a href="seo-detail-wherebly.com-2026-03-18.html">wherebly.com</a></li>
-  <li><a href="seo-detail-res-menu.net-2026-03-18.html">res-menu.net</a></li>
-  <li><a href="seo-detail-foodplacee.com-2026-03-18.html">foodplacee.com</a></li>
-  <li><a href="seo-detail-restaurants-world.net-2026-03-18.html">restaurants-world.net</a></li>
-  <li><a href="seo-detail-goto-where.com-2026-03-18.html">goto-where.com</a></li>
-  <li><a href="seo-detail-menu-world.com-2026-03-18.html">menu-world.com</a></li>
-  <li><a href="seo-detail-grubbio.com-2026-03-18.html">grubbio.com</a></li>
-  <li><a href="seo-detail-menustic.com-2026-03-18.html">menustic.com</a></li>
-  <li><a href="seo-detail-menufyy.com-2026-03-18.html">menufyy.com</a></li>
-  <li><a href="seo-detail-wherevi.com-2026-03-18.html">wherevi.com</a></li>
-  <li><a href="seo-detail-placejoys.com-2026-03-18.html">placejoys.com</a></li>
-</ul>
+<div class="section">
+<h2>📁 Lịch sử báo cáo</h2>
+<div class="links">
+<a href="seo-restaurants-2026-03-18.html" class="link-card"><div class="link-title">Nhà hàng — 18/03/2026</div></a>
+<a href="seo-hotels-2026-03-18.html" class="link-card"><div class="link-title">Khách sạn — 18/03/2026</div></a>
+<a href="seo-restaurants-2026-03-17.html" class="link-card"><div class="link-title">Nhà hàng — 17/03/2026</div></a>
+<a href="seo-hotels-2026-03-17.html" class="link-card"><div class="link-title">Khách sạn — 17/03/2026</div></a>
+<a href="seo-restaurants-2026-03-16.html" class="link-card"><div class="link-title">Nhà hàng — 16/03/2026</div></a>
+<a href="seo-hotels-2026-03-16.html" class="link-card"><div class="link-title">Khách sạn — 16/03/2026</div></a>
+</div>
+</div>
 
-<h4>Khách Sạn (1)</h4>
-<ul>
-  <li><a href="seo-detail-gohotelly.com-2026-03-18.html">gohotelly.com</a></li>
-</ul>
-
-<h3>ℹ️ Ghi Chú</h3>
-<p>
-  <strong>Ngày cắt dữ liệu GA4:</strong> 2026-03-17 (không bao gồm 2026-03-18 và 2026-03-17)<br>
-  <strong>Ngày GSC:</strong> Tất cả các ngày trong khoảng thời gian<br>
-  <strong>So sánh:</strong> 30 ngày gần đây so với 30 ngày trước
-</p>
-
-
-    <script>
-    // Dark mode toggle
-    const darkToggle = document.getElementById('darkToggle');
-    const html = document.documentElement;
-
-    function initDarkMode() {
-      const stored = localStorage.getItem('darkMode');
-      if (stored === 'true' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        html.classList.add('dark-mode');
-        if (darkToggle) darkToggle.textContent = '☀️ ' + (window.darkModeText || 'Light Mode');
-      }
-    }
-
-    if (darkToggle) {
-      darkToggle.addEventListener('click', function() {
-        html.classList.toggle('dark-mode');
-        const isDark = html.classList.contains('dark-mode');
-        localStorage.setItem('darkMode', isDark);
-        darkToggle.textContent = isDark ? '☀️ ' + (window.darkModeText || 'Light Mode') : '🌙 ' + (window.darkModeText || 'Dark Mode');
-      });
-    }
-
-    initDarkMode();
-
-    // TOC active section highlighting
-    const toc = document.querySelector('.toc');
-    if (toc) {
-      const sections = document.querySelectorAll('h2[id]');
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            document.querySelectorAll('.toc a').forEach(a => a.parentElement.classList.remove('active'));
-            const link = toc.querySelector(`a[href="#${entry.target.id}"]`);
-            if (link) link.parentElement.classList.add('active');
-          }
-        });
-      }, { threshold: 0.3 });
-
-      sections.forEach(section => observer.observe(section));
-    }
-
-    // Table sorting
-    document.querySelectorAll('th').forEach(th => {
-      if (th.cellIndex === undefined) return;
-      th.addEventListener('click', function() {
-        const table = this.closest('table');
-        const tbody = table.querySelector('tbody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        const colIdx = this.cellIndex;
-
-        const isAsc = this.classList.toggle('sort-asc');
-        this.classList.toggle('sort-desc');
-
-        rows.sort((a, b) => {
-          const aVal = a.cells[colIdx].textContent.trim();
-          const bVal = b.cells[colIdx].textContent.trim();
-          const aNum = parseFloat(aVal);
-          const bNum = parseFloat(bVal);
-
-          if (!isNaN(aNum) && !isNaN(bNum)) {
-            return isAsc ? aNum - bNum : bNum - aNum;
-          }
-          return isAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-        });
-
-        tbody.innerHTML = '';
-        rows.forEach(row => tbody.appendChild(row));
-      });
-    });
-
-    // Website filter
-    const websiteFilter = document.getElementById('websiteFilter');
-    if (websiteFilter) {
-      websiteFilter.addEventListener('change', function() {
-        const selected = this.value;
-        document.querySelectorAll('[data-domain]').forEach(elem => {
-          if (selected === 'all' || elem.dataset.domain === selected) {
-            elem.style.display = '';
-          } else {
-            elem.style.display = 'none';
-          }
-        });
-      });
-    }
-
-    window.domainLink = function(domain) {
-      return 'seo-detail-' + domain + '-2026-03-18.html';
-    };
-    </script>
-    
+<footer>⚡ SEO Monitor — Tự động tạo 19/03/2026</footer>
 </div>
 </body>
 </html>
