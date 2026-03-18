@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Báo cáo SEO — Mảng Khách sạn — 19/03/2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<style>
+:root {
+    --bg: #0f172a; --bg2: #1e293b; --bg3: #334155;
+    --text: #e2e8f0; --text2: #94a3b8; --text3: #64748b;
+    --accent: #3b82f6; --accent2: #2563eb;
+    --green: #10b981; --red: #ef4444; --orange: #f59e0b;
+    --border: #334155;
+}
+.light {
+    --bg: #f8fafc; --bg2: #ffffff; --bg3: #e2e8f0;
+    --text: #1e293b; --text2: #475569; --text3: #94a3b8;
+    --accent: #2563eb; --accent2: #1d4ed8;
+    --border: #e2e8f0;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.site-name { color:var(--accent); text-decoration:underline; cursor:pointer; }
+.site-name:hover { color:var(--accent2); }
+
+.header { background:var(--bg2); border-bottom:1px solid var(--border); padding:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+.header h1 { font-size:1.5em; color:var(--text); }
+.header .meta { color:var(--text2); font-size:0.9em; }
+.dark-toggle { background:var(--bg3); border:none; color:var(--text); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+.dark-toggle:hover { background:var(--accent); color:white; }
+
+.cross-link-bar { background:var(--accent); color:white; padding:10px 20px; text-align:center; font-size:0.9em; position:sticky; top:0; z-index:200; }
+.cross-link-bar a { color:white; text-decoration:underline; margin:0 8px; }
+
+.toc { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 20px; position:sticky; top:40px; z-index:190; overflow-x:auto; display:flex; gap:0; }
+.toc a { display:inline-block; padding:12px 16px; color:var(--text2); font-size:0.85em; white-space:nowrap; border-bottom:3px solid transparent; text-decoration:none; }
+.toc a:hover, .toc a.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+.container { max-width:1400px; margin:0 auto; padding:24px 20px; }
+section { margin-bottom:40px; scroll-margin-top:110px; }
+section h2 { font-size:1.25em; color:var(--text); margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--accent); }
+
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:12px; }
+.kpi-card { background:var(--bg2); border-radius:8px; padding:16px; border:1px solid var(--border); }
+.kpi-label { font-size:0.8em; color:var(--text2); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; }
+.kpi-value { font-size:1.5em; font-weight:700; color:var(--text); }
+.kpi-change { font-size:0.8em; margin-top:4px; }
+.trend-up { color: var(--green); }
+.trend-down { color: var(--red); }
+.neutral { color: var(--text3); }
+
+.filter-bar { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:20px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.filter-bar label { font-size:0.9em; color:var(--text2); }
+.filter-bar select { background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:6px 10px; font-size:0.9em; }
+
+.charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:768px) { .charts-grid { grid-template-columns:1fr; } }
+.chart-box { background:var(--bg2); border-radius:8px; padding:16px; border:1px solid var(--border); }
+.chart-box h3 { font-size:0.9em; color:var(--text2); margin-bottom:12px; }
+.chart-box canvas { max-height:280px; }
+
+.table-wrapper { background:var(--bg2); border-radius:8px; border:1px solid var(--border); overflow:hidden; }
+table { width:100%; border-collapse:collapse; font-size:0.85em; }
+th { background:var(--bg3); color:var(--text2); padding:10px 12px; text-align:left; font-weight:600; cursor:pointer; user-select:none; white-space:nowrap; }
+th:hover { color:var(--accent); }
+td { padding:9px 12px; border-top:1px solid var(--border); color:var(--text); }
+tr:hover td { background:var(--bg3); }
+.positive { color: var(--green); }
+.negative { color: var(--red); }
+
+.anomaly-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:12px; }
+.anomaly-card { border-radius:8px; padding:16px; border-left:4px solid; }
+.anomaly-critical { background:rgba(220,38,38,0.1); border-color:#dc2626; }
+.anomaly-warning { background:rgba(245,158,11,0.1); border-color:#f59e0b; }
+.anomaly-info { background:rgba(59,130,246,0.1); border-color:#3b82f6; }
+.anomaly-title { font-weight:600; margin-bottom:4px; }
+.anomaly-desc { font-size:0.85em; color:var(--text2); }
+
+.no-anomaly { background:rgba(16,185,129,0.1); border:1px solid var(--green); border-radius:8px; padding:16px; color:var(--green); text-align:center; }
+
+.recommend-grid { display:grid; gap:10px; }
+.recommend-row { display:grid; grid-template-columns:100px 1fr 200px; gap:12px; padding:12px; background:var(--bg2); border-radius:8px; border:1px solid var(--border); align-items:start; }
+@media(max-width:768px) { .recommend-row { grid-template-columns:1fr; } }
+.priority-high { color:#ef4444; font-weight:700; }
+.priority-medium { color:#f59e0b; font-weight:700; }
+.priority-low { color:#10b981; font-weight:700; }
+
+footer { text-align:center; color:var(--text3); font-size:0.8em; padding:20px; margin-top:20px; border-top:1px solid var(--border); }
+
+@media(max-width:640px) {
+    .kpi-grid { grid-template-columns:repeat(2,1fr); }
+    .toc { top:40px; }
+}
+
+/* Scrollable table */
+.table-scroll { overflow-x:auto; }
+</style>
+
+</head>
+<body>
+<div class="cross-link-bar">
+  📊 Bạn đang xem: <strong>Mảng Khách sạn</strong> (1 website) — 19/03/2026
+  &nbsp;|&nbsp;
+  <a href="seo-restaurants-2026-03-19.html">→ Xem báo cáo Mảng Nhà hàng</a>
+  &nbsp;|&nbsp;
+  <a href="index.html">→ Tất cả báo cáo</a>
+</div>
+
+<div class="header">
+  <div>
+    <h1>Báo cáo SEO — Mảng Khách sạn</h1>
+    <div class="meta">📅 Ngày báo cáo: 19/03/2026 &nbsp;|&nbsp; 1 website &nbsp;|&nbsp; Dữ liệu 60 ngày &nbsp;|&nbsp; ⚠️ Sử dụng cache (Windsor API không khả dụng hôm nay)</div>
+  </div>
+  <button class="dark-toggle" onclick="toggleDark()">☀️ Light</button>
+</div>
+
+<nav class="toc">
+  <a href="#kpi">Tổng quan KPI</a>
+  <a href="#charts">Biểu đồ xu hướng</a>
+  <a href="#comparison">So sánh Website</a>
+  <a href="#keywords">Top Keywords</a>
+  <a href="#anomalies">Phát hiện bất thường</a>
+  <a href="#trends">Phân tích xu hướng</a>
+  <a href="#recommendations">Đề xuất tối ưu</a>
+</nav>
+
+<div class="container">
+
+<section id="kpi">
+  <h2>📊 Tổng quan KPI (30 ngày gần nhất)</h2>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng Sessions</div>
+      <div class="kpi-value">19,022</div>
+      <div class="kpi-change trend-down"><span style="color:#ef4444">↓ 15.0%</span> so với kỳ trước</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng Users</div>
+      <div class="kpi-value">16,723</div>
+      <div class="kpi-change trend-down"><span style="color:#ef4444">↓ 14.7%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng Pageviews</div>
+      <div class="kpi-value">21,911</div>
+      <div class="kpi-change trend-down"><span style="color:#ef4444">↓ 15.4%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng Clicks GSC</div>
+      <div class="kpi-value">3,113</div>
+      <div class="kpi-change trend-up"><span style="color:#10b981">↑ 118.3%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng Impressions</div>
+      <div class="kpi-value">239,521</div>
+      <div class="kpi-change trend-up"><span style="color:#10b981">↑ 37.8%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">TB Bounce Rate</div>
+      <div class="kpi-value">54.3%</div>
+      <div class="kpi-change neutral"><span style="color:#6b7280">↓ 3.8%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">TB CTR</div>
+      <div class="kpi-value">1.03%</div>
+      <div class="kpi-change"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">TB Vị trí GSC</div>
+      <div class="kpi-value">9.8</div>
+      <div class="kpi-change trend-down"><span style="color:#ef4444">↓ 5.4%</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="filter-bar">
+  <label>Lọc website:</label>
+  <select id="siteFilter" onchange="filterSite(this.value)">
+    <option value="all">Tất cả website</option>
+    <option value="gohotelly.com">gohotelly.com</option>
+  </select>
+</div>
+
+<section id="charts">
+  <h2>📈 Biểu đồ xu hướng</h2>
+  <div class="charts-grid">
+    <div class="chart-box"><h3>Sessions theo ngày (GA4)</h3>
+<canvas id="chart_sessions"></canvas>
+<script>
+(function() {
+    const ctx = document.getElementById('chart_sessions');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'line',
+        data: {"labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16"], "datasets": [{"label": "gohotelly.com", "data": [726, 730, 634, 716, 753, 741, 891, 816, 688, 795, 988, 914, 790, 786, 786, 746, 978, 897, 682, 738, 648, 705, 590, 602, 676, 762, 720, 704, 554, 614, 725, 842, 782, 817, 673, 636, 571, 581, 601, 572, 643, 639, 577, 789, 660, 567, 590, 619, 651, 666, 596, 654, 633, 621, 626, 692, 629, 672, 661, 752, 10], "borderColor": "#3b82f6", "backgroundColor": "#3b82f622", "tension": 0.3, "pointRadius": 2, "borderWidth": 2, "fill": false, "spanGaps": true}]},
+        options: {"responsive": true, "maintainAspectRatio": true, "plugins": {"legend": {"labels": {"color": "#94a3b8", "boxWidth": 10, "font": {"size": 11}}}, "title": {"display": true, "text": "Sessions", "color": "#e2e8f0", "font": {"size": 13}}}, "scales": {"x": {"ticks": {"color": "#64748b", "font": {"size": 10}, "maxTicksLimit": 10}, "grid": {"color": "#1e293b"}}, "y": {"ticks": {"color": "#64748b"}, "grid": {"color": "#1e293b"}, "reverse": false}}}
+    });
+})();
+</script>
+</div>
+    <div class="chart-box"><h3>Clicks GSC theo ngày</h3>
+<canvas id="chart_clicks"></canvas>
+<script>
+(function() {
+    const ctx = document.getElementById('chart_clicks');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'line',
+        data: {"labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"], "datasets": [{"label": "gohotelly.com", "data": [35, 25, 36, 38, 29, 53, 51, 49, 50, 48, 53, 58, 49, 59, 62, 31, 43, 37, 42, 46, 46, 57, 47, 49, 52, 61, 75, 50, 57, 38, 65, 58, 40, 61, 61, 63, 66, 60, 66, 63, 80, 76, 67, 62, 63, 58, 62, 82, 64, 89, 67, 83, 57, 82, 74, 93, 90, 93, 65, 1103], "borderColor": "#3b82f6", "backgroundColor": "#3b82f622", "tension": 0.3, "pointRadius": 2, "borderWidth": 2, "fill": false, "spanGaps": true}]},
+        options: {"responsive": true, "maintainAspectRatio": true, "plugins": {"legend": {"labels": {"color": "#94a3b8", "boxWidth": 10, "font": {"size": 11}}}, "title": {"display": true, "text": "Clicks GSC", "color": "#e2e8f0", "font": {"size": 13}}}, "scales": {"x": {"ticks": {"color": "#64748b", "font": {"size": 10}, "maxTicksLimit": 10}, "grid": {"color": "#1e293b"}}, "y": {"ticks": {"color": "#64748b"}, "grid": {"color": "#1e293b"}, "reverse": false}}}
+    });
+})();
+</script>
+</div>
+    <div class="chart-box"><h3>Impressions theo ngày</h3>
+<canvas id="chart_impressions"></canvas>
+<script>
+(function() {
+    const ctx = document.getElementById('chart_impressions');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'line',
+        data: {"labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"], "datasets": [{"label": "gohotelly.com", "data": [4922, 4630, 4939, 4790, 5141, 5704, 5701, 6246, 5836, 6275, 5541, 6225, 6259, 6062, 7601, 5408, 5814, 5181, 5552, 5628, 5521, 5610, 6077, 6309, 5410, 6525, 6229, 6323, 6184, 6211, 6407, 5333, 6473, 5398, 5383, 5674, 6239, 6810, 6028, 6747, 6361, 6374, 6220, 6876, 6049, 6369, 7259, 6599, 7063, 7200, 7126, 8057, 6839, 7323, 8345, 8140, 7737, 8556, 7776, 42760], "borderColor": "#3b82f6", "backgroundColor": "#3b82f622", "tension": 0.3, "pointRadius": 2, "borderWidth": 2, "fill": false, "spanGaps": true}]},
+        options: {"responsive": true, "maintainAspectRatio": true, "plugins": {"legend": {"labels": {"color": "#94a3b8", "boxWidth": 10, "font": {"size": 11}}}, "title": {"display": true, "text": "Impressions", "color": "#e2e8f0", "font": {"size": 13}}}, "scales": {"x": {"ticks": {"color": "#64748b", "font": {"size": 10}, "maxTicksLimit": 10}, "grid": {"color": "#1e293b"}}, "y": {"ticks": {"color": "#64748b"}, "grid": {"color": "#1e293b"}, "reverse": false}}}
+    });
+})();
+</script>
+</div>
+    <div class="chart-box"><h3>Vị trí trung bình (thấp = tốt)</h3>
+<canvas id="chart_position"></canvas>
+<script>
+(function() {
+    const ctx = document.getElementById('chart_position');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'line',
+        data: {"labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"], "datasets": [{"label": "gohotelly.com", "data": [8.6233, 8.8438, 9.2162, 9.6267, 9.5466, 9.3166, 9.1033, 9.1916, 9.8358, 8.7681, 9.6878, 9.6699, 9.0663, 8.7735, 7.6481, 9.3404, 9.8806, 10.5233, 11.6349, 9.0858, 9.5532, 9.5861, 9.0464, 8.8117, 8.9688, 9.6417, 8.8289, 9.2692, 9.5228, 8.9205, 8.8982, 9.0842, 10.5373, 9.5302, 9.575, 9.528, 9.6254, 9.7646, 9.8359, 10.6203, 9.5961, 9.505, 9.9195, 9.3694, 9.343, 9.7508, 11.2892, 9.404, 10.5366, 10.0956, 10.2254, 10.1215, 10.2648, 9.9507, 11.4376, 9.7781, 9.6248, 9.6426, 9.7582, 6.711839054544662], "borderColor": "#3b82f6", "backgroundColor": "#3b82f622", "tension": 0.3, "pointRadius": 2, "borderWidth": 2, "fill": false, "spanGaps": true}]},
+        options: {"responsive": true, "maintainAspectRatio": true, "plugins": {"legend": {"labels": {"color": "#94a3b8", "boxWidth": 10, "font": {"size": 11}}}, "title": {"display": true, "text": "V\u1ecb tr\u00ed TB", "color": "#e2e8f0", "font": {"size": 13}}}, "scales": {"x": {"ticks": {"color": "#64748b", "font": {"size": 10}, "maxTicksLimit": 10}, "grid": {"color": "#1e293b"}}, "y": {"ticks": {"color": "#64748b"}, "grid": {"color": "#1e293b"}, "reverse": true}}}
+    });
+})();
+</script>
+</div>
+  </div>
+</section>
+
+<section id="comparison">
+  <h2>📋 Bảng so sánh Website (30 ngày gần nhất)</h2>
+  <div class="table-wrapper table-scroll">
+    <table id="compTable">
+      <thead><tr>
+        <th>Website</th><th>Sessions</th><th>Users</th><th>Pageviews</th>
+        <th>Clicks</th><th>Impressions</th><th>CTR</th><th>Vị trí</th>
+        <th>Δ Sessions</th><th>Δ Clicks</th>
+      </tr></thead>
+      <tbody><tr>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-19.html" title="Xem chi tiết gohotelly.com">gohotelly.com</a></td>
+            <td data-sort="19022">19,022</td>
+            <td data-sort="16723">16,723</td>
+            <td data-sort="21911">21,911</td>
+            <td data-sort="3113">3,113</td>
+            <td data-sort="239521">239,521</td>
+            <td data-sort="1.03">1.03%</td>
+            <td data-sort="9.8">9.8</td>
+            <td class="negative" data-sort="-15.0">-15.0%</td>
+            <td class="positive" data-sort="118.3">+118.3%</td>
+        </tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="keywords">
+  <h2>🔑 Top Keywords (tổng hợp tất cả website)</h2>
+  <div class="table-wrapper table-scroll">
+    <table id="kwTable">
+      <thead><tr><th>Từ khóa</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Vị trí TB</th><th>Ghi chú</th></tr></thead>
+      <tbody><tr ><td>nau salgados dunas suites</td><td>100</td><td>1,369</td><td>7.30%</td><td>3.4</td><td></td></tr><tr ><td>ariyana reach hotel</td><td>65</td><td>2,283</td><td>2.85%</td><td>2.9</td><td></td></tr><tr ><td>ariyana reach</td><td>58</td><td>2,208</td><td>2.63%</td><td>2.9</td><td></td></tr><tr ><td>motel urban</td><td>43</td><td>1,311</td><td>3.28%</td><td>9.4</td><td></td></tr><tr ><td>ariyana reach hotel maharagama</td><td>37</td><td>617</td><td>6.00%</td><td>2.5</td><td></td></tr><tr ><td>hotel luzino</td><td>37</td><td>1,065</td><td>3.47%</td><td>4.6</td><td></td></tr><tr ><td>the village resort & waterpark</td><td>36</td><td>666</td><td>5.41%</td><td>6.4</td><td></td></tr><tr ><td>udayachal tourist lodge</td><td>30</td><td>929</td><td>3.23%</td><td>3.4</td><td></td></tr><tr style="background:rgba(245,158,11,0.1)"><td>matara rest house</td><td>29</td><td>2,291</td><td>1.27%</td><td>5.8</td><td>✨ Cơ hội</td></tr><tr ><td>precios de motel urban villas & suites</td><td>28</td><td>572</td><td>4.90%</td><td>7.8</td><td></td></tr><tr style="background:rgba(245,158,11,0.1)"><td>volets resort</td><td>27</td><td>2,784</td><td>0.97%</td><td>5.7</td><td>✨ Cơ hội</td></tr><tr ><td>university of ghana guest centre prices</td><td>26</td><td>285</td><td>9.12%</td><td>7.2</td><td></td></tr><tr ><td>salgados dunas suites</td><td>25</td><td>832</td><td>3.00%</td><td>4.6</td><td></td></tr><tr ><td>motel urban villas & suites</td><td>22</td><td>926</td><td>2.38%</td><td>7.9</td><td></td></tr><tr ><td>mehran lodges</td><td>20</td><td>586</td><td>3.41%</td><td>2.3</td><td></td></tr><tr style="background:rgba(245,158,11,0.1)"><td>ranowell hotel</td><td>18</td><td>2,307</td><td>0.78%</td><td>7.9</td><td>✨ Cơ hội</td></tr><tr ><td>hôtel magic iliade djerba</td><td>17</td><td>844</td><td>2.01%</td><td>8.4</td><td></td></tr><tr ><td>mehran lodges murree</td><td>17</td><td>643</td><td>2.64%</td><td>2.5</td><td></td></tr><tr ><td>udírna jindřichův hradec</td><td>17</td><td>671</td><td>2.53%</td><td>4.6</td><td></td></tr><tr ><td>tui suneo dunas</td><td>16</td><td>539</td><td>2.97%</td><td>8.4</td><td></td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="anomalies">
+  <h2>⚠️ Phát hiện bất thường</h2>
+  <div class="anomaly-grid"><div class="no-anomaly">✅ Không phát hiện bất thường đáng kể</div></div>
+</section>
+
+<section id="trends">
+  <h2>📊 Phân tích xu hướng SEO</h2>
+  <div style="background:var(--bg2);border-radius:8px;padding:20px;border:1px solid var(--border)">
+    <p style="margin-bottom:12px;color:var(--text2)">
+    Trong 30 ngày gần nhất, mảng Mảng Khách sạn ghi nhận tổng 19,022 phiên từ 1 website
+    (-15.0% so với kỳ trước).
+    Tổng lượt click GSC: 3,113 (+118.3%).
+    </p><p style="margin-bottom:8px;font-weight:600;color:var(--green)">🌟 Top tăng trưởng:</p><ul style="padding-left:20px;color:var(--text2);margin-bottom:12px"><li><a class="site-name" href="seo-detail-gohotelly.com-2026-03-19.html">gohotelly.com</a>: sessions -15.0%</li></ul><p style="margin-bottom:8px;font-weight:600;color:var(--red)">⚠️ Cần chú ý:</p><ul style="padding-left:20px;color:var(--text2)"><li><a class="site-name" href="seo-detail-gohotelly.com-2026-03-19.html">gohotelly.com</a>: sessions -15.0%</li></ul>
+  </div>
+</section>
+
+<section id="recommendations">
+  <h2>💡 Đề xuất tối ưu SEO</h2>
+  <div class="recommend-grid"><div class="recommend-row">
+            <div class="priority-medium">🟡 Trung bình</div>
+            <div>CTR thấp (1.03%) với 239,521 impressions — tối ưu title/meta description</div>
+            <div><a class="site-name" href="seo-detail-gohotelly.com-2026-03-19.html">gohotelly.com</a></div>
+        </div></div>
+</section>
+
+</div>
+
+<footer>
+  ⚡ Báo cáo tự động tạo 19/03/2026 &nbsp;|&nbsp; Dữ liệu từ Google Analytics 4 & Search Console qua Windsor.ai
+  &nbsp;|&nbsp; ⚠️ Lưu ý: Sử dụng cache (Windsor API không khả dụng — dữ liệu cập nhật đến 16/03/2026)
+</footer>
+
+<script>
+// Filter function
+const allChartData = {
+    sessions: {"labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16"], "datasets": [{"label": "gohotelly.com", "data": [726, 730, 634, 716, 753, 741, 891, 816, 688, 795, 988, 914, 790, 786, 786, 746, 978, 897, 682, 738, 648, 705, 590, 602, 676, 762, 720, 704, 554, 614, 725, 842, 782, 817, 673, 636, 571, 581, 601, 572, 643, 639, 577, 789, 660, 567, 590, 619, 651, 666, 596, 654, 633, 621, 626, 692, 629, 672, 661, 752, 10], "borderColor": "#3b82f6", "backgroundColor": "#3b82f622", "tension": 0.3, "pointRadius": 2, "borderWidth": 2, "fill": false, "spanGaps": true}]},
+    clicks: {"labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"], "datasets": [{"label": "gohotelly.com", "data": [35, 25, 36, 38, 29, 53, 51, 49, 50, 48, 53, 58, 49, 59, 62, 31, 43, 37, 42, 46, 46, 57, 47, 49, 52, 61, 75, 50, 57, 38, 65, 58, 40, 61, 61, 63, 66, 60, 66, 63, 80, 76, 67, 62, 63, 58, 62, 82, 64, 89, 67, 83, 57, 82, 74, 93, 90, 93, 65, 1103], "borderColor": "#3b82f6", "backgroundColor": "#3b82f622", "tension": 0.3, "pointRadius": 2, "borderWidth": 2, "fill": false, "spanGaps": true}]},
+    impressions: {"labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"], "datasets": [{"label": "gohotelly.com", "data": [4922, 4630, 4939, 4790, 5141, 5704, 5701, 6246, 5836, 6275, 5541, 6225, 6259, 6062, 7601, 5408, 5814, 5181, 5552, 5628, 5521, 5610, 6077, 6309, 5410, 6525, 6229, 6323, 6184, 6211, 6407, 5333, 6473, 5398, 5383, 5674, 6239, 6810, 6028, 6747, 6361, 6374, 6220, 6876, 6049, 6369, 7259, 6599, 7063, 7200, 7126, 8057, 6839, 7323, 8345, 8140, 7737, 8556, 7776, 42760], "borderColor": "#3b82f6", "backgroundColor": "#3b82f622", "tension": 0.3, "pointRadius": 2, "borderWidth": 2, "fill": false, "spanGaps": true}]},
+    position: {"labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15"], "datasets": [{"label": "gohotelly.com", "data": [8.6233, 8.8438, 9.2162, 9.6267, 9.5466, 9.3166, 9.1033, 9.1916, 9.8358, 8.7681, 9.6878, 9.6699, 9.0663, 8.7735, 7.6481, 9.3404, 9.8806, 10.5233, 11.6349, 9.0858, 9.5532, 9.5861, 9.0464, 8.8117, 8.9688, 9.6417, 8.8289, 9.2692, 9.5228, 8.9205, 8.8982, 9.0842, 10.5373, 9.5302, 9.575, 9.528, 9.6254, 9.7646, 9.8359, 10.6203, 9.5961, 9.505, 9.9195, 9.3694, 9.343, 9.7508, 11.2892, 9.404, 10.5366, 10.0956, 10.2254, 10.1215, 10.2648, 9.9507, 11.4376, 9.7781, 9.6248, 9.6426, 9.7582, 6.711839054544662], "borderColor": "#3b82f6", "backgroundColor": "#3b82f622", "tension": 0.3, "pointRadius": 2, "borderWidth": 2, "fill": false, "spanGaps": true}]}
+};
+let charts = {};
+
+function filterSite(site) {
+    ['sessions','clicks','impressions','position'].forEach(metric => {
+        const c = charts[metric];
+        if (!c) return;
+        c.data.datasets.forEach(ds => {
+            ds.hidden = (site !== 'all' && ds.label !== site);
+        });
+        c.update();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    makeTableSortable('compTable');
+    makeTableSortable('kwTable');
+
+    const chartConfigs = [
+        ['chart_sessions', 'sessions', 'Sessions', false],
+        ['chart_clicks', 'clicks', 'Clicks GSC', false],
+        ['chart_impressions', 'impressions', 'Impressions', false],
+        ['chart_position', 'position', 'Vị trí TB', true]
+    ];
+
+    chartConfigs.forEach(([id, metric, label, reverse]) => {
+        const el = document.getElementById(id);
+        if (el && el.chartInstance) {
+            charts[metric] = el.chartInstance;
+        } else {
+            const existingChart = Chart.getChart(el);
+            if (existingChart) charts[metric] = existingChart;
+        }
+    });
+});
+</script>
+
+<script>
+function toggleDark() {
+    document.body.classList.toggle('light');
+    const btn = document.querySelector('.dark-toggle');
+    btn.textContent = document.body.classList.contains('light') ? '🌙 Dark' : '☀️ Light';
+}
+
+// Sortable tables
+function makeTableSortable(tableId) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    const headers = table.querySelectorAll('th');
+    headers.forEach((th, col) => {
+        th.addEventListener('click', () => {
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const asc = th.dataset.asc !== 'true';
+            headers.forEach(h => { h.dataset.asc = ''; h.textContent = h.textContent.replace(' ▲','').replace(' ▼',''); });
+            th.dataset.asc = asc;
+            th.textContent += asc ? ' ▲' : ' ▼';
+            rows.sort((a, b) => {
+                const av = a.cells[col]?.dataset.sort || a.cells[col]?.textContent || '';
+                const bv = b.cells[col]?.dataset.sort || b.cells[col]?.textContent || '';
+                const an = parseFloat(av.replace(/[,%]/g,''));
+                const bn = parseFloat(bv.replace(/[,%]/g,''));
+                if (!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+                return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+            });
+            rows.forEach(r => tbody.appendChild(r));
+        });
+    });
+}
+
+// TOC IntersectionObserver
+function setupTOC() {
+    const sections = document.querySelectorAll('section[id]');
+    const tocLinks = document.querySelectorAll('.toc a');
+    if (!sections.length || !tocLinks.length) return;
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                tocLinks.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector('.toc a[href="#' + e.target.id + '"]');
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    sections.forEach(s => obs.observe(s));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setupTOC();
+});
+</script>
+
+</body>
+</html>
