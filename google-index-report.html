@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Google Index Report - Báo Cáo Chỉ Số Google">
+  <title>Báo Cáo Chỉ Số Google - Google Index Report</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --border-color: #dddddd;
+      --card-bg: #ffffff;
+      --card-border: #e0e0e0;
+      --color-green: #10b981;
+      --color-orange: #f59e0b;
+      --color-red: #ef4444;
+    }
+
+    body.dark-mode {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --border-color: #444444;
+      --card-bg: #2d2d2d;
+      --card-border: #444444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin: 0;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .last-updated {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+    }
+
+    .dark-mode-toggle {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9em;
+      color: var(--text-primary);
+      transition: all 0.3s;
+    }
+
+    .dark-mode-toggle:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    .kpi-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .kpi-label {
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .kpi-value {
+      font-size: 2em;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .comparison-section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 30px;
+      margin-bottom: 40px;
+    }
+
+    .comparison-section h2 {
+      font-size: 1.5em;
+      margin-bottom: 30px;
+      color: var(--text-primary);
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .comparison-item {
+      text-align: center;
+    }
+
+    .comparison-label {
+      font-size: 1em;
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+    }
+
+    .comparison-value {
+      font-size: 3em;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .tables-section {
+      margin-bottom: 40px;
+    }
+
+    .tables-section h2 {
+      font-size: 1.5em;
+      margin-bottom: 30px;
+      margin-top: 0;
+      color: var(--text-primary);
+    }
+
+    .tables-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 30px;
+    }
+
+    .table-container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table-title {
+      padding: 15px 20px;
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--card-border);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    th {
+      background-color: var(--bg-secondary);
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.85em;
+    }
+
+    td {
+      color: var(--text-primary);
+    }
+
+    .rank {
+      font-weight: 600;
+      width: 40px;
+    }
+
+    .domain {
+      font-weight: 500;
+    }
+
+    .pages {
+      text-align: right;
+      width: 100px;
+    }
+
+    .bar-cell {
+      padding: 8px 15px !important;
+    }
+
+    .bar-container {
+      background-color: var(--bg-secondary);
+      border-radius: 3px;
+      overflow: hidden;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .bar {
+      height: 100%;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+      font-size: 0.75em;
+      font-weight: 600;
+      min-width: 30px;
+      color: white;
+    }
+
+    .bar-green {
+      background-color: var(--color-green);
+    }
+
+    .bar-orange {
+      background-color: var(--color-orange);
+    }
+
+    .bar-red {
+      background-color: var(--color-red);
+    }
+
+    .chart-section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 30px;
+      margin-bottom: 40px;
+    }
+
+    .chart-section h2 {
+      font-size: 1.5em;
+      margin-bottom: 30px;
+      margin-top: 0;
+      color: var(--text-primary);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+    }
+
+    .chart-message {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+      font-size: 1.1em;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.9em;
+      border-top: 1px solid var(--card-border);
+      margin-top: 40px;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8em;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .comparison-value {
+        font-size: 2em;
+      }
+
+      .tables-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-container {
+        height: 300px;
+      }
+
+      table {
+        font-size: 0.9em;
+      }
+
+      th, td {
+        padding: 8px 10px;
+      }
+    }
+
+    .error-message {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      color: var(--text-primary);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Báo Cáo Chỉ Số Google</h1>
+        <p style="color: var(--text-secondary); margin: 5px 0 0 0;">Google Index Report</p>
+      </div>
+      <div class="header-right">
+        <div class="last-updated">
+          Cập nhật lần cuối: <span id="lastUpdated">—</span>
+        </div>
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙 Chế độ tối</button>
+      </div>
+    </header>
+
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card">
+        <div class="kpi-label">Tổng Trang Của Tôi</div>
+        <div class="kpi-value" id="kpiMyTotal">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tổng Trang Đối Thủ</div>
+        <div class="kpi-value" id="kpiCompetitorTotal">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tỷ Lệ %</div>
+        <div class="kpi-value" id="kpiRatio">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Nhà Hàng Tổng</div>
+        <div class="kpi-value" id="kpiRestaurantTotal">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Khách Sạn Tổng</div>
+        <div class="kpi-value" id="kpiHotelTotal">—</div>
+      </div>
+    </div>
+
+    <div class="comparison-section">
+      <h2>So Sánh</h2>
+      <div class="comparison-grid">
+        <div class="comparison-item">
+          <div class="comparison-label">Tổng Trang Của Tôi</div>
+          <div class="comparison-value" id="compMyTotal">—</div>
+        </div>
+        <div class="comparison-item">
+          <div class="comparison-label">Tổng Trang Đối Thủ</div>
+          <div class="comparison-value" id="compCompetitorTotal">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tables-section">
+      <h2>Chi Tiết Từng Danh Mục</h2>
+      <div class="tables-grid">
+        <div class="table-container">
+          <div class="table-title">Nhà Hàng (Restaurants)</div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="rank">#</th>
+                  <th class="domain">Domain</th>
+                  <th class="pages">Trang</th>
+                  <th style="width: 150px;">Biểu Đồ</th>
+                </tr>
+              </thead>
+              <tbody id="restaurantsTable">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="table-title">Khách Sạn (Hotels)</div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="rank">#</th>
+                  <th class="domain">Domain</th>
+                  <th class="pages">Trang</th>
+                  <th style="width: 150px;">Biểu Đồ</th>
+                </tr>
+              </thead>
+              <tbody id="hotelsTable">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="table-title">Đối Thủ (Competitors)</div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="rank">#</th>
+                  <th class="domain">Domain</th>
+                  <th class="pages">Trang</th>
+                  <th style="width: 150px;">Biểu Đồ</th>
+                </tr>
+              </thead>
+              <tbody id="competitorsTable">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-section">
+      <h2>Lịch Sử Hàng Ngày</h2>
+      <div class="chart-container">
+        <canvas id="historyChart"></canvas>
+        <div class="chart-message" id="chartMessage" style="display: none;">
+          Biểu đồ sẽ hiển thị sau 2+ ngày dữ liệu
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Powered by SerpAPI • Auto-generated daily
+    </footer>
+  </div>
+
+  <script>
+    let chartInstance = null;
+    let historyData = [];
+
+    // Load data from history.json
+    async function loadData() {
+      try {
+        const response = await fetch('history.json');
+        historyData = await response.json();
+        renderDashboard();
+      } catch (error) {
+        console.error('Error loading history.json:', error);
+        document.body.innerHTML = '<div class="container"><div class="error-message">Lỗi: Không thể tải dữ liệu. Vui lòng kiểm tra file history.json.</div></div>';
+      }
+    }
+
+    function renderDashboard() {
+      if (historyData.length === 0) return;
+
+      const latestData = historyData[historyData.length - 1];
+      const myTotal = latestData.totals.nha_hang + latestData.totals.hotel;
+      const competitorTotal = latestData.totals.doi_thu;
+      const ratio = competitorTotal > 0 ? (myTotal / competitorTotal * 100).toFixed(2) : 0;
+
+      // Update KPI cards
+      document.getElementById('kpiMyTotal').textContent = formatNumber(myTotal);
+      document.getElementById('kpiCompetitorTotal').textContent = formatNumber(competitorTotal);
+      document.getElementById('kpiRatio').textContent = ratio + '%';
+      document.getElementById('kpiRestaurantTotal').textContent = formatNumber(latestData.totals.nha_hang);
+      document.getElementById('kpiHotelTotal').textContent = formatNumber(latestData.totals.hotel);
+
+      // Update comparison section
+      document.getElementById('compMyTotal').textContent = formatNumber(myTotal);
+      document.getElementById('compCompetitorTotal').textContent = formatNumber(competitorTotal);
+
+      // Update last updated date
+      document.getElementById('lastUpdated').textContent = formatDate(latestData.date);
+
+      // Render tables
+      renderRestaurantsTable(latestData.nha_hang);
+      renderHotelsTable(latestData.hotel);
+      renderCompetitorsTable(latestData.doi_thu);
+
+      // Render chart
+      renderHistoryChart();
+    }
+
+    function renderRestaurantsTable(data) {
+      const sorted = Object.entries(data)
+        .sort((a, b) => b[1] - a[1])
+        .map(([domain, count], index) => ({
+          rank: index + 1,
+          domain,
+          count
+        }));
+
+      const maxValue = sorted[0]?.count || 1;
+      const html = sorted.map(item => `
+        <tr>
+          <td class="rank">${item.rank}</td>
+          <td class="domain">${item.domain}</td>
+          <td class="pages">${formatNumber(item.count)}</td>
+          <td class="bar-cell">
+            <div class="bar-container">
+              <div class="bar bar-green" style="width: ${(item.count / maxValue * 100)}%">
+                ${item.count > 50000 ? formatNumberShort(item.count) : ''}
+              </div>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      document.getElementById('restaurantsTable').innerHTML = html;
+    }
+
+    function renderHotelsTable(data) {
+      const sorted = Object.entries(data)
+        .sort((a, b) => b[1] - a[1])
+        .map(([domain, count], index) => ({
+          rank: index + 1,
+          domain,
+          count
+        }));
+
+      const maxValue = sorted[0]?.count || 1;
+      const html = sorted.map(item => `
+        <tr>
+          <td class="rank">${item.rank}</td>
+          <td class="domain">${item.domain}</td>
+          <td class="pages">${formatNumber(item.count)}</td>
+          <td class="bar-cell">
+            <div class="bar-container">
+              <div class="bar bar-orange" style="width: ${(item.count / maxValue * 100)}%">
+                ${item.count > 50000 ? formatNumberShort(item.count) : ''}
+              </div>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      document.getElementById('hotelsTable').innerHTML = html;
+    }
+
+    function renderCompetitorsTable(data) {
+      const sorted = Object.entries(data)
+        .sort((a, b) => b[1] - a[1])
+        .map(([domain, count], index) => ({
+          rank: index + 1,
+          domain,
+          count
+        }));
+
+      const maxValue = sorted[0]?.count || 1;
+      const html = sorted.map(item => `
+        <tr>
+          <td class="rank">${item.rank}</td>
+          <td class="domain">${item.domain}</td>
+          <td class="pages">${formatNumber(item.count)}</td>
+          <td class="bar-cell">
+            <div class="bar-container">
+              <div class="bar bar-red" style="width: ${(item.count / maxValue * 100)}%">
+                ${item.count > 50000 ? formatNumberShort(item.count) : ''}
+              </div>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      document.getElementById('competitorsTable').innerHTML = html;
+    }
+
+    function renderHistoryChart() {
+      const chartCanvas = document.getElementById('historyChart');
+      const chartMessage = document.getElementById('chartMessage');
+
+      if (historyData.length < 2) {
+        chartMessage.style.display = 'block';
+        chartCanvas.style.display = 'none';
+        return;
+      }
+
+      chartMessage.style.display = 'none';
+      chartCanvas.style.display = 'block';
+
+      const labels = historyData.map(d => formatDate(d.date));
+      const myTotals = historyData.map(d => d.totals.nha_hang + d.totals.hotel);
+      const competitorTotals = historyData.map(d => d.totals.doi_thu);
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      const textColor = isDarkMode ? '#cccccc' : '#1a1a1a';
+      const gridColor = isDarkMode ? '#444444' : '#e0e0e0';
+
+      chartInstance = new Chart(chartCanvas, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Tổng Của Tôi (My Total)',
+              data: myTotals,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              fill: true,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              pointBackgroundColor: '#10b981',
+              pointBorderColor: '#fff'
+            },
+            {
+              label: 'Tổng Đối Thủ (Competitor Total)',
+              data: competitorTotals,
+              borderColor: '#ef4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              borderWidth: 2,
+              tension: 0.4,
+              fill: true,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              pointBackgroundColor: '#ef4444',
+              pointBorderColor: '#fff'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: textColor,
+                font: { size: 12 },
+                usePointStyle: true,
+                padding: 20
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: textColor,
+                callback: function(value) {
+                  return formatNumberShort(value);
+                }
+              },
+              grid: {
+                color: gridColor,
+                drawBorder: false
+              }
+            },
+            x: {
+              ticks: {
+                color: textColor
+              },
+              grid: {
+                color: gridColor,
+                drawBorder: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function formatNumber(num) {
+      return new Intl.NumberFormat('vi-VN').format(num);
+    }
+
+    function formatNumberShort(num) {
+      if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+      }
+      if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K';
+      }
+      return num.toString();
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr + 'T00:00:00');
+      return new Intl.DateTimeFormat('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).format(date);
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+      if (chartInstance) {
+        renderHistoryChart();
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+      if (savedDarkMode) {
+        document.body.classList.add('dark-mode');
+      }
+      loadData();
+    });
+  </script>
+</body>
+</html>
