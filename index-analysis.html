@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phân Tích Biến Động Index</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-adapter-date-fns/3.0.0/chartjs-adapter-date-fns.bundle.min.js"></script>
+<style>
+:root {
+  --bg-primary: #0f172a;
+  --bg-card: #1e293b;
+  --bg-card-hover: #263348;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: #334155;
+  --accent-green: #22c55e;
+  --accent-red: #ef4444;
+  --accent-blue: #3b82f6;
+  --accent-yellow: #eab308;
+  --accent-purple: #a855f7;
+  --accent-cyan: #06b6d4;
+  --accent-orange: #f97316;
+  --accent-pink: #ec4899;
+}
+[data-theme="light"] {
+  --bg-primary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border: #e2e8f0;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+}
+h1 { font-size: 1.6rem; }
+h1 span { color: var(--accent-blue); }
+.controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.btn {
+  padding: 8px 16px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg-card); color: var(--text-primary); cursor: pointer;
+  font-size: 0.85rem; transition: all 0.2s;
+}
+.btn:hover { background: var(--bg-card-hover); }
+.btn.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
+select.btn { appearance: auto; }
+
+/* Summary cards */
+.summary-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px; margin-bottom: 28px;
+}
+.summary-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px; text-align: center;
+}
+.summary-card .label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+.summary-card .value { font-size: 1.5rem; font-weight: 700; }
+.summary-card .change { font-size: 0.85rem; margin-top: 4px; }
+.up { color: var(--accent-green); }
+.down { color: var(--accent-red); }
+
+/* Category overview chart */
+.section {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; margin-bottom: 24px;
+}
+.section-title {
+  font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.chart-container { position: relative; width: 100%; }
+.chart-container canvas { max-height: 380px; }
+
+/* Domain cards grid */
+.domain-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 20px; margin-bottom: 28px;
+}
+.domain-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px; transition: border-color 0.2s;
+}
+.domain-card:hover { border-color: var(--accent-blue); }
+.domain-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 12px; flex-wrap: wrap; gap: 6px;
+}
+.domain-name { font-weight: 700; font-size: 1rem; }
+.domain-badge {
+  font-size: 0.7rem; padding: 2px 8px; border-radius: 12px;
+  font-weight: 600; text-transform: uppercase;
+}
+.badge-nha-hang { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+.badge-hotel { background: rgba(168,85,247,0.15); color: var(--accent-purple); }
+.badge-doi-thu { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+
+.domain-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;
+}
+.domain-stat { text-align: center; }
+.domain-stat .s-label { font-size: 0.7rem; color: var(--text-muted); }
+.domain-stat .s-value { font-size: 0.95rem; font-weight: 600; }
+.domain-chart canvas { max-height: 200px; }
+
+/* Ranking table */
+.rank-table { width: 100%; border-collapse: collapse; }
+.rank-table th, .rank-table td {
+  padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.rank-table th { color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
+.rank-table tr:hover td { background: var(--bg-card-hover); }
+.rank-num { font-weight: 700; color: var(--accent-blue); }
+.bar-bg {
+  height: 6px; background: var(--border); border-radius: 3px; margin-top: 4px;
+}
+.bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .domain-grid { grid-template-columns: 1fr; }
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  h1 { font-size: 1.2rem; }
+}
+.loading {
+  text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 1.1rem;
+}
+.back-link { color: var(--accent-blue); text-decoration: none; font-size: 0.85rem; }
+.back-link:hover { text-decoration: underline; }
+.tab-bar { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <a href="google-index-report.html" class="back-link">← Báo cáo tổng quan</a>
+      <h1>Phân Tích <span>Biến Động Index</span></h1>
+    </div>
+    <div class="controls">
+      <select class="btn" id="timeRange">
+        <option value="30">30 ngày</option>
+        <option value="60">60 ngày</option>
+        <option value="90" selected>90 ngày</option>
+        <option value="180">6 tháng</option>
+        <option value="0">Tất cả</option>
+      </select>
+      <button class="btn" id="themeToggle">🌙</button>
+    </div>
+  </header>
+
+  <div id="app"><div class="loading">Đang tải dữ liệu...</div></div>
+</div>
+
+<script>
+const CATEGORIES = {
+  nha_hang: { label: 'Nhà Hàng', badge: 'badge-nha-hang', color: '#22c55e' },
+  hotel: { label: 'Hotel', badge: 'badge-hotel', color: '#a855f7' },
+  doi_thu: { label: 'Đối Thủ', badge: 'badge-doi-thu', color: '#ef4444' },
+};
+const COLORS = ['#3b82f6','#22c55e','#ef4444','#eab308','#a855f7','#06b6d4','#f97316','#ec4899','#8b5cf6','#14b8a6','#f43f5e','#84cc16','#0ea5e9'];
+
+let allHistory = [];
+let charts = {};
+
+// Theme
+const themeBtn = document.getElementById('themeToggle');
+let isDark = true;
+themeBtn.addEventListener('click', () => {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? '' : 'light');
+  themeBtn.textContent = isDark ? '🌙' : '☀️';
+  Object.values(charts).forEach(c => {
+    if (c && c.options) {
+      const gridColor = isDark ? 'rgba(148,163,184,0.1)' : 'rgba(0,0,0,0.08)';
+      const tickColor = isDark ? '#94a3b8' : '#475569';
+      Object.values(c.options.scales || {}).forEach(s => {
+        if (s.grid) s.grid.color = gridColor;
+        if (s.ticks) s.ticks.color = tickColor;
+      });
+      c.update('none');
+    }
+  });
+});
+
+// Time range
+document.getElementById('timeRange').addEventListener('change', () => render());
+
+function filterHistory(days) {
+  if (!days || days === 0) return allHistory;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  const cutStr = cutoff.toISOString().slice(0, 10);
+  return allHistory.filter(e => e.date >= cutStr);
+}
+
+function fmt(n) {
+  if (n == null || n === 0) return '—';
+  return n.toLocaleString('vi-VN');
+}
+
+function pctChange(oldVal, newVal) {
+  if (!oldVal || oldVal === 0) return { text: 'N/A', cls: '' };
+  const pct = ((newVal - oldVal) / oldVal * 100).toFixed(1);
+  if (pct > 0) return { text: `+${pct}%`, cls: 'up' };
+  if (pct < 0) return { text: `${pct}%`, cls: 'down' };
+  return { text: '0%', cls: '' };
+}
+
+function getDomainData(history, domain, category) {
+  const points = [];
+  for (const entry of history) {
+    const val = entry[category] && entry[category][domain];
+    if (val != null && val > 0) {
+      points.push({ date: entry.date, value: val });
+    }
+  }
+  return points;
+}
+
+function getAllDomains(history) {
+  const domains = {};
+  for (const entry of history) {
+    for (const cat of ['nha_hang', 'hotel', 'doi_thu']) {
+      for (const [domain, val] of Object.entries(entry[cat] || {})) {
+        if (!domains[domain]) {
+          domains[domain] = { category: cat, points: [] };
+        }
+        if (val != null && val > 0) {
+          domains[domain].points.push({ date: entry.date, value: val });
+        }
+      }
+    }
+  }
+  return domains;
+}
+
+function render() {
+  const days = parseInt(document.getElementById('timeRange').value);
+  const history = filterHistory(days);
+  if (!history.length) { document.getElementById('app').innerHTML = '<div class="loading">Không có dữ liệu</div>'; return; }
+
+  // Destroy old charts
+  Object.values(charts).forEach(c => c && c.destroy && c.destroy());
+  charts = {};
+
+  const domains = getAllDomains(allHistory); // Use all data for domain discovery
+  const filteredDomains = getAllDomains(history); // Filtered for display
+
+  // Latest & earliest in range
+  const latest = history[history.length - 1];
+  const earliest = history[0];
+
+  // Summary stats
+  const totalNow = latest.totals?.nha_hang || 0;
+  const totalHotelNow = latest.totals?.hotel || 0;
+  const totalDoiThuNow = latest.totals?.doi_thu || 0;
+  const grandNow = totalNow + totalHotelNow + totalDoiThuNow;
+
+  const totalBefore = earliest.totals?.nha_hang || 0;
+  const totalHotelBefore = earliest.totals?.hotel || 0;
+  const totalDoiThuBefore = earliest.totals?.doi_thu || 0;
+  const grandBefore = totalBefore + totalHotelBefore + totalDoiThuBefore;
+
+  let html = '';
+
+  // Summary cards
+  const summaryItems = [
+    { label: 'Tổng Index Hiện Tại', value: grandNow, before: grandBefore },
+    { label: 'Nhà Hàng', value: totalNow, before: totalBefore },
+    { label: 'Hotel', value: totalHotelNow, before: totalHotelBefore },
+    { label: 'Đối Thủ', value: totalDoiThuNow, before: totalDoiThuBefore },
+    { label: 'Số Website', value: Object.keys(filteredDomains).length, before: null },
+  ];
+
+  html += '<div class="summary-grid">';
+  for (const item of summaryItems) {
+    const chg = item.before != null ? pctChange(item.before, item.value) : { text: '', cls: '' };
+    html += `<div class="summary-card">
+      <div class="label">${item.label}</div>
+      <div class="value">${fmt(item.value)}</div>
+      ${chg.text ? `<div class="change ${chg.cls}">${chg.text} so với ${earliest.date}</div>` : ''}
+    </div>`;
+  }
+  html += '</div>';
+
+  // Category tabs
+  html += '<div class="tab-bar">';
+  html += '<button class="btn active" data-tab="all">Tất cả</button>';
+  for (const [cat, info] of Object.entries(CATEGORIES)) {
+    html += `<button class="btn" data-tab="${cat}">${info.label}</button>`;
+  }
+  html += '</div>';
+
+  // Overview chart (totals over time)
+  html += `<div class="section">
+    <div class="section-title">Tổng quan Index theo nhóm</div>
+    <div class="chart-container"><canvas id="overviewChart"></canvas></div>
+  </div>`;
+
+  // Growth ranking table
+  html += `<div class="section">
+    <div class="section-title">Bảng xếp hạng tăng trưởng</div>
+    <div style="overflow-x:auto">
+    <table class="rank-table">
+      <thead><tr>
+        <th>#</th><th>Domain</th><th>Nhóm</th><th>Hiện tại</th>
+        <th>Đầu kỳ</th><th>Thay đổi</th><th>% Tăng trưởng</th><th>Xu hướng</th>
+      </tr></thead>
+      <tbody id="rankBody"></tbody>
+    </table>
+    </div>
+  </div>`;
+
+  // Domain cards by category
+  for (const [cat, catInfo] of Object.entries(CATEGORIES)) {
+    const catDomains = Object.entries(filteredDomains).filter(([d, info]) => info.category === cat);
+    if (!catDomains.length) continue;
+    catDomains.sort((a, b) => {
+      const aLast = a[1].points.length ? a[1].points[a[1].points.length - 1].value : 0;
+      const bLast = b[1].points.length ? b[1].points[b[1].points.length - 1].value : 0;
+      return bLast - aLast;
+    });
+
+    html += `<h2 style="margin: 24px 0 16px; font-size: 1.2rem;" data-cat="${cat}">
+      ${catInfo.label} <span style="color:var(--text-muted); font-weight:400; font-size:0.9rem;">(${catDomains.length} website)</span>
+    </h2>`;
+    html += `<div class="domain-grid" data-cat="${cat}">`;
+
+    for (const [domain, info] of catDomains) {
+      const pts = info.points;
+      if (pts.length < 2) {
+        // Not enough data for chart
+        const lastVal = pts.length ? pts[pts.length - 1].value : 0;
+        html += `<div class="domain-card" data-domain-cat="${cat}">
+          <div class="domain-header">
+            <span class="domain-name">${domain}</span>
+            <span class="domain-badge ${catInfo.badge}">${catInfo.label}</span>
+          </div>
+          <div class="domain-stats">
+            <div class="domain-stat"><div class="s-label">Hiện tại</div><div class="s-value">${fmt(lastVal)}</div></div>
+            <div class="domain-stat"><div class="s-label">Dữ liệu</div><div class="s-value">${pts.length} ngày</div></div>
+            <div class="domain-stat"><div class="s-label">Xu hướng</div><div class="s-value" style="color:var(--text-muted)">Chưa đủ dữ liệu</div></div>
+          </div>
+        </div>`;
+        continue;
+      }
+
+      const firstVal = pts[0].value;
+      const lastVal = pts[pts.length - 1].value;
+      const maxVal = Math.max(...pts.map(p => p.value));
+      const minVal = Math.min(...pts.map(p => p.value));
+      const chg = pctChange(firstVal, lastVal);
+      const cardId = domain.replace(/[^a-zA-Z0-9]/g, '_');
+
+      html += `<div class="domain-card" data-domain-cat="${cat}">
+        <div class="domain-header">
+          <span class="domain-name">${domain}</span>
+          <span class="domain-badge ${catInfo.badge}">${catInfo.label}</span>
+        </div>
+        <div class="domain-stats">
+          <div class="domain-stat"><div class="s-label">Hiện tại</div><div class="s-value">${fmt(lastVal)}</div></div>
+          <div class="domain-stat"><div class="s-label">Cao nhất</div><div class="s-value">${fmt(maxVal)}</div></div>
+          <div class="domain-stat"><div class="s-label">Tăng trưởng</div><div class="s-value ${chg.cls}">${chg.text}</div></div>
+        </div>
+        <div class="domain-stats">
+          <div class="domain-stat"><div class="s-label">Thấp nhất</div><div class="s-value">${fmt(minVal)}</div></div>
+          <div class="domain-stat"><div class="s-label">Đầu kỳ</div><div class="s-value">${fmt(firstVal)}</div></div>
+          <div class="domain-stat"><div class="s-label">Dữ liệu</div><div class="s-value">${pts.length} ngày</div></div>
+        </div>
+        <div class="domain-chart"><canvas id="chart_${cardId}"></canvas></div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  document.getElementById('app').innerHTML = html;
+
+  // Tab filtering
+  document.querySelectorAll('.tab-bar .btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-bar .btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('[data-cat]').forEach(el => {
+        el.style.display = (tab === 'all' || el.dataset.cat === tab) ? '' : 'none';
+      });
+      document.querySelectorAll('[data-domain-cat]').forEach(el => {
+        el.style.display = (tab === 'all' || el.dataset.domainCat === tab) ? '' : 'none';
+      });
+    });
+  });
+
+  // Render overview chart
+  renderOverviewChart(history);
+
+  // Render ranking table
+  renderRankingTable(filteredDomains, earliest.date);
+
+  // Render per-domain charts
+  for (const [domain, info] of Object.entries(filteredDomains)) {
+    const cardId = domain.replace(/[^a-zA-Z0-9]/g, '_');
+    const canvas = document.getElementById(`chart_${cardId}`);
+    if (!canvas || info.points.length < 2) continue;
+    renderDomainChart(canvas, domain, info, CATEGORIES[info.category]?.color || '#3b82f6');
+  }
+}
+
+function renderOverviewChart(history) {
+  const canvas = document.getElementById('overviewChart');
+  if (!canvas) return;
+
+  const datasets = [];
+  for (const [cat, info] of Object.entries(CATEGORIES)) {
+    const data = [];
+    for (const entry of history) {
+      const total = entry.totals?.[cat];
+      if (total != null && total > 0) {
+        data.push({ x: entry.date, y: total });
+      }
+    }
+    datasets.push({
+      label: info.label,
+      data,
+      borderColor: info.color,
+      backgroundColor: info.color + '20',
+      borderWidth: 2,
+      pointRadius: data.length > 60 ? 0 : 2,
+      pointHoverRadius: 5,
+      fill: true,
+      tension: 0.3,
+      spanGaps: true,
+    });
+  }
+
+  charts['overview'] = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: { datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        tooltip: {
+          callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y?.toLocaleString('vi-VN')}` }
+        },
+        legend: { labels: { color: '#94a3b8', usePointStyle: true, padding: 16 } },
+      },
+      scales: {
+        x: {
+          type: 'time',
+          time: { unit: 'week', tooltipFormat: 'dd/MM/yyyy' },
+          grid: { color: 'rgba(148,163,184,0.1)' },
+          ticks: { color: '#94a3b8', maxRotation: 45 },
+        },
+        y: {
+          grid: { color: 'rgba(148,163,184,0.1)' },
+          ticks: { color: '#94a3b8', callback: v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? (v/1e3).toFixed(0)+'K' : v },
+        }
+      }
+    }
+  });
+  canvas.parentElement.style.height = '360px';
+}
+
+function renderDomainChart(canvas, domain, info, color) {
+  const pts = info.points;
+  const cardId = domain.replace(/[^a-zA-Z0-9]/g, '_');
+
+  // Calculate 7-day moving average
+  const maData = [];
+  for (let i = 0; i < pts.length; i++) {
+    const window = pts.slice(Math.max(0, i - 6), i + 1);
+    const avg = window.reduce((s, p) => s + p.value, 0) / window.length;
+    maData.push({ x: pts[i].date, y: Math.round(avg) });
+  }
+
+  charts[cardId] = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      datasets: [
+        {
+          label: 'Index',
+          data: pts.map(p => ({ x: p.date, y: p.value })),
+          borderColor: color,
+          backgroundColor: color + '15',
+          borderWidth: 1.5,
+          pointRadius: pts.length > 40 ? 0 : 2,
+          pointHoverRadius: 4,
+          fill: true,
+          tension: 0.2,
+        },
+        {
+          label: 'TB 7 ngày',
+          data: maData,
+          borderColor: '#eab308',
+          borderWidth: 1.5,
+          borderDash: [4, 3],
+          pointRadius: 0,
+          fill: false,
+          tension: 0.3,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        tooltip: {
+          callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y?.toLocaleString('vi-VN')}` }
+        },
+        legend: { display: true, labels: { color: '#94a3b8', usePointStyle: true, boxWidth: 6, padding: 8, font: { size: 10 } } },
+      },
+      scales: {
+        x: {
+          type: 'time',
+          time: { unit: pts.length > 90 ? 'month' : 'week', tooltipFormat: 'dd/MM/yyyy' },
+          grid: { color: 'rgba(148,163,184,0.08)' },
+          ticks: { color: '#94a3b8', font: { size: 9 }, maxRotation: 0, maxTicksLimit: 6 },
+        },
+        y: {
+          grid: { color: 'rgba(148,163,184,0.08)' },
+          ticks: {
+            color: '#94a3b8', font: { size: 9 },
+            callback: v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? (v/1e3).toFixed(0)+'K' : v,
+          },
+        }
+      }
+    }
+  });
+  canvas.parentElement.style.height = '180px';
+}
+
+function renderRankingTable(domains, startDate) {
+  const tbody = document.getElementById('rankBody');
+  if (!tbody) return;
+
+  const rows = [];
+  for (const [domain, info] of Object.entries(domains)) {
+    const pts = info.points;
+    if (!pts.length) continue;
+    const first = pts[0].value;
+    const last = pts[pts.length - 1].value;
+    const change = last - first;
+    const pct = first > 0 ? ((last - first) / first * 100) : (last > 0 ? 100 : 0);
+
+    // Simple trend: compare last 7 days average vs previous 7 days
+    let trend = '—';
+    if (pts.length >= 7) {
+      const recent = pts.slice(-7).reduce((s, p) => s + p.value, 0) / 7;
+      const prev = pts.slice(-14, -7);
+      if (prev.length) {
+        const prevAvg = prev.reduce((s, p) => s + p.value, 0) / prev.length;
+        if (recent > prevAvg * 1.05) trend = '📈 Tăng';
+        else if (recent < prevAvg * 0.95) trend = '📉 Giảm';
+        else trend = '➡️ Ổn định';
+      }
+    }
+
+    rows.push({ domain, category: info.category, first, last, change, pct, trend, points: pts.length });
+  }
+
+  // Sort by growth %
+  rows.sort((a, b) => b.pct - a.pct);
+
+  const maxVal = Math.max(...rows.map(r => r.last), 1);
+  let html = '';
+  rows.forEach((r, i) => {
+    const catInfo = CATEGORIES[r.category];
+    const chgCls = r.change > 0 ? 'up' : (r.change < 0 ? 'down' : '');
+    const pctStr = r.pct > 0 ? `+${r.pct.toFixed(1)}%` : `${r.pct.toFixed(1)}%`;
+    const barW = (r.last / maxVal * 100).toFixed(1);
+
+    html += `<tr>
+      <td class="rank-num">${i + 1}</td>
+      <td>
+        <strong>${r.domain}</strong>
+        <div class="bar-bg"><div class="bar-fill" style="width:${barW}%;background:${catInfo.color}"></div></div>
+      </td>
+      <td><span class="domain-badge ${catInfo.badge}">${catInfo.label}</span></td>
+      <td><strong>${fmt(r.last)}</strong></td>
+      <td>${fmt(r.first)}</td>
+      <td class="${chgCls}">${r.change > 0 ? '+' : ''}${fmt(r.change)}</td>
+      <td class="${chgCls}"><strong>${pctStr}</strong></td>
+      <td>${r.trend}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+// Load data
+fetch('history.json')
+  .then(r => r.json())
+  .then(data => {
+    allHistory = data;
+    render();
+  })
+  .catch(err => {
+    document.getElementById('app').innerHTML = `<div class="loading">Lỗi: ${err.message}</div>`;
+  });
+</script>
+</body>
+</html>
