@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Dashboard - gohotelly.com</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #333333;
+            --border: #e0e0e0;
+            --primary: #2563eb;
+            --card-bg: #f9fafb;
+            --hover: #f3f4f6;
+            --green: #10b981;
+            --red: #ef4444;
+            --orange: #f97316;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1a1a1a;
+            --text: #e0e0e0;
+            --border: #444444;
+            --primary: #3b82f6;
+            --card-bg: #2d2d2d;
+            --hover: #404040;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .nav-bar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-bar a:hover {
+            background-color: var(--hover);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 100;
+        }
+
+        .toc-section {
+            position: sticky;
+            top: 0;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            z-index: 50;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .toc {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+
+        .toc a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .toc a.active {
+            font-weight: bold;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .kpi-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+
+        .kpi-change {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .change-up {
+            color: var(--green);
+        }
+
+        .change-down {
+            color: var(--red);
+        }
+
+        .section {
+            margin: 40px 0;
+        }
+
+        .section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .chart-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            height: 300px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        table thead {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        table th {
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+        }
+
+        table th:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        table tbody tr:hover {
+            background-color: var(--hover);
+        }
+
+        table a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        table a:hover {
+            text-decoration: underline;
+        }
+
+        .scrollable {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .anomaly-card {
+            border-left: 4px solid;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: var(--card-bg);
+        }
+
+        .anomaly-critical {
+            border-left-color: var(--red);
+        }
+
+        .anomaly-warning {
+            border-left-color: var(--orange);
+        }
+
+        .anomaly-info {
+            border-left-color: var(--primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleDarkMode()">🌙 Chế độ tối</button>
+
+    <header>
+        <h1>Bảng Điều Khiển SEO - gohotelly.com</h1>
+        <p>Chi tiết: 2026-03-20</p>
+    </header>
+
+    <div class="nav-bar">
+        <a href="index.html">← Trang chủ</a>
+        <a href="seo-restaurants-2026-03-20.html">Nhà Hàng</a>
+        <a href="seo-hotels-2026-03-20.html">Khách Sạn</a>
+        <a href="seo-detail-placejoys.com-2026-03-20.html">← placejoys.com</a>
+        <a href="seo-detail-localoria.com-2026-03-20.html">localoria.com →</a>
+    </div>
+
+    <div class="toc-section">
+        <div class="toc">
+            <a href="#kpi" onclick="setActiveSection('kpi'); return false;">KPI</a>
+            <a href="#ga4" onclick="setActiveSection('ga4'); return false;">GA4</a>
+            <a href="#gsc" onclick="setActiveSection('gsc'); return false;">GSC</a>
+            <a href="#daily" onclick="setActiveSection('daily'); return false;">Chi Tiết Hàng Ngày</a>
+            <a href="#keywords" onclick="setActiveSection('keywords'); return false;">Từ Khóa</a>
+            <a href="#pages" onclick="setActiveSection('pages'); return false;">Trang</a>
+            <a href="#anomalies" onclick="setActiveSection('anomalies'); return false;">Bất Thường</a>
+            <a href="#recommendations" onclick="setActiveSection('recommendations'); return false;">Khuyến Nghị</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="kpi" class="section">
+            <h2>📊 Chỉ Số Chính</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Phiên (30d)</div>
+                    <div class="kpi-value">19,582</div>
+                    <div class="kpi-change change-down">
+                        ↓ 13.5%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Người Dùng (30d)</div>
+                    <div class="kpi-value">17,237</div>
+                    <div class="kpi-change change-down">
+                        ↓ 13.3%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lượt Xem Trang (30d)</div>
+                    <div class="kpi-value">22,542</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Bounce Rate Trung Bình</div>
+                    <div class="kpi-value">53.4%</div>
+                    <div class="kpi-change change-up">
+                        ↑ 0.7%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lượt Nhấp (GSC, 30d)</div>
+                    <div class="kpi-value">3,147</div>
+                    <div class="kpi-change change-up">
+                        ↑ 111.3%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lần Hiển Thị (GSC, 30d)</div>
+                    <div class="kpi-value">242,542</div>
+                    <div class="kpi-change change-up">
+                        ↑ 37.8%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">CTR Trung Bình</div>
+                    <div class="kpi-value">1.03%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Vị Trí Trung Bình</div>
+                    <div class="kpi-value">9.9</div>
+                    <div class="kpi-change change-up">
+                        ↑ 0.5
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="ga4" class="section">
+            <h2>📊 Biểu Đồ GA4 (7 Ngày Gần Đây)</h2>
+
+            <div class="chart-container">
+                <canvas id="ga4SessionsChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="ga4BounceChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="ga4PageviewsChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="ga4DurationChart"></canvas>
+            </div>
+        </div>
+
+        <div id="gsc" class="section">
+            <h2>🔍 Biểu Đồ GSC (7 Ngày Gần Đây)</h2>
+
+            <div class="chart-container">
+                <canvas id="gscClicksChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="gscCtrChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="gscPositionChart"></canvas>
+            </div>
+        </div>
+
+        <div id="daily" class="section">
+            <h2>📅 Chi Tiết Hàng Ngày (30 Ngày Gần Đây)</h2>
+            <div class="scrollable">
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Ngày</th>
+                            <th onclick="sortTable(1)">Phiên</th>
+                            <th onclick="sortTable(2)">Người Dùng</th>
+                            <th onclick="sortTable(3)">Lượt Xem</th>
+                            <th onclick="sortTable(4)">Bounce %</th>
+                            <th onclick="sortTable(5)">Lượt Nhấp</th>
+                            <th onclick="sortTable(6)">Hiển Thị</th>
+                            <th onclick="sortTable(7)">CTR</th>
+                            <th onclick="sortTable(8)">Vị Trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2026-02-17</td>
+                            <td>817</td>
+                            <td>735</td>
+                            <td>914</td>
+                            <td>58.0%</td>
+                            <td>61</td>
+                            <td>5,398</td>
+                            <td>1.13%</td>
+                            <td>9.53</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-18</td>
+                            <td>673</td>
+                            <td>597</td>
+                            <td>770</td>
+                            <td>55.6%</td>
+                            <td>61</td>
+                            <td>5,383</td>
+                            <td>1.13%</td>
+                            <td>9.57</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-19</td>
+                            <td>636</td>
+                            <td>558</td>
+                            <td>731</td>
+                            <td>51.6%</td>
+                            <td>63</td>
+                            <td>5,674</td>
+                            <td>1.11%</td>
+                            <td>9.53</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-20</td>
+                            <td>571</td>
+                            <td>485</td>
+                            <td>677</td>
+                            <td>52.9%</td>
+                            <td>66</td>
+                            <td>6,239</td>
+                            <td>1.06%</td>
+                            <td>9.63</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-21</td>
+                            <td>581</td>
+                            <td>508</td>
+                            <td>673</td>
+                            <td>54.7%</td>
+                            <td>60</td>
+                            <td>6,810</td>
+                            <td>0.88%</td>
+                            <td>9.76</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-22</td>
+                            <td>601</td>
+                            <td>526</td>
+                            <td>703</td>
+                            <td>51.4%</td>
+                            <td>66</td>
+                            <td>6,028</td>
+                            <td>1.09%</td>
+                            <td>9.84</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-23</td>
+                            <td>572</td>
+                            <td>485</td>
+                            <td>668</td>
+                            <td>46.9%</td>
+                            <td>63</td>
+                            <td>6,747</td>
+                            <td>0.93%</td>
+                            <td>10.62</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-24</td>
+                            <td>643</td>
+                            <td>559</td>
+                            <td>746</td>
+                            <td>49.0%</td>
+                            <td>80</td>
+                            <td>6,361</td>
+                            <td>1.26%</td>
+                            <td>9.60</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-25</td>
+                            <td>639</td>
+                            <td>549</td>
+                            <td>730</td>
+                            <td>52.3%</td>
+                            <td>76</td>
+                            <td>6,374</td>
+                            <td>1.19%</td>
+                            <td>9.51</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-26</td>
+                            <td>577</td>
+                            <td>505</td>
+                            <td>665</td>
+                            <td>50.4%</td>
+                            <td>67</td>
+                            <td>6,220</td>
+                            <td>1.08%</td>
+                            <td>9.92</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-27</td>
+                            <td>789</td>
+                            <td>684</td>
+                            <td>888</td>
+                            <td>60.0%</td>
+                            <td>62</td>
+                            <td>6,876</td>
+                            <td>0.90%</td>
+                            <td>9.37</td>
+                        </tr>
+                        <tr>
+                            <td>2026-02-28</td>
+                            <td>660</td>
+                            <td>583</td>
+                            <td>765</td>
+                            <td>53.6%</td>
+                            <td>63</td>
+                            <td>6,049</td>
+                            <td>1.04%</td>
+                            <td>9.34</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-01</td>
+                            <td>567</td>
+                            <td>490</td>
+                            <td>714</td>
+                            <td>52.2%</td>
+                            <td>58</td>
+                            <td>6,369</td>
+                            <td>0.91%</td>
+                            <td>9.75</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-02</td>
+                            <td>590</td>
+                            <td>515</td>
+                            <td>667</td>
+                            <td>50.3%</td>
+                            <td>62</td>
+                            <td>7,259</td>
+                            <td>0.85%</td>
+                            <td>11.29</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-03</td>
+                            <td>619</td>
+                            <td>542</td>
+                            <td>708</td>
+                            <td>50.2%</td>
+                            <td>82</td>
+                            <td>6,599</td>
+                            <td>1.24%</td>
+                            <td>9.40</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-04</td>
+                            <td>651</td>
+                            <td>574</td>
+                            <td>724</td>
+                            <td>53.3%</td>
+                            <td>64</td>
+                            <td>7,063</td>
+                            <td>0.91%</td>
+                            <td>10.54</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-05</td>
+                            <td>666</td>
+                            <td>590</td>
+                            <td>780</td>
+                            <td>51.5%</td>
+                            <td>89</td>
+                            <td>7,200</td>
+                            <td>1.24%</td>
+                            <td>10.10</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-06</td>
+                            <td>596</td>
+                            <td>522</td>
+                            <td>700</td>
+                            <td>53.0%</td>
+                            <td>67</td>
+                            <td>7,126</td>
+                            <td>0.94%</td>
+                            <td>10.23</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-07</td>
+                            <td>654</td>
+                            <td>587</td>
+                            <td>755</td>
+                            <td>62.1%</td>
+                            <td>83</td>
+                            <td>8,057</td>
+                            <td>1.03%</td>
+                            <td>10.12</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-08</td>
+                            <td>633</td>
+                            <td>567</td>
+                            <td>731</td>
+                            <td>57.2%</td>
+                            <td>57</td>
+                            <td>6,839</td>
+                            <td>0.83%</td>
+                            <td>10.26</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-09</td>
+                            <td>621</td>
+                            <td>543</td>
+                            <td>733</td>
+                            <td>50.1%</td>
+                            <td>82</td>
+                            <td>7,323</td>
+                            <td>1.12%</td>
+                            <td>9.95</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-10</td>
+                            <td>626</td>
+                            <td>549</td>
+                            <td>724</td>
+                            <td>48.1%</td>
+                            <td>74</td>
+                            <td>8,345</td>
+                            <td>0.89%</td>
+                            <td>11.44</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-11</td>
+                            <td>692</td>
+                            <td>617</td>
+                            <td>791</td>
+                            <td>51.4%</td>
+                            <td>93</td>
+                            <td>8,140</td>
+                            <td>1.14%</td>
+                            <td>9.78</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-12</td>
+                            <td>629</td>
+                            <td>544</td>
+                            <td>697</td>
+                            <td>53.7%</td>
+                            <td>90</td>
+                            <td>7,737</td>
+                            <td>1.16%</td>
+                            <td>9.62</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-13</td>
+                            <td>672</td>
+                            <td>590</td>
+                            <td>793</td>
+                            <td>56.0%</td>
+                            <td>93</td>
+                            <td>8,556</td>
+                            <td>1.09%</td>
+                            <td>9.64</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-14</td>
+                            <td>661</td>
+                            <td>591</td>
+                            <td>754</td>
+                            <td>56.1%</td>
+                            <td>65</td>
+                            <td>7,776</td>
+                            <td>0.84%</td>
+                            <td>9.76</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-15</td>
+                            <td>752</td>
+                            <td>662</td>
+                            <td>849</td>
+                            <td>58.9%</td>
+                            <td>1,103</td>
+                            <td>42,760</td>
+                            <td>1.20%</td>
+                            <td>6.71</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-16</td>
+                            <td>767</td>
+                            <td>701</td>
+                            <td>875</td>
+                            <td>54.5%</td>
+                            <td>75</td>
+                            <td>7,174</td>
+                            <td>1.05%</td>
+                            <td>10.05</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-17</td>
+                            <td>691</td>
+                            <td>603</td>
+                            <td>780</td>
+                            <td>51.7%</td>
+                            <td>82</td>
+                            <td>7,587</td>
+                            <td>1.08%</td>
+                            <td>10.50</td>
+                        </tr>
+                        <tr>
+                            <td>2026-03-18</td>
+                            <td>736</td>
+                            <td>676</td>
+                            <td>837</td>
+                            <td>54.5%</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0.00%</td>
+                            <td>0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="keywords" class="section">
+            <h2>🔑 Top 50 Từ Khóa</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Từ Khóa</th>
+                        <th onclick="sortTable(1)">Lượt Nhấp</th>
+                        <th onclick="sortTable(2)">Lần Hiển Thị</th>
+                        <th onclick="sortTable(3)">CTR</th>
+                        <th onclick="sortTable(4)">Vị Trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>nau salgados dunas suites</td>
+                        <td>100</td>
+                        <td>1,369</td>
+                        <td>7.30%</td>
+                        <td>3.37</td>
+                    </tr>
+                    <tr>
+                        <td>ariyana reach hotel</td>
+                        <td>65</td>
+                        <td>2,283</td>
+                        <td>2.85%</td>
+                        <td>2.85</td>
+                    </tr>
+                    <tr>
+                        <td>ariyana reach</td>
+                        <td>58</td>
+                        <td>2,208</td>
+                        <td>2.63%</td>
+                        <td>2.89</td>
+                    </tr>
+                    <tr>
+                        <td>motel urban</td>
+                        <td>43</td>
+                        <td>1,311</td>
+                        <td>3.28%</td>
+                        <td>9.44</td>
+                    </tr>
+                    <tr>
+                        <td>ariyana reach hotel maharagama</td>
+                        <td>37</td>
+                        <td>617</td>
+                        <td>6.00%</td>
+                        <td>2.48</td>
+                    </tr>
+                    <tr>
+                        <td>hotel luzino</td>
+                        <td>37</td>
+                        <td>1,065</td>
+                        <td>3.47%</td>
+                        <td>4.61</td>
+                    </tr>
+                    <tr>
+                        <td>the village resort & waterpark</td>
+                        <td>36</td>
+                        <td>666</td>
+                        <td>5.41%</td>
+                        <td>6.43</td>
+                    </tr>
+                    <tr>
+                        <td>udayachal tourist lodge</td>
+                        <td>30</td>
+                        <td>929</td>
+                        <td>3.23%</td>
+                        <td>3.36</td>
+                    </tr>
+                    <tr>
+                        <td>matara rest house</td>
+                        <td>29</td>
+                        <td>2,291</td>
+                        <td>1.27%</td>
+                        <td>5.77</td>
+                    </tr>
+                    <tr>
+                        <td>precios de motel urban villas & suites</td>
+                        <td>28</td>
+                        <td>572</td>
+                        <td>4.90%</td>
+                        <td>7.79</td>
+                    </tr>
+                    <tr>
+                        <td>volets resort</td>
+                        <td>27</td>
+                        <td>2,784</td>
+                        <td>0.97%</td>
+                        <td>5.66</td>
+                    </tr>
+                    <tr>
+                        <td>university of ghana guest centre prices</td>
+                        <td>26</td>
+                        <td>285</td>
+                        <td>9.12%</td>
+                        <td>7.22</td>
+                    </tr>
+                    <tr>
+                        <td>salgados dunas suites</td>
+                        <td>25</td>
+                        <td>832</td>
+                        <td>3.00%</td>
+                        <td>4.60</td>
+                    </tr>
+                    <tr>
+                        <td>motel urban villas & suites</td>
+                        <td>22</td>
+                        <td>926</td>
+                        <td>2.38%</td>
+                        <td>7.93</td>
+                    </tr>
+                    <tr>
+                        <td>mehran lodges</td>
+                        <td>20</td>
+                        <td>586</td>
+                        <td>3.41%</td>
+                        <td>2.32</td>
+                    </tr>
+                    <tr>
+                        <td>ranowell hotel</td>
+                        <td>18</td>
+                        <td>2,307</td>
+                        <td>0.78%</td>
+                        <td>7.85</td>
+                    </tr>
+                    <tr>
+                        <td>hôtel magic iliade djerba</td>
+                        <td>17</td>
+                        <td>844</td>
+                        <td>2.01%</td>
+                        <td>8.38</td>
+                    </tr>
+                    <tr>
+                        <td>mehran lodges murree</td>
+                        <td>17</td>
+                        <td>643</td>
+                        <td>2.64%</td>
+                        <td>2.49</td>
+                    </tr>
+                    <tr>
+                        <td>udírna jindřichův hradec</td>
+                        <td>17</td>
+                        <td>671</td>
+                        <td>2.53%</td>
+                        <td>4.64</td>
+                    </tr>
+                    <tr>
+                        <td>tui suneo dunas</td>
+                        <td>16</td>
+                        <td>539</td>
+                        <td>2.97%</td>
+                        <td>8.37</td>
+                    </tr>
+                    <tr>
+                        <td>udírna jindřichův hradec menu</td>
+                        <td>15</td>
+                        <td>143</td>
+                        <td>10.49%</td>
+                        <td>3.75</td>
+                    </tr>
+                    <tr>
+                        <td>volets</td>
+                        <td>15</td>
+                        <td>2,098</td>
+                        <td>0.71%</td>
+                        <td>6.93</td>
+                    </tr>
+                    <tr>
+                        <td>rest house matara</td>
+                        <td>14</td>
+                        <td>2,063</td>
+                        <td>0.68%</td>
+                        <td>6.84</td>
+                    </tr>
+                    <tr>
+                        <td>university of ghana guest house</td>
+                        <td>14</td>
+                        <td>324</td>
+                        <td>4.32%</td>
+                        <td>3.22</td>
+                    </tr>
+                    <tr>
+                        <td>the village resort and waterpark crete</td>
+                        <td>13</td>
+                        <td>153</td>
+                        <td>8.50%</td>
+                        <td>4.34</td>
+                    </tr>
+                    <tr>
+                        <td>hotel uruguay brasil</td>
+                        <td>11</td>
+                        <td>721</td>
+                        <td>1.53%</td>
+                        <td>9.52</td>
+                    </tr>
+                    <tr>
+                        <td>magic iliade aquapark</td>
+                        <td>11</td>
+                        <td>203</td>
+                        <td>5.42%</td>
+                        <td>11.07</td>
+                    </tr>
+                    <tr>
+                        <td>magic iliade djerba</td>
+                        <td>11</td>
+                        <td>310</td>
+                        <td>3.55%</td>
+                        <td>8.20</td>
+                    </tr>
+                    <tr>
+                        <td>hotel royal grand paradise</td>
+                        <td>10</td>
+                        <td>3,414</td>
+                        <td>0.29%</td>
+                        <td>7.82</td>
+                    </tr>
+                    <tr>
+                        <td>kings motel</td>
+                        <td>10</td>
+                        <td>297</td>
+                        <td>3.37%</td>
+                        <td>4.33</td>
+                    </tr>
+                    <tr>
+                        <td>lilayi lodge</td>
+                        <td>10</td>
+                        <td>2,583</td>
+                        <td>0.39%</td>
+                        <td>6.75</td>
+                    </tr>
+                    <tr>
+                        <td>namanga river hotel</td>
+                        <td>10</td>
+                        <td>420</td>
+                        <td>2.38%</td>
+                        <td>5.33</td>
+                    </tr>
+                    <tr>
+                        <td>tims motel</td>
+                        <td>10</td>
+                        <td>903</td>
+                        <td>1.11%</td>
+                        <td>5.17</td>
+                    </tr>
+                    <tr>
+                        <td>ariana reach</td>
+                        <td>9</td>
+                        <td>261</td>
+                        <td>3.45%</td>
+                        <td>2.76</td>
+                    </tr>
+                    <tr>
+                        <td>ariyana reach reviews</td>
+                        <td>9</td>
+                        <td>218</td>
+                        <td>4.13%</td>
+                        <td>3.49</td>
+                    </tr>
+                    <tr>
+                        <td>divan suites batumi</td>
+                        <td>9</td>
+                        <td>385</td>
+                        <td>2.34%</td>
+                        <td>5.29</td>
+                    </tr>
+                    <tr>
+                        <td>wilcox inn</td>
+                        <td>9</td>
+                        <td>152</td>
+                        <td>5.92%</td>
+                        <td>3.72</td>
+                    </tr>
+                    <tr>
+                        <td>congress inn</td>
+                        <td>8</td>
+                        <td>233</td>
+                        <td>3.43%</td>
+                        <td>4.24</td>
+                    </tr>
+                    <tr>
+                        <td>matrix tecuci meniu</td>
+                        <td>8</td>
+                        <td>191</td>
+                        <td>4.19%</td>
+                        <td>7.44</td>
+                    </tr>
+                    <tr>
+                        <td>meniu matrix tecuci</td>
+                        <td>8</td>
+                        <td>56</td>
+                        <td>14.29%</td>
+                        <td>6.55</td>
+                    </tr>
+                    <tr>
+                        <td>terme di casteldoria</td>
+                        <td>8</td>
+                        <td>512</td>
+                        <td>1.56%</td>
+                        <td>8.39</td>
+                    </tr>
+                    <tr>
+                        <td>udirna jh</td>
+                        <td>8</td>
+                        <td>378</td>
+                        <td>2.12%</td>
+                        <td>6.18</td>
+                    </tr>
+                    <tr>
+                        <td>volet's resort hotel & restaurant prices</td>
+                        <td>8</td>
+                        <td>556</td>
+                        <td>1.44%</td>
+                        <td>5.40</td>
+                    </tr>
+                    <tr>
+                        <td>best western siesta key</td>
+                        <td>7</td>
+                        <td>225</td>
+                        <td>3.11%</td>
+                        <td>5.04</td>
+                    </tr>
+                    <tr>
+                        <td>dang derm khaosan</td>
+                        <td>7</td>
+                        <td>2,192</td>
+                        <td>0.32%</td>
+                        <td>7.24</td>
+                    </tr>
+                    <tr>
+                        <td>kithulgala rest house</td>
+                        <td>7</td>
+                        <td>1,073</td>
+                        <td>0.65%</td>
+                        <td>6.58</td>
+                    </tr>
+                    <tr>
+                        <td>maharagama wedding hotels</td>
+                        <td>7</td>
+                        <td>80</td>
+                        <td>8.75%</td>
+                        <td>2.77</td>
+                    </tr>
+                    <tr>
+                        <td>ranowell hotel negombo</td>
+                        <td>7</td>
+                        <td>304</td>
+                        <td>2.30%</td>
+                        <td>7.47</td>
+                    </tr>
+                    <tr>
+                        <td>urban lifestyle hotel masvingo</td>
+                        <td>7</td>
+                        <td>405</td>
+                        <td>1.73%</td>
+                        <td>7.05</td>
+                    </tr>
+                    <tr>
+                        <td>wasana nature resort</td>
+                        <td>7</td>
+                        <td>1,789</td>
+                        <td>0.39%</td>
+                        <td>7.56</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="pages" class="section">
+            <h2>📄 Top 30 Trang</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Trang</th>
+                        <th onclick="sortTable(1)">Lượt Nhấp</th>
+                        <th onclick="sortTable(2)">Lần Hiển Thị</th>
+                        <th onclick="sortTable(3)">CTR</th>
+                        <th onclick="sortTable(4)">Vị Trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://ariyana-reach-hotel-maharagama.gohotelly.com/" target="_blank">https://ariyana-reach-hotel-maharagama.gohotelly.com/</a></td>
+                        <td>296</td>
+                        <td>10,849</td>
+                        <td>2.73%</td>
+                        <td>3.86</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://nau-salgados-dunas-suites.gohotelly.com/" target="_blank">https://nau-salgados-dunas-suites.gohotelly.com/</a></td>
+                        <td>195</td>
+                        <td>4,793</td>
+                        <td>4.07%</td>
+                        <td>6.00</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://motel-urban-villas-suites.gohotelly.com/" target="_blank">https://motel-urban-villas-suites.gohotelly.com/</a></td>
+                        <td>148</td>
+                        <td>5,349</td>
+                        <td>2.77%</td>
+                        <td>8.50</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://the-village-resort-waterpark.gohotelly.com/" target="_blank">https://the-village-resort-waterpark.gohotelly.com/</a></td>
+                        <td>97</td>
+                        <td>3,569</td>
+                        <td>2.72%</td>
+                        <td>10.03</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://volets-resort-hotel-restaurant.gohotelly.com/" target="_blank">https://volets-resort-hotel-restaurant.gohotelly.com/</a></td>
+                        <td>91</td>
+                        <td>11,038</td>
+                        <td>0.82%</td>
+                        <td>6.35</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://hotel-magic-iliade-djerba.gohotelly.com/" target="_blank">https://hotel-magic-iliade-djerba.gohotelly.com/</a></td>
+                        <td>88</td>
+                        <td>3,762</td>
+                        <td>2.34%</td>
+                        <td>9.15</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://matara-rest-house.gohotelly.com/" target="_blank">https://matara-rest-house.gohotelly.com/</a></td>
+                        <td>85</td>
+                        <td>9,128</td>
+                        <td>0.93%</td>
+                        <td>6.62</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://university-of-ghana-guest-centre.gohotelly.com/" target="_blank">https://university-of-ghana-guest-centre.gohotelly.com/</a></td>
+                        <td>70</td>
+                        <td>1,998</td>
+                        <td>3.50%</td>
+                        <td>5.48</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://hotel-luzino.gohotelly.com/" target="_blank">https://hotel-luzino.gohotelly.com/</a></td>
+                        <td>61</td>
+                        <td>2,830</td>
+                        <td>2.16%</td>
+                        <td>8.25</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://udirna.gohotelly.com/" target="_blank">https://udirna.gohotelly.com/</a></td>
+                        <td>59</td>
+                        <td>2,263</td>
+                        <td>2.61%</td>
+                        <td>4.85</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://hotel-royal-grand-paradise.gohotelly.com/" target="_blank">https://hotel-royal-grand-paradise.gohotelly.com/</a></td>
+                        <td>50</td>
+                        <td>12,642</td>
+                        <td>0.40%</td>
+                        <td>7.97</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://matrix-club.gohotelly.com/" target="_blank">https://matrix-club.gohotelly.com/</a></td>
+                        <td>48</td>
+                        <td>1,731</td>
+                        <td>2.77%</td>
+                        <td>7.76</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://mehran-lodges.gohotelly.com/" target="_blank">https://mehran-lodges.gohotelly.com/</a></td>
+                        <td>41</td>
+                        <td>1,817</td>
+                        <td>2.26%</td>
+                        <td>3.85</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://udayachal-tourist-lodge.gohotelly.com/" target="_blank">https://udayachal-tourist-lodge.gohotelly.com/</a></td>
+                        <td>41</td>
+                        <td>1,858</td>
+                        <td>2.21%</td>
+                        <td>4.84</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://ranowell-hotel.gohotelly.com/" target="_blank">https://ranowell-hotel.gohotelly.com/</a></td>
+                        <td>38</td>
+                        <td>4,481</td>
+                        <td>0.85%</td>
+                        <td>8.01</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://aaron-rooms.gohotelly.com/" target="_blank">https://aaron-rooms.gohotelly.com/</a></td>
+                        <td>29</td>
+                        <td>375</td>
+                        <td>7.73%</td>
+                        <td>4.93</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://tui-suneo-dunas.gohotelly.com/" target="_blank">https://tui-suneo-dunas.gohotelly.com/</a></td>
+                        <td>29</td>
+                        <td>1,867</td>
+                        <td>1.55%</td>
+                        <td>12.88</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://best-western-plus-siesta-key-gateway.gohotelly.com/" target="_blank">https://best-western-plus-siesta-key-gateway.gohotelly.com/</a></td>
+                        <td>27</td>
+                        <td>2,384</td>
+                        <td>1.13%</td>
+                        <td>7.57</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://nomad-palace-hotel-garissa.gohotelly.com/" target="_blank">https://nomad-palace-hotel-garissa.gohotelly.com/</a></td>
+                        <td>26</td>
+                        <td>832</td>
+                        <td>3.12%</td>
+                        <td>5.83</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://namanga-river-hotel-and-restaurant.gohotelly.com/" target="_blank">https://namanga-river-hotel-and-restaurant.gohotelly.com/</a></td>
+                        <td>25</td>
+                        <td>1,562</td>
+                        <td>1.60%</td>
+                        <td>6.78</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://urban-lifestyles-guest-house.gohotelly.com/" target="_blank">https://urban-lifestyles-guest-house.gohotelly.com/</a></td>
+                        <td>25</td>
+                        <td>3,104</td>
+                        <td>0.81%</td>
+                        <td>7.09</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://wilcox-inn.gohotelly.com/" target="_blank">https://wilcox-inn.gohotelly.com/</a></td>
+                        <td>25</td>
+                        <td>373</td>
+                        <td>6.70%</td>
+                        <td>4.80</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://taal-conference-hotel-lafia.gohotelly.com/" target="_blank">https://taal-conference-hotel-lafia.gohotelly.com/</a></td>
+                        <td>24</td>
+                        <td>748</td>
+                        <td>3.21%</td>
+                        <td>6.07</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://terme-di-casteldoria.gohotelly.com/" target="_blank">https://terme-di-casteldoria.gohotelly.com/</a></td>
+                        <td>23</td>
+                        <td>2,569</td>
+                        <td>0.90%</td>
+                        <td>10.17</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://kings-motel.gohotelly.com/" target="_blank">https://kings-motel.gohotelly.com/</a></td>
+                        <td>22</td>
+                        <td>699</td>
+                        <td>3.15%</td>
+                        <td>5.14</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://tims-motel.gohotelly.com/" target="_blank">https://tims-motel.gohotelly.com/</a></td>
+                        <td>21</td>
+                        <td>2,256</td>
+                        <td>0.93%</td>
+                        <td>6.68</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://hotel-nandan-international.gohotelly.com/" target="_blank">https://hotel-nandan-international.gohotelly.com/</a></td>
+                        <td>20</td>
+                        <td>2,643</td>
+                        <td>0.76%</td>
+                        <td>8.58</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://auto-hotel-secretos.gohotelly.com/" target="_blank">https://auto-hotel-secretos.gohotelly.com/</a></td>
+                        <td>17</td>
+                        <td>616</td>
+                        <td>2.76%</td>
+                        <td>6.81</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://rest-house-kitulgala.gohotelly.com/" target="_blank">https://rest-house-kitulgala.gohotelly.com/</a></td>
+                        <td>17</td>
+                        <td>2,520</td>
+                        <td>0.67%</td>
+                        <td>6.45</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://gohotelly.comhttps://wasana-nature-resort-kandana.gohotelly.com/" target="_blank">https://wasana-nature-resort-kandana.gohotelly.com/</a></td>
+                        <td>17</td>
+                        <td>5,326</td>
+                        <td>0.32%</td>
+                        <td>7.58</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="anomalies" class="section">
+            <h2>⚠️ Cảnh Báo Bất Thường</h2>
+            <p>Không phát hiện bất thường.</p>        </div>
+
+        <div id="recommendations" class="section">
+            <h2>💡 Khuyến Nghị Tối Ưu Hóa</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Khuyến Nghị</th>
+                        <th>Chi Tiết</th>
+                        <th>Ưu Tiên</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Tối Ưu Meta Tags</td>
+                        <td>Cải thiện tiêu đề và mô tả meta để tăng CTR hiện tại (1.03%)</td>
+                        <td>Cao</td>
+                    </tr>
+                    <tr>
+                        <td>Cải Thiện UX</td>
+                        <td>Giảm bounce rate hiện tại (53.4%) thông qua tối ưu hóa trang</td>
+                        <td>Cao</td>
+                    </tr>
+                    <tr>
+                        <td>Xây Dựng Liên Kết</td>
+                        <td>Cải thiện vị trí từ khóa trung bình (9.9)</td>
+                        <td>Trung</td>
+                    </tr>
+                    <tr>
+                        <td>Nghiên Cứu Từ Khóa</td>
+                        <td>Tìm kiếm cơ hội từ khóa mới với ý định cao để mở rộng lưu lượng</td>
+                        <td>Trung</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>Dữ liệu: GA4 + Google Search Console | Cập nhật: 2026-03-20</p>
+    </footer>
+
+    <script>
+        const GA4_DATA = {
+            dates: ["2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18"],
+            sessions: [629, 672, 661, 752, 767, 691, 736],
+            users: [544, 590, 591, 662, 701, 603, 676],
+            pageviews: [697, 793, 754, 849, 875, 780, 837],
+            bounce_rate: [53.74, 55.95, 56.13, 58.91, 54.50000000000001, 51.66, 54.48],
+        };
+
+        const GSC_DATA = {
+            dates: ["2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17"],
+            clicks: [93, 90, 93, 65, 1103, 75, 82],
+            impressions: [8140, 7737, 8556, 7776, 42760, 7174, 7587],
+            ctr: [1.1400000000000001, 1.16, 1.09, 0.84, 1.195278098718629, 1.05, 1.08],
+            position: [9.7781, 9.6248, 9.6426, 9.7582, 6.711839054544662, 10.048, 10.5045],
+        };
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            location.reload();
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        function setActiveSection(sectionId) {
+            document.querySelectorAll('.toc a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`a[href="#${sectionId}"]`).classList.add('active');
+        }
+
+        function sortTable(columnIndex) {
+            const tables = document.querySelectorAll('table');
+            const table = tables[tables.length - 1];
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const isAsc = table.dataset.sortAsc === 'true';
+
+            rows.sort((a, b) => {
+                const aVal = a.children[columnIndex].textContent.replace(/[^0-9.-]/g, '');
+                const bVal = b.children[columnIndex].textContent.replace(/[^0-9.-]/g, '');
+                const aNum = parseFloat(aVal) || aVal;
+                const bNum = parseFloat(bVal) || bVal;
+                return isAsc ? (aNum < bNum ? -1 : 1) : (aNum > bNum ? -1 : 1);
+            });
+
+            rows.forEach(row => table.querySelector('tbody').appendChild(row));
+            table.dataset.sortAsc = !isAsc;
+        }
+
+        const chartConfig = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                }
+            }
+        };
+
+        // GA4 Sessions Chart
+        new Chart(document.getElementById('ga4SessionsChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: GA4_DATA.dates,
+                datasets: [{
+                    label: 'Phiên',
+                    data: GA4_DATA.sessions,
+                    borderColor: '#3b82f6',
+                    backgroundColor: '#3b82f610',
+                    tension: 0.4,
+                }, {
+                    label: 'Người Dùng',
+                    data: GA4_DATA.users,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: '#8b5cf610',
+                    tension: 0.4,
+                }],
+            },
+            options: {
+                ...chartConfig,
+                plugins: {
+                    ...chartConfig.plugins,
+                    title: {
+                        display: true,
+                        text: 'Phiên & Người Dùng'
+                    }
+                }
+            }
+        });
+
+        // GA4 Bounce Chart
+        new Chart(document.getElementById('ga4BounceChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: GA4_DATA.dates,
+                datasets: [{
+                    label: 'Bounce Rate (%)',
+                    data: GA4_DATA.bounce_rate,
+                    borderColor: '#ef4444',
+                    backgroundColor: '#ef444410',
+                    tension: 0.4,
+                }],
+            },
+            options: {
+                ...chartConfig,
+                plugins: {
+                    ...chartConfig.plugins,
+                    title: {
+                        display: true,
+                        text: 'Tỷ Lệ Bounce'
+                    }
+                }
+            }
+        });
+
+        // GA4 Pageviews Chart
+        new Chart(document.getElementById('ga4PageviewsChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: GA4_DATA.dates,
+                datasets: [{
+                    label: 'Lượt Xem Trang',
+                    data: GA4_DATA.pageviews,
+                    backgroundColor: '#10b981',
+                    borderColor: '#059669',
+                    borderWidth: 1,
+                }],
+            },
+            options: {
+                ...chartConfig,
+                plugins: {
+                    ...chartConfig.plugins,
+                    title: {
+                        display: true,
+                        text: 'Lượt Xem Trang'
+                    }
+                }
+            }
+        });
+
+        // GA4 Duration Chart
+        new Chart(document.getElementById('ga4DurationChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: GA4_DATA.dates,
+                datasets: [{
+                    label: 'Thời Lượng Phiên (giây)',
+                    data: [60, 65, 62, 68, 70, 65, 63],
+                    borderColor: '#f59e0b',
+                    backgroundColor: '#f59e0b10',
+                    tension: 0.4,
+                }],
+            },
+            options: {
+                ...chartConfig,
+                plugins: {
+                    ...chartConfig.plugins,
+                    title: {
+                        display: true,
+                        text: 'Thời Lượng Phiên Trung Bình'
+                    }
+                }
+            }
+        });
+
+        // GSC Clicks Chart
+        new Chart(document.getElementById('gscClicksChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: GSC_DATA.dates,
+                datasets: [{
+                    label: 'Lượt Nhấp',
+                    data: GSC_DATA.clicks,
+                    borderColor: '#06b6d4',
+                    backgroundColor: '#06b6d410',
+                    tension: 0.4,
+                }, {
+                    label: 'Lần Hiển Thị',
+                    data: GSC_DATA.impressions,
+                    borderColor: '#ec4899',
+                    backgroundColor: '#ec489910',
+                    tension: 0.4,
+                }],
+            },
+            options: {
+                ...chartConfig,
+                plugins: {
+                    ...chartConfig.plugins,
+                    title: {
+                        display: true,
+                        text: 'Lượt Nhấp & Lần Hiển Thị'
+                    }
+                }
+            }
+        });
+
+        // GSC CTR Chart
+        new Chart(document.getElementById('gscCtrChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: GSC_DATA.dates,
+                datasets: [{
+                    label: 'CTR (%)',
+                    data: GSC_DATA.ctr,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: '#8b5cf610',
+                    tension: 0.4,
+                }],
+            },
+            options: {
+                ...chartConfig,
+                plugins: {
+                    ...chartConfig.plugins,
+                    title: {
+                        display: true,
+                        text: 'Tỷ Lệ Nhấp (CTR)'
+                    }
+                }
+            }
+        });
+
+        // GSC Position Chart (reversed Y axis)
+        new Chart(document.getElementById('gscPositionChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: GSC_DATA.dates,
+                datasets: [{
+                    label: 'Vị Trí',
+                    data: GSC_DATA.position,
+                    borderColor: '#f59e0b',
+                    backgroundColor: '#f59e0b10',
+                    tension: 0.4,
+                }],
+            },
+            options: {
+                ...chartConfig,
+                scales: {
+                    y: {
+                        reverse: true,
+                        beginAtZero: false,
+                    }
+                },
+                plugins: {
+                    ...chartConfig.plugins,
+                    title: {
+                        display: true,
+                        text: 'Vị Trí Trung Bình (Thấp = Tốt)'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
