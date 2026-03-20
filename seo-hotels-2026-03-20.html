@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Dashboard - Khách Sạn</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #333333;
+            --border: #e0e0e0;
+            --primary: #2563eb;
+            --card-bg: #f9fafb;
+            --hover: #f3f4f6;
+            --green: #10b981;
+            --red: #ef4444;
+            --orange: #f97316;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1a1a1a;
+            --text: #e0e0e0;
+            --border: #444444;
+            --primary: #3b82f6;
+            --card-bg: #2d2d2d;
+            --hover: #404040;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .nav-bar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-bar a:hover {
+            background-color: var(--hover);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 100;
+        }
+
+        .toc-section {
+            position: sticky;
+            top: 0;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            z-index: 50;
+        }
+
+        .toc-section h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .toc {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+
+        .toc a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .toc a.active {
+            font-weight: bold;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .kpi-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+
+        .kpi-change {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .change-up {
+            color: var(--green);
+        }
+
+        .change-down {
+            color: var(--red);
+        }
+
+        .section {
+            margin: 40px 0;
+        }
+
+        .section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .chart-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            height: 300px;
+        }
+
+        .filter-row {
+            margin: 15px 0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-row select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        table thead {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        table th {
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+        }
+
+        table th:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        table tbody tr:hover {
+            background-color: var(--hover);
+        }
+
+        .domain-link {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .domain-link:hover {
+            text-decoration: underline;
+        }
+
+        .anomaly-card {
+            border-left: 4px solid;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: var(--card-bg);
+        }
+
+        .anomaly-critical {
+            border-left-color: var(--red);
+        }
+
+        .anomaly-warning {
+            border-left-color: var(--orange);
+        }
+
+        .anomaly-info {
+            border-left-color: var(--primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleDarkMode()">🌙 Chế độ tối</button>
+
+    <header>
+        <h1>Bảng Điều Khiển SEO - Khách Sạn</h1>
+        <p>Cập nhật: 2026-03-20</p>
+    </header>
+
+    <div class="nav-bar">
+        <a href="index.html">← Trang chủ</a>
+        <a href="seo-restaurants-2026-03-20.html">→ Nhà Hàng</a>
+        <a href="seo-hotels-2026-03-20.html"></a>
+    </div>
+
+    <div class="toc-section">
+        <h3>📍 Mục Lục</h3>
+        <div class="toc">
+            <a href="#kpi" onclick="setActiveSection('kpi'); return false;">KPI</a>
+            <a href="#charts" onclick="setActiveSection('charts'); return false;">Biểu Đồ</a>
+            <a href="#comparison" onclick="setActiveSection('comparison'); return false;">So Sánh</a>
+            <a href="#keywords" onclick="setActiveSection('keywords'); return false;">Từ Khóa</a>
+            <a href="#anomalies" onclick="setActiveSection('anomalies'); return false;">Bất Thường</a>
+            <a href="#recommendations" onclick="setActiveSection('recommendations'); return false;">Khuyến Nghị</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="kpi" class="section">
+            <h2>📊 Chỉ Số Chính</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Phiên Làm Việc</div>
+                    <div class="kpi-value">19,582</div>
+                    <div class="kpi-change change-down">
+                        ↓ 13.5%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Người Dùng Hoạt Động</div>
+                    <div class="kpi-value">17,237</div>
+                    <div class="kpi-change change-down">
+                        ↓ 13.3%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lượt Xem Trang</div>
+                    <div class="kpi-value">22,542</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lượt Nhấp (GSC)</div>
+                    <div class="kpi-value">3,147</div>
+                    <div class="kpi-change change-up">
+                        ↑ 111.3%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lần Hiển Thị (GSC)</div>
+                    <div class="kpi-value">242,542</div>
+                    <div class="kpi-change change-up">
+                        ↑ 37.8%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ Lệ Bounce Trung Bình</div>
+                    <div class="kpi-value">53.4%</div>
+                    <div class="kpi-change change-up">
+                        ↑ 0.7%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Vị Trí Trung Bình</div>
+                    <div class="kpi-value">9.9</div>
+                    <div class="kpi-change change-up">
+                        ↑ 0.5
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="charts" class="section">
+            <h2>📈 Biểu Đồ Xu Hướng (7 Ngày Gần Đây)</h2>
+
+            <div class="chart-container">
+                <canvas id="sessionsChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="clicksChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="impressionsChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="positionChart"></canvas>
+            </div>
+        </div>
+
+        <div id="comparison" class="section">
+            <h2>🔍 So Sánh Các Trang Web</h2>
+
+            <div class="filter-row">
+                <label>Lọc theo:</label>
+                <select id="filterSelect" onchange="filterTable()">
+                    <option value="">Tất cả</option>
+                    <option value="gohotelly.com">gohotelly.com</option>
+                </select>
+            </div>
+
+            <table id="comparisonTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Trang Web</th>
+                        <th onclick="sortTable(1)">Phiên (30d)</th>
+                        <th onclick="sortTable(2)">Người Dùng (30d)</th>
+                        <th onclick="sortTable(3)">Lượt Nhấp</th>
+                        <th onclick="sortTable(4)">Lần Hiển Thị</th>
+                        <th onclick="sortTable(5)">CTR</th>
+                        <th onclick="sortTable(6)">Vị Trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-domain="gohotelly.com">
+                        <td><a href="seo-detail-gohotelly.com-2026-03-20.html" class="domain-link">gohotelly.com</a></td>
+                        <td>19,582</td>
+                        <td>17,237</td>
+                        <td>3,147</td>
+                        <td>242,542</td>
+                        <td>1.03%</td>
+                        <td>9.9</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="keywords" class="section">
+            <h2>🔑 Top 20 Từ Khóa</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Từ Khóa</th>
+                        <th>Lượt Nhấp</th>
+                        <th>Lần Hiển Thị</th>
+                        <th>CTR</th>
+                        <th>Vị Trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>nau salgados dunas suites</td>
+                        <td>100</td>
+                        <td>1,369</td>
+                        <td>7.30%</td>
+                        <td>3.37</td>
+                    </tr>
+                    <tr>
+                        <td>ariyana reach hotel</td>
+                        <td>65</td>
+                        <td>2,283</td>
+                        <td>2.85%</td>
+                        <td>2.85</td>
+                    </tr>
+                    <tr>
+                        <td>ariyana reach</td>
+                        <td>58</td>
+                        <td>2,208</td>
+                        <td>2.63%</td>
+                        <td>2.89</td>
+                    </tr>
+                    <tr>
+                        <td>motel urban</td>
+                        <td>43</td>
+                        <td>1,311</td>
+                        <td>3.28%</td>
+                        <td>9.44</td>
+                    </tr>
+                    <tr>
+                        <td>ariyana reach hotel maharagama</td>
+                        <td>37</td>
+                        <td>617</td>
+                        <td>6.00%</td>
+                        <td>2.48</td>
+                    </tr>
+                    <tr>
+                        <td>hotel luzino</td>
+                        <td>37</td>
+                        <td>1,065</td>
+                        <td>3.47%</td>
+                        <td>4.61</td>
+                    </tr>
+                    <tr>
+                        <td>the village resort & waterpark</td>
+                        <td>36</td>
+                        <td>666</td>
+                        <td>5.41%</td>
+                        <td>6.43</td>
+                    </tr>
+                    <tr>
+                        <td>udayachal tourist lodge</td>
+                        <td>30</td>
+                        <td>929</td>
+                        <td>3.23%</td>
+                        <td>3.36</td>
+                    </tr>
+                    <tr>
+                        <td>matara rest house</td>
+                        <td>29</td>
+                        <td>2,291</td>
+                        <td>1.27%</td>
+                        <td>5.77</td>
+                    </tr>
+                    <tr>
+                        <td>precios de motel urban villas & suites</td>
+                        <td>28</td>
+                        <td>572</td>
+                        <td>4.90%</td>
+                        <td>7.79</td>
+                    </tr>
+                    <tr>
+                        <td>volets resort</td>
+                        <td>27</td>
+                        <td>2,784</td>
+                        <td>0.97%</td>
+                        <td>5.66</td>
+                    </tr>
+                    <tr>
+                        <td>university of ghana guest centre prices</td>
+                        <td>26</td>
+                        <td>285</td>
+                        <td>9.12%</td>
+                        <td>7.22</td>
+                    </tr>
+                    <tr>
+                        <td>salgados dunas suites</td>
+                        <td>25</td>
+                        <td>832</td>
+                        <td>3.00%</td>
+                        <td>4.60</td>
+                    </tr>
+                    <tr>
+                        <td>motel urban villas & suites</td>
+                        <td>22</td>
+                        <td>926</td>
+                        <td>2.38%</td>
+                        <td>7.93</td>
+                    </tr>
+                    <tr>
+                        <td>mehran lodges</td>
+                        <td>20</td>
+                        <td>586</td>
+                        <td>3.41%</td>
+                        <td>2.32</td>
+                    </tr>
+                    <tr>
+                        <td>ranowell hotel</td>
+                        <td>18</td>
+                        <td>2,307</td>
+                        <td>0.78%</td>
+                        <td>7.85</td>
+                    </tr>
+                    <tr>
+                        <td>hôtel magic iliade djerba</td>
+                        <td>17</td>
+                        <td>844</td>
+                        <td>2.01%</td>
+                        <td>8.38</td>
+                    </tr>
+                    <tr>
+                        <td>mehran lodges murree</td>
+                        <td>17</td>
+                        <td>643</td>
+                        <td>2.64%</td>
+                        <td>2.49</td>
+                    </tr>
+                    <tr>
+                        <td>udírna jindřichův hradec</td>
+                        <td>17</td>
+                        <td>671</td>
+                        <td>2.53%</td>
+                        <td>4.64</td>
+                    </tr>
+                    <tr>
+                        <td>tui suneo dunas</td>
+                        <td>16</td>
+                        <td>539</td>
+                        <td>2.97%</td>
+                        <td>8.37</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="anomalies" class="section">
+            <h2>⚠️ Cảnh Báo Bất Thường</h2>
+            <p>Không phát hiện bất thường.</p>        </div>
+
+        <div id="recommendations" class="section">
+            <h2>💡 Khuyến Nghị Tối Ưu Hóa</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Loại</th>
+                        <th>Mô Tả</th>
+                        <th>Ưu Tiên</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>CTR Thấp</td>
+                        <td>Cải thiện tiêu đề và mô tả meta để tăng CTR từ kết quả tìm kiếm</td>
+                        <td>Cao</td>
+                    </tr>
+                    <tr>
+                        <td>Bounce Rate Cao</td>
+                        <td>Tối ưu hóa nội dung trang và trải nghiệm người dùng để giảm bounce rate</td>
+                        <td>Cao</td>
+                    </tr>
+                    <tr>
+                        <td>Vị Trí Thấp</td>
+                        <td>Cải thiện SEO trên trang và xây dựng liên kết để tăng xếp hạng</td>
+                        <td>Trung</td>
+                    </tr>
+                    <tr>
+                        <td>Từ Khóa Mới</td>
+                        <td>Tìm kiếm từ khóa mới với ý định cao có thể thêm vào</td>
+                        <td>Trung</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>Dữ liệu: GA4 + Google Search Console | Cập nhật: {ANALYSIS_DATE}</p>
+    </footer>
+
+    <script>
+        const CHART_DATES = {json.dumps(chart_dates)};
+        const CHART_SESSIONS = {json.dumps(chart_sessions)};
+        const CHART_CLICKS = {json.dumps(chart_clicks)};
+        const CHART_IMPRESSIONS = {json.dumps(chart_impressions)};
+        const CHART_POSITION = {json.dumps(chart_position)};
+
+        function toggleDarkMode() {{
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            location.reload();
+        }}
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        function setActiveSection(sectionId) {{
+            document.querySelectorAll('.toc a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`a[href="#${{sectionId}}"]`).classList.add('active');
+        }}
+
+        function sortTable(columnIndex) {{
+            const table = document.getElementById('comparisonTable');
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const isAsc = table.dataset.sortAsc === 'true';
+
+            rows.sort((a, b) => {{
+                const aVal = a.children[columnIndex].textContent.replace(/[^0-9.-]/g, '');
+                const bVal = b.children[columnIndex].textContent.replace(/[^0-9.-]/g, '');
+                const aNum = parseFloat(aVal) || aVal;
+                const bNum = parseFloat(bVal) || bVal;
+                return isAsc ? (aNum < bNum ? -1 : 1) : (aNum > bNum ? -1 : 1);
+            }});
+
+            rows.forEach(row => table.querySelector('tbody').appendChild(row));
+            table.dataset.sortAsc = !isAsc;
+        }}
+
+        function filterTable() {{
+            const filter = document.getElementById('filterSelect').value;
+            document.querySelectorAll('#comparisonTable tbody tr').forEach(row => {{
+                row.style.display = !filter || row.dataset.domain === filter ? '' : 'none';
+            }});
+        }}
+
+        // Initialize charts
+        const chartConfig = {{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {{
+                legend: {{
+                    position: 'top',
+                }},
+            }},
+            scales: {{
+                y: {{
+                    beginAtZero: true,
+                }}
+            }}
+        }};
+
+        // Sessions Chart
+        const sessionsCtx = document.getElementById('sessionsChart').getContext('2d');
+        const sessionsDatasets = Object.entries(CHART_SESSIONS).map(([domain, data]) => ({{
+            label: domain,
+            data: data.data,
+            borderColor: data.color,
+            backgroundColor: data.color + '10',
+            tension: 0.4,
+        }}));
+
+        new Chart(sessionsCtx, {{
+            type: 'line',
+            data: {{
+                labels: CHART_DATES,
+                datasets: sessionsDatasets,
+            }},
+            options: {{
+                ...chartConfig,
+                plugins: {{
+                    ...chartConfig.plugins,
+                    title: {{
+                        display: true,
+                        text: 'Phiên Làm Việc - 7 Ngày Gần Đây'
+                    }}
+                }}
+            }}
+        }});
+
+        // Clicks Chart
+        const clicksCtx = document.getElementById('clicksChart').getContext('2d');
+        const clicksDatasets = Object.entries(CHART_CLICKS).map(([domain, data]) => ({{
+            label: domain,
+            data: data.data,
+            borderColor: data.color,
+            backgroundColor: data.color + '10',
+            tension: 0.4,
+        }}));
+
+        new Chart(clicksCtx, {{
+            type: 'line',
+            data: {{
+                labels: CHART_DATES,
+                datasets: clicksDatasets,
+            }},
+            options: {{
+                ...chartConfig,
+                plugins: {{
+                    ...chartConfig.plugins,
+                    title: {{
+                        display: true,
+                        text: 'Lượt Nhấp (GSC) - 7 Ngày Gần Đây'
+                    }}
+                }}
+            }}
+        }});
+
+        // Impressions Chart
+        const impressionsCtx = document.getElementById('impressionsChart').getContext('2d');
+        const impressionsDatasets = Object.entries(CHART_IMPRESSIONS).map(([domain, data]) => ({{
+            label: domain,
+            data: data.data,
+            borderColor: data.color,
+            backgroundColor: data.color + '10',
+            tension: 0.4,
+        }}));
+
+        new Chart(impressionsCtx, {{
+            type: 'line',
+            data: {{
+                labels: CHART_DATES,
+                datasets: impressionsDatasets,
+            }},
+            options: {{
+                ...chartConfig,
+                plugins: {{
+                    ...chartConfig.plugins,
+                    title: {{
+                        display: true,
+                        text: 'Lần Hiển Thị (GSC) - 7 Ngày Gần Đây'
+                    }}
+                }}
+            }}
+        }});
+
+        // Position Chart (reversed Y axis)
+        const positionCtx = document.getElementById('positionChart').getContext('2d');
+        const positionDatasets = Object.entries(CHART_POSITION).map(([domain, data]) => ({{
+            label: domain,
+            data: data.data,
+            borderColor: data.color,
+            backgroundColor: data.color + '10',
+            tension: 0.4,
+        }}));
+
+        new Chart(positionCtx, {{
+            type: 'line',
+            data: {{
+                labels: CHART_DATES,
+                datasets: positionDatasets,
+            }},
+            options: {{
+                ...chartConfig,
+                scales: {{
+                    y: {{
+                        reverse: true,
+                        beginAtZero: false,
+                    }}
+                }},
+                plugins: {{
+                    ...chartConfig.plugins,
+                    title: {{
+                        display: true,
+                        text: 'Vị Trí Trung Bình (GSC) - 7 Ngày Gần Đây'
+                    }}
+                }}
+            }}
+        }});
+    </script>
+</body>
+</html>
