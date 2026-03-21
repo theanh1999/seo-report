@@ -3,152 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SEO Monitor — Tất cả báo cáo</title>
-
+<title>SEO Reports Index</title>
 <style>
-:root {
-    --bg: #1a1a2e; --bg2: #16213e; --bg3: #0f3460;
-    --card: #1e2a45; --card2: #253352;
-    --text: #e0e0e0; --text2: #b0b0c0;
-    --border: #2a3a55;
-    --accent: #4ECDC4; --accent2: #FF6B6B;
-    --green: #4CAF50; --red: #FF6B6B; --orange: #FFA500; --blue: #64B5F6;
-    --toc-bg: #0d1b2a; --toc-active: #4ECDC4;
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;font-size:14px}
+:root{--bg:#f0f2f5;--bg2:#fff;--bg3:#f8f9fa;--text:#212529;--text2:#6c757d;--border:#dee2e6;--accent:#4e79a7;--accent-hover:#3a5d8a;--up:#28a745;--down:#dc3545;--warn:#fd7e14;--neutral:#6c757d}
+.dark{--bg:#1a1d23;--bg2:#252830;--bg3:#2d3039;--text:#e9ecef;--text2:#adb5bd;--border:#3d4147;--accent:#6d9bc0;--accent-hover:#5a86ab;--up:#4caf50;--down:#f44336;--warn:#ff9800}
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 24px;position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.header-left h1{font-size:1.25rem;font-weight:700;color:var(--accent)}
+.header-left .subtitle{font-size:.8rem;color:var(--text2);margin-top:2px}
+.header-right{display:flex;gap:8px;align-items:center}
+.btn{padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text);cursor:pointer;font-size:.8rem;text-decoration:none;transition:.2s}
+.btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cross-bar{background:linear-gradient(90deg,var(--accent) 0%,var(--accent-hover) 100%);color:#fff;padding:8px 24px;font-size:.82rem;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.cross-bar a{color:#fff;text-decoration:none;opacity:.9;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:1px}
+.cross-bar a:hover{opacity:1;border-color:#fff}
+.toc{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 24px;position:sticky;top:57px;z-index:99;overflow-x:auto;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.toc a{display:inline-block;padding:4px 12px;margin-right:4px;border-radius:20px;font-size:.78rem;color:var(--text2);text-decoration:none;border:1px solid transparent;transition:.2s}
+.toc a:hover,.toc a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+main{max-width:1400px;margin:0 auto;padding:20px 24px}
+section{margin-bottom:32px}
+h2{font-size:1.05rem;font-weight:700;color:var(--accent);margin-bottom:14px;padding-bottom:6px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.kpi{background:var(--bg2);border-radius:8px;padding:14px;border:1px solid var(--border);transition:.2s}
+.kpi:hover{box-shadow:0 3px 10px rgba(0,0,0,.08)}
+.kpi .label{font-size:.72rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kpi .value{font-size:1.4rem;font-weight:700;color:var(--text);line-height:1.1}
+.kpi .change{font-size:.75rem;margin-top:4px;font-weight:600}
+.up{color:var(--up)}.down{color:var(--down)}.neutral{color:var(--neutral)}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-box{background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border)}
+.chart-box h3{font-size:.85rem;font-weight:600;color:var(--text2);margin-bottom:10px}
+.chart-box canvas{max-height:220px}
+.filter-bar{background:var(--bg2);border-radius:8px;padding:12px 16px;border:1px solid var(--border);margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.filter-bar label{font-size:.82rem;color:var(--text2);font-weight:600}
+select{padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:.82rem}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{background:var(--bg3);padding:8px 10px;text-align:left;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--border);user-select:none}
+th:hover{background:var(--accent);color:#fff}
+td{padding:7px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+tr:hover td{background:var(--bg3)}
+.table-wrap{background:var(--bg2);border-radius:8px;border:1px solid var(--border);overflow:hidden;overflow-x:auto}
+.up-cell{color:var(--up);font-weight:600}.down-cell{color:var(--down);font-weight:600}.neutral-cell{color:var(--neutral)}
+.anomaly-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.anomaly-card{padding:14px;border-radius:8px;border-left:4px solid;background:var(--bg2);border:1px solid var(--border)}
+.anomaly-card.critical{border-left-color:var(--down);background:rgba(220,53,69,.05)}
+.anomaly-card.warning{border-left-color:var(--warn);background:rgba(253,126,20,.05)}
+.anomaly-card.info{border-left-color:var(--accent);background:rgba(78,121,167,.05)}
+.anomaly-card h4{font-size:.85rem;font-weight:700;margin-bottom:4px}
+.anomaly-card p{font-size:.78rem;color:var(--text2);line-height:1.5}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600;text-transform:uppercase}
+.badge-critical{background:rgba(220,53,69,.15);color:var(--down)}.badge-warning{background:rgba(253,126,20,.15);color:var(--warn)}.badge-ok{background:rgba(40,167,69,.15);color:var(--up)}
+.seo-analysis{background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--border);line-height:1.7;font-size:.85rem}
+.seo-analysis p{margin-bottom:10px}
+.recommend-table td:first-child{font-weight:600}
+.site-name{color:var(--accent);text-decoration:underline;cursor:pointer}
+.site-name:hover{color:var(--accent-hover)}
+.no-data{color:var(--text2);font-size:.85rem;padding:16px;text-align:center;background:var(--bg2);border-radius:8px;border:1px solid var(--border)}
+.highlight-row td{background:rgba(220,53,69,.08)!important}
+@media(max-width:768px){
+.kpi-grid{grid-template-columns:repeat(2,1fr)}
+.chart-grid{grid-template-columns:1fr}
+.header-right{flex-wrap:wrap}
+main{padding:12px}
 }
-body.light {
-    --bg: #f0f2f5; --bg2: #e8eaf0; --bg3: #dde3ec;
-    --card: #fff; --card2: #f8f9fc;
-    --text: #1a1a2e; --text2: #555;
-    --border: #d0d8e8;
-    --toc-bg: #e0e5f0; --toc-active: #0078d4;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:14px; }
-a { color:var(--accent); text-decoration:none; }
-a:hover { text-decoration:underline; }
-.site-name { color:var(--accent); text-decoration:underline; cursor:pointer; }
-.cross-bar { background:var(--bg3); padding:8px 20px; font-size:13px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-.cross-bar strong { color:var(--accent); }
-.cross-bar a { color:var(--text); border:1px solid var(--border); padding:3px 10px; border-radius:4px; font-size:12px; }
-.cross-bar a:hover { background:var(--accent); color:#000; text-decoration:none; }
-header { background:var(--bg2); padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-header h1 { font-size:20px; color:var(--accent); }
-header .meta { color:var(--text2); font-size:13px; }
-.dark-toggle { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 14px; border-radius:6px; cursor:pointer; font-size:13px; }
-.dark-toggle:hover { background:var(--accent); color:#000; }
-.toc { position:sticky; top:0; z-index:100; background:var(--toc-bg); border-bottom:1px solid var(--border); padding:0 20px; display:flex; gap:0; overflow-x:auto; }
-.toc a { color:var(--text2); padding:10px 14px; font-size:13px; white-space:nowrap; border-bottom:2px solid transparent; display:block; }
-.toc a:hover { color:var(--text); text-decoration:none; }
-.toc a.active { color:var(--toc-active); border-bottom-color:var(--toc-active); }
-.container { max-width:1400px; margin:0 auto; padding:16px 20px; }
-section { margin-bottom:32px; scroll-margin-top:50px; }
-section h2 { font-size:17px; color:var(--accent); margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); }
-.kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
-.kpi-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
-.kpi-card .label { color:var(--text2); font-size:12px; margin-bottom:4px; }
-.kpi-card .value { font-size:20px; font-weight:700; color:var(--text); }
-.kpi-card .change { font-size:12px; margin-top:4px; }
-.positive { color:var(--green); }
-.negative { color:var(--red); }
-.neutral { color:var(--text2); }
-.charts-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(500px,1fr)); gap:16px; }
-.chart-box { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; }
-.chart-box h3 { font-size:14px; color:var(--text2); margin-bottom:10px; }
-.chart-box canvas { max-height:220px; }
-.filter-bar { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:16px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-.filter-bar label { color:var(--text2); font-size:13px; }
-.filter-bar select { background:var(--bg2); border:1px solid var(--border); color:var(--text); padding:6px 10px; border-radius:6px; font-size:13px; }
-table { width:100%; border-collapse:collapse; font-size:13px; }
-th { background:var(--bg3); color:var(--text); padding:8px 10px; text-align:left; cursor:pointer; user-select:none; white-space:nowrap; }
-th:hover { background:var(--border); }
-td { padding:7px 10px; border-bottom:1px solid var(--border); color:var(--text); }
-tr:hover td { background:var(--card2); }
-.tbl-wrap { background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:auto; max-height:480px; }
-.anomaly-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:12px; }
-.anomaly-card { border-radius:10px; padding:14px; border-left:4px solid; }
-.anomaly-card.critical { background:rgba(255,107,107,0.1); border-color:#FF6B6B; }
-.anomaly-card.warning { background:rgba(255,165,0,0.1); border-color:#FFA500; }
-.anomaly-card.info { background:rgba(100,181,246,0.1); border-color:#64B5F6; }
-.anomaly-card h4 { font-size:14px; margin-bottom:4px; }
-.anomaly-card p { font-size:13px; color:var(--text2); }
-.badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
-.badge.high { background:rgba(255,107,107,0.2); color:#FF6B6B; }
-.badge.med { background:rgba(255,165,0,0.2); color:#FFA500; }
-.badge.low { background:rgba(76,175,80,0.2); color:#4CAF50; }
-.rec-table td:first-child { width:80px; }
-.green-bg { background:rgba(76,175,80,0.1); }
-.red-bg { background:rgba(255,107,107,0.1); }
-.nav-links { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
-.nav-links a { background:var(--card); border:1px solid var(--border); padding:6px 12px; border-radius:6px; font-size:13px; color:var(--text); }
-.nav-links a:hover { background:var(--accent); color:#000; text-decoration:none; }
-.summary-text { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; line-height:1.7; color:var(--text); }
-.summary-text p { margin-bottom:8px; }
-.comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-.opp-row { background:rgba(100,181,246,0.07); }
-@media(max-width:700px) {
-    .kpi-grid { grid-template-columns:repeat(2,1fr); }
-    .charts-grid { grid-template-columns:1fr; }
-    .comparison-grid { grid-template-columns:1fr; }
-}
+
+.report-section{background:var(--bg2);border-radius:8px;padding:20px;border:1px solid var(--border);margin-bottom:20px}
+.report-section h3{color:var(--accent);margin-bottom:12px;font-size:1rem}
+.report-links{display:flex;flex-wrap:wrap;gap:8px}
+.report-link{display:inline-block;padding:6px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;text-decoration:none;color:var(--text);font-size:.82rem;transition:.2s}
+.report-link:hover{background:var(--accent);color:#fff}
+.report-link.primary{background:var(--accent);color:#fff;font-weight:600}
+.today-badge{display:inline-block;padding:2px 6px;background:#28a745;color:#fff;border-radius:10px;font-size:.7rem;margin-left:6px}
 </style>
 </head>
 <body>
-<script>
-function toggleDark(){document.body.classList.toggle('light');localStorage.setItem('mode',document.body.classList.contains('light')?'light':'dark');}
-(function(){if(localStorage.getItem('mode')==='light')document.body.classList.add('light');})();
-</script>
 <header>
-  <div><h1>📊 SEO Monitor Dashboard</h1><div class="meta">Cập nhật: 21/03/2026 · 13 websites · GA4 + GSC</div></div>
-  <button class="dark-toggle" onclick="toggleDark()">🌙 Dark/Light</button>
-</header>
-<div class="container">
-<section>
-  <h2>🗂️ Danh sách báo cáo theo ngày</h2>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th>Ngày</th><th>Mảng Nhà hàng</th><th>Mảng Khách sạn</th><th>Chi tiết website</th></tr></thead>
-      <tbody><tr>
-  <td>21/03/2026 <span style="background:#4ECDC4;color:#000;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px">Mới nhất</span></td>
-  <td><a href="seo-restaurants-2026-03-21.html">🍽 Mảng Nhà hàng (12 websites)</a></td>
-  <td><a href="seo-hotels-2026-03-21.html">🏨 Mảng Khách sạn</a></td>
-  <td style="font-size:12px;color:#888"><a href="seo-detail-localoria.com-2026-03-21.html">localoria.com</a> | <a href="seo-detail-wherebly.com-2026-03-21.html">wherebly.com</a> | <a href="seo-detail-res-menu.net-2026-03-21.html">res-menu.net</a> | <a href="seo-detail-foodplacee.com-2026-03-21.html">foodplacee.com</a> | <a href="seo-detail-restaurants-world.net-2026-03-21.html">restaurants-world.net</a> | <a href="seo-detail-goto-where.com-2026-03-21.html">goto-where.com</a>...</td>
-</tr><tr>
-  <td>20/03/2026</td>
-  <td><a href="seo-restaurants-2026-03-20.html">🍽 Mảng Nhà hàng (12 websites)</a></td>
-  <td><a href="seo-hotels-2026-03-20.html">🏨 Mảng Khách sạn</a></td>
-  <td style="font-size:12px;color:#888"><a href="seo-detail-localoria.com-2026-03-20.html">localoria.com</a> | <a href="seo-detail-wherebly.com-2026-03-20.html">wherebly.com</a> | <a href="seo-detail-res-menu.net-2026-03-20.html">res-menu.net</a> | <a href="seo-detail-foodplacee.com-2026-03-20.html">foodplacee.com</a> | <a href="seo-detail-restaurants-world.net-2026-03-20.html">restaurants-world.net</a> | <a href="seo-detail-goto-where.com-2026-03-20.html">goto-where.com</a>...</td>
-</tr><tr>
-  <td>19/03/2026</td>
-  <td><a href="seo-restaurants-2026-03-19.html">🍽 Mảng Nhà hàng (12 websites)</a></td>
-  <td><a href="seo-hotels-2026-03-19.html">🏨 Mảng Khách sạn</a></td>
-  <td style="font-size:12px;color:#888"><a href="seo-detail-localoria.com-2026-03-19.html">localoria.com</a> | <a href="seo-detail-wherebly.com-2026-03-19.html">wherebly.com</a> | <a href="seo-detail-res-menu.net-2026-03-19.html">res-menu.net</a> | <a href="seo-detail-foodplacee.com-2026-03-19.html">foodplacee.com</a> | <a href="seo-detail-restaurants-world.net-2026-03-19.html">restaurants-world.net</a> | <a href="seo-detail-goto-where.com-2026-03-19.html">goto-where.com</a>...</td>
-</tr><tr>
-  <td>18/03/2026</td>
-  <td><a href="seo-restaurants-2026-03-18.html">🍽 Mảng Nhà hàng (12 websites)</a></td>
-  <td><a href="seo-hotels-2026-03-18.html">🏨 Mảng Khách sạn</a></td>
-  <td style="font-size:12px;color:#888"><a href="seo-detail-localoria.com-2026-03-18.html">localoria.com</a> | <a href="seo-detail-wherebly.com-2026-03-18.html">wherebly.com</a> | <a href="seo-detail-res-menu.net-2026-03-18.html">res-menu.net</a> | <a href="seo-detail-foodplacee.com-2026-03-18.html">foodplacee.com</a> | <a href="seo-detail-restaurants-world.net-2026-03-18.html">restaurants-world.net</a> | <a href="seo-detail-goto-where.com-2026-03-18.html">goto-where.com</a>...</td>
-</tr><tr>
-  <td>17/03/2026</td>
-  <td><a href="seo-restaurants-2026-03-17.html">🍽 Mảng Nhà hàng (12 websites)</a></td>
-  <td><a href="seo-hotels-2026-03-17.html">🏨 Mảng Khách sạn</a></td>
-  <td style="font-size:12px;color:#888"><a href="seo-detail-localoria.com-2026-03-17.html">localoria.com</a> | <a href="seo-detail-wherebly.com-2026-03-17.html">wherebly.com</a> | <a href="seo-detail-res-menu.net-2026-03-17.html">res-menu.net</a> | <a href="seo-detail-foodplacee.com-2026-03-17.html">foodplacee.com</a> | <a href="seo-detail-restaurants-world.net-2026-03-17.html">restaurants-world.net</a> | <a href="seo-detail-goto-where.com-2026-03-17.html">goto-where.com</a>...</td>
-</tr><tr>
-  <td>16/03/2026</td>
-  <td><a href="seo-restaurants-2026-03-16.html">🍽 Mảng Nhà hàng (12 websites)</a></td>
-  <td><a href="seo-hotels-2026-03-16.html">🏨 Mảng Khách sạn</a></td>
-  <td style="font-size:12px;color:#888"><a href="seo-detail-localoria.com-2026-03-16.html">localoria.com</a> | <a href="seo-detail-wherebly.com-2026-03-16.html">wherebly.com</a> | <a href="seo-detail-res-menu.net-2026-03-16.html">res-menu.net</a> | <a href="seo-detail-foodplacee.com-2026-03-16.html">foodplacee.com</a> | <a href="seo-detail-restaurants-world.net-2026-03-16.html">restaurants-world.net</a> | <a href="seo-detail-goto-where.com-2026-03-16.html">goto-where.com</a>...</td>
-</tr></tbody>
-    </table>
-  </div>
-</section>
-<section>
-  <h2>📋 Báo cáo hôm nay (21/03/2026)</h2>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:12px">
-    <a href="seo-restaurants-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:16px;border-radius:10px;display:block;text-align:center;color:var(--text)">🍽️<br><strong>Nhà hàng</strong><br><small>12 websites</small></a>
-    <a href="seo-hotels-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:16px;border-radius:10px;display:block;text-align:center;color:var(--text)">🏨<br><strong>Khách sạn</strong><br><small>1 website</small></a>
-    <a href="seo-detail-localoria.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">localoria.com</a><a href="seo-detail-wherebly.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">wherebly.com</a><a href="seo-detail-res-menu.net-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">res-menu.net</a><a href="seo-detail-foodplacee.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">foodplacee.com</a><a href="seo-detail-restaurants-world.net-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">restaurants-world.net</a><a href="seo-detail-goto-where.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">goto-where.com</a><a href="seo-detail-menu-world.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">menu-world.com</a><a href="seo-detail-grubbio.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">grubbio.com</a><a href="seo-detail-menustic.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">menustic.com</a><a href="seo-detail-menufyy.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">menufyy.com</a><a href="seo-detail-wherevi.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">wherevi.com</a><a href="seo-detail-placejoys.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">placejoys.com</a><a href="seo-detail-gohotelly.com-2026-03-21.html" style="background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px;display:block;text-align:center;color:var(--accent);font-size:13px">gohotelly.com</a>
-  </div>
-</section>
+<div class="header-left">
+<h1>📊 SEO Reports Index</h1>
+<div class="subtitle">Báo cáo hàng ngày — 2026-03-22</div>
 </div>
+<div class="header-right">
+<button class="btn" onclick="toggleDark()">🌙 Dark/Light</button>
+</div>
+</header>
+<main>
+<div class="report-section">
+<h3>📅 Báo cáo hôm nay — 2026-03-22 <span class="today-badge">Mới nhất</span></h3>
+<div class="report-links">
+<a href="seo-restaurants-2026-03-22.html" class="report-link primary">🍽 Mảng Nhà hàng (12 website)</a>
+<a href="seo-hotels-2026-03-22.html" class="report-link primary">🏨 Mảng Khách sạn (gohotelly.com)</a>
+</div>
+</div>
+<div class="report-section">
+<h3>🔍 Báo cáo chi tiết từng website — 2026-03-22</h3>
+<div class="report-links">
+<a href="seo-detail-localoria.com-2026-03-22.html" class="report-link">localoria.com</a>
+<a href="seo-detail-wherebly.com-2026-03-22.html" class="report-link">wherebly.com</a>
+<a href="seo-detail-res-menu.net-2026-03-22.html" class="report-link">res-menu.net</a>
+<a href="seo-detail-foodplacee.com-2026-03-22.html" class="report-link">foodplacee.com</a>
+<a href="seo-detail-restaurants-world.net-2026-03-22.html" class="report-link">restaurants-world.net</a>
+<a href="seo-detail-goto-where.com-2026-03-22.html" class="report-link">goto-where.com</a>
+<a href="seo-detail-menu-world.com-2026-03-22.html" class="report-link">menu-world.com</a>
+<a href="seo-detail-grubbio.com-2026-03-22.html" class="report-link">grubbio.com</a>
+<a href="seo-detail-menustic.com-2026-03-22.html" class="report-link">menustic.com</a>
+<a href="seo-detail-menufyy.com-2026-03-22.html" class="report-link">menufyy.com</a>
+<a href="seo-detail-wherevi.com-2026-03-22.html" class="report-link">wherevi.com</a>
+<a href="seo-detail-placejoys.com-2026-03-22.html" class="report-link">placejoys.com</a>
+<a href="seo-detail-gohotelly.com-2026-03-22.html" class="report-link">gohotelly.com</a>
+</div>
+</div>
+</main>
+<script>
+function toggleDark(){document.body.classList.toggle('dark');localStorage.setItem('dark',document.body.classList.contains('dark')?'1':'0')}
+if(localStorage.getItem('dark')==='1')document.body.classList.add('dark');
+</script>
 </body>
 </html>
