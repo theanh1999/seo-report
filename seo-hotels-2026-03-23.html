@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Báo cáo SEO — Mảng Khách sạn — 23/03/2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --text: #1a1a2e; --text-muted: #6c757d;
+  --border: #dee2e6; --accent: #2196F3; --accent-green: #4CAF50; --accent-red: #F44336;
+  --accent-orange: #FF9800; --header-bg: #1a237e; --header-text: #ffffff;
+  --toc-bg: #ffffff; --toc-border: #e0e0e0; --card-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.dark {
+  --bg: #1a1a2e; --surface: #16213e; --text: #e0e0e0; --text-muted: #9e9e9e;
+  --border: #333; --toc-bg: #16213e; --toc-border: #333;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+a { color: var(--accent); }
+.site-name { color: var(--accent); text-decoration: underline; cursor: pointer; font-weight: 500; }
+.site-name:hover { opacity: 0.8; }
+.header { background: var(--header-bg); color: var(--header-text); padding: 20px; }
+.header h1 { font-size: 1.4em; margin-bottom: 4px; }
+.header .meta { opacity: 0.8; font-size: 0.9em; }
+.dark-toggle { position: fixed; top: 15px; right: 15px; z-index: 9999; background: var(--surface); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85em; color: var(--text); }
+.cross-link-bar { background: #1565C0; color: white; padding: 8px 20px; font-size: 0.9em; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.cross-link-bar a { color: #90CAF9; font-weight: 500; }
+.toc { position: sticky; top: 0; z-index: 100; background: var(--toc-bg); border-bottom: 2px solid var(--toc-border); padding: 0 20px; display: flex; gap: 0; overflow-x: auto; scrollbar-width: thin; }
+.toc a { display: inline-block; padding: 10px 14px; font-size: 0.85em; color: var(--text-muted); text-decoration: none; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.2s; }
+.toc a:hover, .toc a.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+.section { background: var(--surface); border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: var(--card-shadow); }
+.section h2 { font-size: 1.1em; color: var(--text); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.kpi-card { background: var(--bg); border-radius: 8px; padding: 14px; text-align: center; }
+.kpi-label { font-size: 0.78em; color: var(--text-muted); margin-bottom: 4px; }
+.kpi-value { font-size: 1.6em; font-weight: 700; color: var(--text); }
+.kpi-pct { font-size: 0.85em; margin-top: 4px; }
+.pct-up { color: var(--accent-green); font-weight: 600; }
+.pct-down { color: var(--accent-red); font-weight: 600; }
+.pct-neutral { color: var(--text-muted); }
+.pct-na { color: var(--text-muted); font-size: 0.85em; }
+.filter-bar { margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.filter-bar label { font-size: 0.85em; font-weight: 600; }
+.filter-bar select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 0.85em; }
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
+.chart-container { position: relative; height: 250px; }
+.table-wrapper { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+th { background: var(--bg); padding: 10px 8px; text-align: left; font-size: 0.8em; cursor: pointer; white-space: nowrap; border-bottom: 2px solid var(--border); user-select: none; }
+th:hover { background: var(--border); }
+th.sort-asc::after { content: " ↑"; }
+th.sort-desc::after { content: " ↓"; }
+td { padding: 8px; border-bottom: 1px solid var(--border); }
+tr:hover { background: var(--bg); }
+.anomaly-badge { background: var(--accent-red); color: white; border-radius: 10px; padding: 1px 6px; font-size: 0.75em; font-weight: 600; }
+.anomaly-card { border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.anomaly-critical { background: #FFEBEE; border-left: 4px solid #F44336; }
+.anomaly-warning { background: #FFF8E1; border-left: 4px solid #FF9800; }
+.dark .anomaly-critical { background: #3e1c1c; }
+.dark .anomaly-warning { background: #3e2e0a; }
+.anomaly-header { font-weight: 600; font-size: 0.95em; margin-bottom: 4px; }
+.anomaly-msg { font-size: 0.88em; color: var(--text-muted); }
+.no-anomaly { background: #E8F5E9; border-radius: 8px; padding: 16px; text-align: center; color: #2E7D32; font-weight: 600; }
+.dark .no-anomaly { background: #1b3a1e; color: #81C784; }
+.prio-high { background: #FFCDD2; color: #C62828; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
+.prio-med { background: #FFF3E0; color: #E65100; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
+.prio-low { background: #E8F5E9; color: #2E7D32; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
+.trend-analysis { line-height: 1.8; }
+.trend-analysis ul { padding-left: 20px; margin: 8px 0; }
+.data-note { font-size: 0.78em; color: var(--text-muted); margin-top: 8px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<button class="dark-toggle" onclick="toggleDark()">🌙 Dark</button>
+
+<div class="header">
+  <h1>📊 Báo cáo SEO — Mảng Khách sạn (1 website)</h1>
+  <div class="meta">Dữ liệu: 2026-01-15 → 2026-03-21 (GA4: loại trừ 2026-03-23 & 2026-03-21) · Tạo lúc: 23/03/2026</div>
+</div>
+
+<div class="cross-link-bar">
+  📊 Bạn đang xem: <strong>Mảng Khách sạn</strong> (1 website) — 23/03/2026
+  &nbsp;|&nbsp;
+  <a href="seo-restaurants-2026-03-23.html">→ Xem báo cáo Mảng Nhà hàng</a>
+  &nbsp;|&nbsp;
+  <a href="index.html">→ Tất cả báo cáo</a>
+</div>
+
+<nav class="toc" id="toc">
+  <a href="#kpi">Tổng quan KPI</a>
+  <a href="#charts">Biểu đồ xu hướng</a>
+  <a href="#comparison">So sánh Website</a>
+  <a href="#keywords">Top Keywords</a>
+  <a href="#anomalies">Bất thường</a>
+  <a href="#trend">Xu hướng SEO</a>
+  <a href="#recommendations">Đề xuất tối ưu</a>
+</nav>
+
+<div class="container">
+
+<!-- KPI -->
+<div class="section" id="kpi">
+  <h2>📈 Tổng quan KPI (30 ngày gần nhất vs 30 ngày trước)</h2>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng Sessions</div>
+      <div class="kpi-value">19.4K</div>
+      <div class="kpi-pct"><span class="pct-down">↓ 14.2%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng Users</div>
+      <div class="kpi-value">17.1K</div>
+      <div class="kpi-pct"><span class="pct-down">↓ 14.2%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng Pageviews</div>
+      <div class="kpi-value">22.4K</div>
+      <div class="kpi-pct"><span class="pct-down">↓ 14.5%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng Clicks GSC</div>
+      <div class="kpi-value">2.2K</div>
+      <div class="kpi-pct"><span class="pct-up">↑ 45.3%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng Impressions</div>
+      <div class="kpi-value">208.3K</div>
+      <div class="kpi-pct"><span class="pct-up">↑ 17.3%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">TB Bounce Rate</div>
+      <div class="kpi-value">53.7%</div>
+      <div class="kpi-pct"><span class="pct-up">↑ 0.7%</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">TB Engagement Rate</div>
+      <div class="kpi-value">46.3%</div>
+      <div class="kpi-pct">&nbsp;</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">TB Vị trí GSC</div>
+      <div class="kpi-value">10.0</div>
+      <div class="kpi-pct"><span class="pct-down">↑ 6.2%</span></div>
+    </div>
+  </div>
+  <div class="data-note">⚠️ GA4 loại trừ dữ liệu hôm nay (2026-03-23) và hôm qua do dữ liệu chưa đầy đủ. GSC giữ nguyên tất cả ngày.</div>
+</div>
+
+<!-- Filter -->
+<div class="section" id="charts">
+  <h2>📊 Biểu đồ xu hướng</h2>
+  <div class="filter-bar">
+    <label>Lọc website:</label>
+    <select id="siteFilter" onchange="filterCharts()">
+      <option value="all">Tất cả website</option>
+      <option value="gohotelly.com">gohotelly.com</option>
+    </select>
+  </div>
+  <div class="charts-grid">
+    <div>
+      <h3 style="font-size:0.9em;margin-bottom:8px;">Sessions theo ngày</h3>
+      <div class="chart-container"><canvas id="chartSessions"></canvas></div>
+    </div>
+    <div>
+      <h3 style="font-size:0.9em;margin-bottom:8px;">Clicks GSC theo ngày</h3>
+      <div class="chart-container"><canvas id="chartClicks"></canvas></div>
+    </div>
+    <div>
+      <h3 style="font-size:0.9em;margin-bottom:8px;">Impressions theo ngày</h3>
+      <div class="chart-container"><canvas id="chartImpressions"></canvas></div>
+    </div>
+    <div>
+      <h3 style="font-size:0.9em;margin-bottom:8px;">Vị trí trung bình (thấp = tốt)</h3>
+      <div class="chart-container"><canvas id="chartPosition"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- Comparison Table -->
+<div class="section" id="comparison">
+  <h2>🏆 So sánh Website (30 ngày gần nhất)</h2>
+  <div class="table-wrapper">
+    <table id="compTable">
+      <thead>
+        <tr>
+          <th onclick="sortTable('compTable',0)">Website</th>
+          <th onclick="sortTable('compTable',1)">Sessions</th>
+          <th onclick="sortTable('compTable',2)">Users</th>
+          <th onclick="sortTable('compTable',3)">Pageviews</th>
+          <th onclick="sortTable('compTable',4)">Clicks</th>
+          <th onclick="sortTable('compTable',5)">Impressions</th>
+          <th onclick="sortTable('compTable',6)">CTR</th>
+          <th onclick="sortTable('compTable',7)">Vị trí TB</th>
+          <th onclick="sortTable('compTable',8)">% Sessions</th>
+          <th onclick="sortTable('compTable',9)">% Clicks</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-23.html" title="Xem chi tiết gohotelly.com">gohotelly.com</a> <span class="anomaly-badge">1</span></td>
+            <td>19.4K</td>
+            <td>17.1K</td>
+            <td>22.4K</td>
+            <td>2.2K</td>
+            <td>208.3K</td>
+            <td>1.04%</td>
+            <td>10.0</td>
+            <td><span class="pct-down">↓ 14.2%</span></td>
+            <td><span class="pct-up">↑ 45.3%</span></td>
+        </tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Top Keywords -->
+<div class="section" id="keywords">
+  <h2>🔍 Top Keywords tổng hợp (60 ngày)</h2>
+  <div class="table-wrapper">
+    <table id="kwTable">
+      <thead>
+        <tr>
+          <th onclick="sortTable('kwTable',0)">Từ khóa</th>
+          <th onclick="sortTable('kwTable',1)">Clicks</th>
+          <th onclick="sortTable('kwTable',2)">Impressions</th>
+          <th onclick="sortTable('kwTable',3)">CTR</th>
+          <th onclick="sortTable('kwTable',4)">Vị trí TB</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+            <td>nau salgados dunas suites</td>
+            <td>100</td>
+            <td>1.4K</td>
+            <td>7.30%</td>
+            <td>3.4</td>
+        </tr><tr>
+            <td>ariyana reach hotel</td>
+            <td>65</td>
+            <td>2.3K</td>
+            <td>2.85%</td>
+            <td>2.9</td>
+        </tr><tr>
+            <td>ariyana reach</td>
+            <td>58</td>
+            <td>2.2K</td>
+            <td>2.63%</td>
+            <td>2.9</td>
+        </tr><tr>
+            <td>motel urban</td>
+            <td>43</td>
+            <td>1.3K</td>
+            <td>3.28%</td>
+            <td>9.4</td>
+        </tr><tr>
+            <td>ariyana reach hotel maharagama</td>
+            <td>37</td>
+            <td>617</td>
+            <td>6.00%</td>
+            <td>2.5</td>
+        </tr><tr>
+            <td>hotel luzino</td>
+            <td>37</td>
+            <td>1.1K</td>
+            <td>3.47%</td>
+            <td>4.6</td>
+        </tr><tr>
+            <td>the village resort & waterpark</td>
+            <td>36</td>
+            <td>666</td>
+            <td>5.41%</td>
+            <td>6.4</td>
+        </tr><tr>
+            <td>udayachal tourist lodge</td>
+            <td>30</td>
+            <td>929</td>
+            <td>3.23%</td>
+            <td>3.4</td>
+        </tr><tr>
+            <td>matara rest house</td>
+            <td>29</td>
+            <td>2.3K</td>
+            <td>1.27%</td>
+            <td>5.8</td>
+        </tr><tr>
+            <td>precios de motel urban villas & suites</td>
+            <td>28</td>
+            <td>572</td>
+            <td>4.90%</td>
+            <td>7.8</td>
+        </tr><tr>
+            <td>volets resort</td>
+            <td>27</td>
+            <td>2.8K</td>
+            <td>0.97%</td>
+            <td>5.7</td>
+        </tr><tr>
+            <td>university of ghana guest centre prices</td>
+            <td>26</td>
+            <td>285</td>
+            <td>9.12%</td>
+            <td>7.2</td>
+        </tr><tr>
+            <td>salgados dunas suites</td>
+            <td>25</td>
+            <td>832</td>
+            <td>3.00%</td>
+            <td>4.6</td>
+        </tr><tr>
+            <td>motel urban villas & suites</td>
+            <td>22</td>
+            <td>926</td>
+            <td>2.38%</td>
+            <td>7.9</td>
+        </tr><tr>
+            <td>mehran lodges</td>
+            <td>20</td>
+            <td>586</td>
+            <td>3.41%</td>
+            <td>2.3</td>
+        </tr><tr>
+            <td>ranowell hotel</td>
+            <td>18</td>
+            <td>2.3K</td>
+            <td>0.78%</td>
+            <td>7.9</td>
+        </tr><tr>
+            <td>hôtel magic iliade djerba</td>
+            <td>17</td>
+            <td>844</td>
+            <td>2.01%</td>
+            <td>8.4</td>
+        </tr><tr>
+            <td>mehran lodges murree</td>
+            <td>17</td>
+            <td>643</td>
+            <td>2.64%</td>
+            <td>2.5</td>
+        </tr><tr>
+            <td>udírna jindřichův hradec</td>
+            <td>17</td>
+            <td>671</td>
+            <td>2.53%</td>
+            <td>4.6</td>
+        </tr><tr>
+            <td>tui suneo dunas</td>
+            <td>16</td>
+            <td>539</td>
+            <td>2.97%</td>
+            <td>8.4</td>
+        </tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Anomalies -->
+<div class="section" id="anomalies">
+  <h2>⚠️ Phát hiện bất thường (7 ngày gần nhất)</h2>
+  <div class="anomaly-card anomaly-warning">
+                <div class="anomaly-header">📉 <a class="site-name" href="seo-detail-gohotelly.com-2026-03-23.html">gohotelly.com</a> — 2026-03-20</div>
+                <div class="anomaly-msg">Giảm traffic: 421.0 phiên (40% dưới mức bình thường)</div>
+            </div>
+</div>
+
+<!-- Trend Analysis -->
+<div class="section" id="trend">
+  <h2>📈 Phân tích xu hướng SEO</h2>
+  <div class="trend-analysis">
+    <p><strong>Tổng quan:</strong> Mảng Khách sạn ghi nhận <strong>sụt giảm 14.2%</strong> về sessions trong 30 ngày gần nhất so với 30 ngày trước. Tổng clicks GSC tăng 677 clicks.</p>
+    <p style="margin-top:12px"><strong>🌟 Top 3 website tăng trưởng tốt nhất:</strong></p>
+    <ul><li><a class="site-name" href="seo-detail-gohotelly.com-2026-03-23.html">gohotelly.com</a>: 19.4K phiên (-14.2%)</li></ul>
+    <p style="margin-top:12px"><strong>⚠️ Top 3 website cần chú ý (traffic thấp nhất):</strong></p>
+    <ul><li><a class="site-name" href="seo-detail-gohotelly.com-2026-03-23.html">gohotelly.com</a>: 19.4K phiên (-14.2%)</li></ul>
+    <p style="margin-top:12px"><strong>Nhận xét chung:</strong> Nhiều website có bounce rate cao (>95%) có thể là dấu hiệu của bot/spam traffic. Cần kiểm tra và lọc IP trong GA4. Một số website có impressions tăng nhưng CTR thấp — cơ hội cải thiện meta title/description.</p>
+  </div>
+</div>
+
+<!-- Recommendations -->
+<div class="section" id="recommendations">
+  <h2>💡 Đề xuất tối ưu SEO</h2>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Ưu tiên</th>
+          <th>Đề xuất</th>
+          <th>Website áp dụng</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+            <td><span class="prio-med">Trung bình</span></td>
+            <td>Cơ hội tối ưu CTR: keywords có impressions cao nhưng CTR thấp: matara rest house, volets resort, motel urban villas & suites</td>
+            <td><a class="site-name" href="seo-detail-gohotelly.com-2026-03-23.html">gohotelly.com</a></td>
+        </tr></tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- container -->
+
+<script>
+const allDates = ["2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20"];
+const gscDates = ["2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18"];
+const sessionsDatasets = [{"label": "gohotelly.com", "data": [741, 891, 816, 688, 795, 988, 914, 790, 786, 786, 746, 978, 897, 682, 738, 648, 705, 590, 602, 676, 762, 720, 704, 554, 614, 725, 842, 782, 817, 673, 636, 571, 581, 601, 572, 643, 639, 577, 789, 660, 567, 590, 619, 651, 666, 596, 654, 633, 621, 626, 692, 629, 672, 661, 756.0, 767.0, 691.0, 736.0, 924.0, 421.0], "borderColor": "#4CAF50", "backgroundColor": "#4CAF5020", "fill": false, "tension": 0.3, "pointRadius": 2}];
+const clicksDatasets = [{"label": "gohotelly.com", "data": [38, 29, 53, 51, 49, 50, 48, 53, 58, 49, 59, 62, 31, 43, 37, 42, 46, 46, 57, 47, 49, 52, 61, 75, 50, 57, 38, 65, 58, 40, 61, 61, 63, 66, 60, 66, 63, 80, 76, 67, 62, 63, 58, 62, 82, 64, 89, 67, 83, 57, 82, 74, 93, 90, 93, 65, 71.0, 75.0, 82.0, 95.0], "borderColor": "#4CAF50", "backgroundColor": "#4CAF5020", "fill": false, "tension": 0.3, "pointRadius": 2}];
+const impressionsDatasets = [{"label": "gohotelly.com", "data": [4790, 5141, 5704, 5701, 6246, 5836, 6275, 5541, 6225, 6259, 6062, 7601, 5408, 5814, 5181, 5552, 5628, 5521, 5610, 6077, 6309, 5410, 6525, 6229, 6323, 6184, 6211, 6407, 5333, 6473, 5398, 5383, 5674, 6239, 6810, 6028, 6747, 6361, 6374, 6220, 6876, 6049, 6369, 7259, 6599, 7063, 7200, 7126, 8057, 6839, 7323, 8345, 8140, 7737, 8556, 7776, 7189.0, 7174.0, 7587.0, 7772.0], "borderColor": "#4CAF50", "backgroundColor": "#4CAF5020", "fill": false, "tension": 0.3, "pointRadius": 2}];
+const positionDatasets = [{"label": "gohotelly.com", "data": [9.6, 9.5, 9.3, 9.1, 9.2, 9.8, 8.8, 9.7, 9.7, 9.1, 8.8, 7.6, 9.3, 9.9, 10.5, 11.6, 9.1, 9.6, 9.6, 9.0, 8.8, 9.0, 9.6, 8.8, 9.3, 9.5, 8.9, 8.9, 9.1, 10.5, 9.5, 9.6, 9.5, 9.6, 9.8, 9.8, 10.6, 9.6, 9.5, 9.9, 9.4, 9.3, 9.8, 11.3, 9.4, 10.5, 10.1, 10.2, 10.1, 10.3, 10.0, 11.4, 9.8, 9.6, 9.6, 9.8, 10.2, 10.0, 10.5, 10.1], "borderColor": "#4CAF50", "backgroundColor": "#4CAF5020", "fill": false, "tension": 0.3, "pointRadius": 2}];
+const today = "2026-03-23";
+
+let charts = {};
+
+function makeChart(id, labels, datasets, yLabel, reverseY=false) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  const isDark = document.documentElement.classList.contains('dark');
+  const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)';
+  const textColor = isDark ? '#ccc' : '#666';
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: datasets.length <= 6, position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, color: textColor } },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${Number(ctx.parsed.y||0).toLocaleString()}` } }
+      },
+      scales: {
+        x: { ticks: { maxTicksLimit: 10, font: { size: 10 }, color: textColor }, grid: { color: gridColor } },
+        y: { reverse: reverseY, ticks: { font: { size: 10 }, color: textColor }, grid: { color: gridColor }, title: { display: false } }
+      }
+    }
+  });
+}
+
+function filterCharts() {
+  const val = document.getElementById('siteFilter').value;
+  const filterFn = ds => val === 'all' ? ds : ds.filter(d => d.label === val);
+  makeChart('chartSessions', allDates, filterFn(sessionsDatasets), 'Sessions');
+  makeChart('chartClicks', gscDates, filterFn(clicksDatasets), 'Clicks');
+  makeChart('chartImpressions', gscDates, filterFn(impressionsDatasets), 'Impressions');
+  makeChart('chartPosition', gscDates, filterFn(positionDatasets), 'Vị trí', true);
+}
+
+filterCharts();
+
+function toggleDark() {
+  document.documentElement.classList.toggle('dark');
+  const btn = document.querySelector('.dark-toggle');
+  btn.textContent = document.documentElement.classList.contains('dark') ? '☀️ Light' : '🌙 Dark';
+  filterCharts(); // re-render with correct colors
+}
+
+function sortTable(tableId, colIdx) {
+  const table = document.getElementById(tableId);
+  const tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const th = table.querySelectorAll('th')[colIdx];
+  const asc = !th.classList.contains('sort-asc');
+  table.querySelectorAll('th').forEach(h => h.classList.remove('sort-asc','sort-desc'));
+  th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+  rows.sort((a, b) => {
+    const av = a.cells[colIdx]?.innerText.replace(/[^0-9.\-+]/g,'') || '';
+    const bv = b.cells[colIdx]?.innerText.replace(/[^0-9.\-+]/g,'') || '';
+    const an = parseFloat(av), bn = parseFloat(bv);
+    if (!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+    return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  rows.forEach(r => tbody.appendChild(r));
+}
+
+// TOC IntersectionObserver
+const sections = document.querySelectorAll('.section[id]');
+const tocLinks = document.querySelectorAll('.toc a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.toc a[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
