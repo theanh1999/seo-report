@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết SEO - res-menu.net</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: #ddd;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .kpi-card {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .kpi-change {
+            font-size: 12px;
+        }
+
+        .chart-container {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+            height: 300px;
+        }
+
+        .section {
+            margin: 30px 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        thead {
+            background-color: #1a1a1a;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #999;
+            border-bottom: 1px solid #333;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #333;
+        }
+
+        tbody tr:hover {
+            background-color: #333;
+        }
+
+        .summary-row {
+            background-color: #1a1a1a;
+            font-weight: bold;
+        }
+
+        .scroll-table {
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+
+        .anomaly-card {
+            background-color: #2a2a2a;
+            border-left: 4px solid #ef4444;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .health-section {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .recommendation {
+            background-color: #2a2a2a;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .recommendation.high {
+            border-left-color: #ef4444;
+        }
+
+        .recommendation.medium {
+            border-left-color: #f97316;
+        }
+
+        .recommendation.low {
+            border-left-color: #4ade80;
+        }
+
+        .dark-toggle {
+            padding: 8px 16px;
+            background-color: #3b82f6;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>res-menu.net</h1>
+                <div style="font-size:12px;color:#999;margin-top:5px">Báo cáo ngày 2026-03-24</div>
+            </div>
+            <div class="header-actions">
+                <a href="index.html" style="padding:8px 16px;background-color:#3b82f6;border-radius:4px;color:white">← Quay lại</a>
+                <a href="seo-restaurants-2026-03-24.html" style="padding:8px 16px;background-color:#3b82f6;border-radius:4px;color:white">Tổng quan restaurants</a>
+                <div class="nav-links"><a href="seo-detail-wherebly.com-2026-03-24.html" style="padding:8px 16px;background-color:#3b82f6;border-radius:4px;text-decoration:none;color:white;margin-right:8px">← Trước</a><a href="seo-detail-foodplacee.com-2026-03-24.html" style="padding:8px 16px;background-color:#3b82f6;border-radius:4px;text-decoration:none;color:white">Tiếp theo →</a></div>
+                <button onclick="toggleDarkMode()">🌙 Chế độ tối</button>
+            </div>
+        </header>
+
+        <!-- Section 1: KPI Cards - GA4 -->
+        <div class="section">
+            <div class="section-title">GA4 - Chỉ số chính (30 ngày gần nhất vs kỳ trước)</div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Phiên</div>
+                    <div class="kpi-value">1,464,336</div>
+                    <div class="kpi-change"><span style="color:#4ade80">+16.5%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Người dùng hoạt động</div>
+                    <div class="kpi-value">1,260,225</div>
+                    <div class="kpi-change"><span style="color:#4ade80">+17.8%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lượt xem trang</div>
+                    <div class="kpi-value">2,272,721</div>
+                    <div class="kpi-change"><span style="color:#4ade80">+15.4%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ lệ thoát</div>
+                    <div class="kpi-value">0.4%</div>
+                    <div class="kpi-change"><span style="color:#4ade80">+5.4%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ lệ tương tác</div>
+                    <div class="kpi-value">0.6%</div>
+                    <div class="kpi-change"><span style="color:#f87171">-3.2%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Thời lượng trung bình</div>
+                    <div class="kpi-value">112.2</div>
+                    <div class="kpi-change"><span style="color:#f87171">-1.3%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Người dùng mới</div>
+                    <div class="kpi-value">1,192,550</div>
+                    <div class="kpi-change"><span style="color:#4ade80">+17.5%</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: KPI Cards - GSC -->
+        <div class="section">
+            <div class="section-title">Google Search Console - Chỉ số chính</div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Nhấp chuột</div>
+                    <div class="kpi-value">689,930</div>
+                    <div class="kpi-change"><span style="color:#4ade80">+41.0%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Ấn tượng</div>
+                    <div class="kpi-value">40,162,953</div>
+                    <div class="kpi-change"><span style="color:#4ade80">+51.2%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ lệ nhấp chuột</div>
+                    <div class="kpi-value">0.0173</div>
+                    <div class="kpi-change"><span style="color:#f87171">-4.9%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Vị trí trung bình</div>
+                    <div class="kpi-value">9.6</div>
+                    <div class="kpi-change"><span style="color:#4ade80">+8.6%</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: GA4 Trends -->
+        <div class="section">
+            <div class="section-title">Xu hướng GA4</div>
+            <div class="two-column">
+                <div class="chart-container">
+                    <canvas id="ga4SessionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ga4BounceChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container" style="height:250px">
+                <canvas id="ga4PvChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="ga4DurationChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Section 4: GSC Trends -->
+        <div class="section">
+            <div class="section-title">Xu hướng Google Search Console</div>
+            <div class="chart-container">
+                <canvas id="gscClicksChart"></canvas>
+            </div>
+            <div class="two-column">
+                <div class="chart-container">
+                    <canvas id="gscCtrChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="gscPositionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Daily Breakdown -->
+        <div class="section">
+            <div class="section-title">Chi tiết theo ngày (có thể sắp xếp)</div>
+            <div class="scroll-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Ngày ↕</th>
+                            <th onclick="sortTable(1)" style="text-align:right">Phiên ↕</th>
+                            <th onclick="sortTable(2)" style="text-align:right">Người dùng ↕</th>
+                            <th onclick="sortTable(3)" style="text-align:right">PV ↕</th>
+                            <th onclick="sortTable(4)" style="text-align:right">Bounce % ↕</th>
+                            <th onclick="sortTable(5)" style="text-align:right">Nhấp ↕</th>
+                            <th onclick="sortTable(6)" style="text-align:right">Ấn tượng ↕</th>
+                            <th onclick="sortTable(7)" style="text-align:right">CTR ↕</th>
+                            <th onclick="sortTable(8)" style="text-align:right">Vị trí ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dailyTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 6: Top Keywords -->
+        <div class="section">
+            <div class="section-title">Từ khóa hàng đầu (Top 30, highlight: cơ hội)</div>
+            <div class="scroll-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Từ khóa</th>
+                            <th style="text-align:right">Nhấp</th>
+                            <th style="text-align:right">Ấn tượng</th>
+                            <th style="text-align:right">CTR</th>
+                            <th style="text-align:right">Vị trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+    <td>kawa revolving sushi menu</td>
+    <td style="text-align:right">727</td>
+    <td style="text-align:right">1968</td>
+    <td style="text-align:right">0.3694</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+<tr>
+    <td>sofia's pizza & roast beef menu</td>
+    <td style="text-align:right">696</td>
+    <td style="text-align:right">1626</td>
+    <td style="text-align:right">0.4280</td>
+    <td style="text-align:right">2.5</td>
+</tr>
+<tr>
+    <td>bistrot paul bert menu</td>
+    <td style="text-align:right">659</td>
+    <td style="text-align:right">2677</td>
+    <td style="text-align:right">0.2462</td>
+    <td style="text-align:right">2.4</td>
+</tr>
+<tr>
+    <td>panoramic 34 menu</td>
+    <td style="text-align:right">600</td>
+    <td style="text-align:right">1655</td>
+    <td style="text-align:right">0.3625</td>
+    <td style="text-align:right">2.2</td>
+</tr>
+<tr>
+    <td>bell city diner menu</td>
+    <td style="text-align:right">587</td>
+    <td style="text-align:right">2210</td>
+    <td style="text-align:right">0.2656</td>
+    <td style="text-align:right">2.0</td>
+</tr>
+<tr>
+    <td>johnny longboats menu</td>
+    <td style="text-align:right">548</td>
+    <td style="text-align:right">2266</td>
+    <td style="text-align:right">0.2418</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+<tr>
+    <td>ok cafe menu</td>
+    <td style="text-align:right">519</td>
+    <td style="text-align:right">2412</td>
+    <td style="text-align:right">0.2152</td>
+    <td style="text-align:right">2.9</td>
+</tr>
+<tr>
+    <td>the hive waterfront restaurant & tiki menu</td>
+    <td style="text-align:right">507</td>
+    <td style="text-align:right">2868</td>
+    <td style="text-align:right">0.1768</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+<tr>
+    <td>cafe continental menu</td>
+    <td style="text-align:right">469</td>
+    <td style="text-align:right">3949</td>
+    <td style="text-align:right">0.1188</td>
+    <td style="text-align:right">4.3</td>
+</tr>
+<tr>
+    <td>lj shanghai menu</td>
+    <td style="text-align:right">467</td>
+    <td style="text-align:right">2113</td>
+    <td style="text-align:right">0.2210</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+<tr>
+    <td>ltk crawfish menu</td>
+    <td style="text-align:right">431</td>
+    <td style="text-align:right">2891</td>
+    <td style="text-align:right">0.1491</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+<tr>
+    <td>donut hole menu</td>
+    <td style="text-align:right">429</td>
+    <td style="text-align:right">1890</td>
+    <td style="text-align:right">0.2270</td>
+    <td style="text-align:right">3.3</td>
+</tr>
+<tr>
+    <td>katsu hama</td>
+    <td style="text-align:right">404</td>
+    <td style="text-align:right">2718</td>
+    <td style="text-align:right">0.1486</td>
+    <td style="text-align:right">3.0</td>
+</tr>
+<tr>
+    <td>stasio's italian deli & market menu</td>
+    <td style="text-align:right">384</td>
+    <td style="text-align:right">2824</td>
+    <td style="text-align:right">0.1360</td>
+    <td style="text-align:right">2.8</td>
+</tr>
+<tr>
+    <td>alaska fish and chicken menu</td>
+    <td style="text-align:right">378</td>
+    <td style="text-align:right">1932</td>
+    <td style="text-align:right">0.1957</td>
+    <td style="text-align:right">3.4</td>
+</tr>
+<tr>
+    <td>donut hole bakery cafe menu</td>
+    <td style="text-align:right">373</td>
+    <td style="text-align:right">2165</td>
+    <td style="text-align:right">0.1723</td>
+    <td style="text-align:right">3.1</td>
+</tr>
+<tr>
+    <td>bimini twist menu</td>
+    <td style="text-align:right">366</td>
+    <td style="text-align:right">1838</td>
+    <td style="text-align:right">0.1991</td>
+    <td style="text-align:right">2.0</td>
+</tr>
+<tr>
+    <td>ingas bar menu</td>
+    <td style="text-align:right">364</td>
+    <td style="text-align:right">1400</td>
+    <td style="text-align:right">0.2600</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+<tr>
+    <td>taberna dos mercadores</td>
+    <td style="text-align:right">358</td>
+    <td style="text-align:right">7863</td>
+    <td style="text-align:right">0.0455</td>
+    <td style="text-align:right">5.8</td>
+</tr>
+<tr>
+    <td>deaverdura menu</td>
+    <td style="text-align:right">357</td>
+    <td style="text-align:right">1292</td>
+    <td style="text-align:right">0.2763</td>
+    <td style="text-align:right">2.4</td>
+</tr>
+<tr>
+    <td>eric's family barbecue menu</td>
+    <td style="text-align:right">342</td>
+    <td style="text-align:right">1060</td>
+    <td style="text-align:right">0.3226</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+<tr>
+    <td>bottega michelangelo menu</td>
+    <td style="text-align:right">336</td>
+    <td style="text-align:right">1632</td>
+    <td style="text-align:right">0.2059</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+<tr>
+    <td>soup 'n fresh - rancho cucamonga menu</td>
+    <td style="text-align:right">334</td>
+    <td style="text-align:right">1334</td>
+    <td style="text-align:right">0.2504</td>
+    <td style="text-align:right">2.0</td>
+</tr>
+<tr>
+    <td>brass lantern menu</td>
+    <td style="text-align:right">323</td>
+    <td style="text-align:right">1777</td>
+    <td style="text-align:right">0.1818</td>
+    <td style="text-align:right">2.5</td>
+</tr>
+<tr>
+    <td>viva south padre island menu</td>
+    <td style="text-align:right">301</td>
+    <td style="text-align:right">2463</td>
+    <td style="text-align:right">0.1222</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+<tr>
+    <td>country tavern menu</td>
+    <td style="text-align:right">290</td>
+    <td style="text-align:right">1499</td>
+    <td style="text-align:right">0.1935</td>
+    <td style="text-align:right">2.7</td>
+</tr>
+<tr>
+    <td>gondola italian restaurant menu</td>
+    <td style="text-align:right">289</td>
+    <td style="text-align:right">593</td>
+    <td style="text-align:right">0.4874</td>
+    <td style="text-align:right">1.6</td>
+</tr>
+<tr>
+    <td>strange design public house menu</td>
+    <td style="text-align:right">288</td>
+    <td style="text-align:right">519</td>
+    <td style="text-align:right">0.5549</td>
+    <td style="text-align:right">1.5</td>
+</tr>
+<tr>
+    <td>papa paul's menu</td>
+    <td style="text-align:right">285</td>
+    <td style="text-align:right">2022</td>
+    <td style="text-align:right">0.1409</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+<tr>
+    <td>jade garden restaurant waipahu menu</td>
+    <td style="text-align:right">282</td>
+    <td style="text-align:right">616</td>
+    <td style="text-align:right">0.4578</td>
+    <td style="text-align:right">2.1</td>
+</tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 7: Top Pages -->
+        <div class="section">
+            <div class="section-title">Trang hàng đầu (Top 30)</div>
+            <div class="scroll-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th style="text-align:right">Nhấp</th>
+                            <th style="text-align:right">Ấn tượng</th>
+                            <th style="text-align:right">CTR</th>
+                            <th style="text-align:right">Vị trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+    <td style="word-break:break-all;max-width:300px">https://donut-hole-bakery-cafe.res-menu.net/menu</td>
+    <td style="text-align:right">381</td>
+    <td style="text-align:right">1765</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://mariposa.res-menu.net/menu</td>
+    <td style="text-align:right">93</td>
+    <td style="text-align:right">773</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://the-hive-waterfront.res-menu.net/menu</td>
+    <td style="text-align:right">164</td>
+    <td style="text-align:right">1387</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://cafe-continental.res-menu.net/menu</td>
+    <td style="text-align:right">213</td>
+    <td style="text-align:right">1192</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://bistro-cafe.res-menu.net/</td>
+    <td style="text-align:right">156</td>
+    <td style="text-align:right">5122</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://ken-sushi-workshop.res-menu.net/</td>
+    <td style="text-align:right">107</td>
+    <td style="text-align:right">1348</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://soup-n-fresh.res-menu.net/menu</td>
+    <td style="text-align:right">107</td>
+    <td style="text-align:right">513</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://el-sur.res-menu.net/</td>
+    <td style="text-align:right">121</td>
+    <td style="text-align:right">3560</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://mikes-kitchen.res-menu.net/menu</td>
+    <td style="text-align:right">54</td>
+    <td style="text-align:right">415</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://le-plomb-du-cantal.res-menu.net/</td>
+    <td style="text-align:right">185</td>
+    <td style="text-align:right">3296</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://sofias-pizza-roast-beef.res-menu.net/</td>
+    <td style="text-align:right">155</td>
+    <td style="text-align:right">1145</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://zachrys-riverhouse-no-reservations.res-menu.net/</td>
+    <td style="text-align:right">57</td>
+    <td style="text-align:right">1447</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://hawthorne-asylum.res-menu.net/</td>
+    <td style="text-align:right">148</td>
+    <td style="text-align:right">1548</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://johnny-longboats.res-menu.net/menu</td>
+    <td style="text-align:right">107</td>
+    <td style="text-align:right">585</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://katsu-hama.res-menu.net/</td>
+    <td style="text-align:right">124</td>
+    <td style="text-align:right">1390</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://ok-cafe.res-menu.net/menu</td>
+    <td style="text-align:right">135</td>
+    <td style="text-align:right">789</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://johnnys-po-boys.res-menu.net/</td>
+    <td style="text-align:right">96</td>
+    <td style="text-align:right">1140</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://le-consulat.res-menu.net/</td>
+    <td style="text-align:right">76</td>
+    <td style="text-align:right">1395</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://pell-22-hair-salon.res-menu.net/</td>
+    <td style="text-align:right">174</td>
+    <td style="text-align:right">1640</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+<tr>
+    <td style="word-break:break-all;max-width:300px">https://bistrot-paul-bert.res-menu.net/menu</td>
+    <td style="text-align:right">326</td>
+    <td style="text-align:right">1538</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">N/A</td>
+</tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 8: Anomalies -->
+        <div class="section">
+            <div class="section-title">Phát hiện bất thường</div>
+            <div style="color:#999;padding:15px">Không phát hiện bất thường đáng chú ý</div>
+        </div>
+
+        <!-- Section 9: 30-day Comparison -->
+        <div class="section">
+            <div class="section-title">So sánh 30 ngày: Kỳ gần nhất vs Kỳ trước</div>
+            <div class="scroll-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Chỉ số</th>
+                            <th style="text-align:right">30 ngày gần nhất</th>
+                            <th style="text-align:right">30 ngày trước</th>
+                            <th style="text-align:right">Thay đổi %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Phiên</strong></td>
+                            <td style="text-align:right">1,464,336</td>
+                            <td style="text-align:right">1,256,409</td>
+                            <td style="text-align:right"><span style="color:#4ade80">+16.5%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Người dùng</strong></td>
+                            <td style="text-align:right">1,260,225</td>
+                            <td style="text-align:right">1,069,969</td>
+                            <td style="text-align:right"><span style="color:#4ade80">+17.8%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lượt xem trang</strong></td>
+                            <td style="text-align:right">2,272,721</td>
+                            <td style="text-align:right">1,969,409</td>
+                            <td style="text-align:right"><span style="color:#4ade80">+15.4%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nhấp chuột (GSC)</strong></td>
+                            <td style="text-align:right">689,930</td>
+                            <td style="text-align:right">489,349</td>
+                            <td style="text-align:right"><span style="color:#4ade80">+41.0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ấn tượng (GSC)</strong></td>
+                            <td style="text-align:right">40,162,953</td>
+                            <td style="text-align:right">26,561,947</td>
+                            <td style="text-align:right"><span style="color:#4ade80">+51.2%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 10: Health & Recommendations -->
+        <div class="section">
+            <div class="section-title">Đánh giá SEO & Đề xuất</div>
+            <div class="health-section">
+                <h3 style="margin-bottom:10px">Đánh giá sức khỏe</h3>
+                <div style="color:#4ade80">✓ Phiên tăng tốt</div><div style="color:#4ade80">✓ Mức độ tương tác cao</div><div style="color:#4ade80">✓ Vị trí xếp hạng tốt</div>
+            </div>
+            <div class="health-section">
+                <h3 style="margin-bottom:10px">Đề xuất ưu tiên</h3>
+                <div class="recommendation high">
+                    <strong>🔴 Cao:</strong> Tối ưu hóa từ khóa có cơ hội (lượt ấn tượng cao nhưng CTR thấp ở vị trí 5-20)
+                </div>
+                <div class="recommendation medium">
+                    <strong>🟡 Trung bình:</strong> Cải thiện thời lượng phiên và tỷ lệ tương tác
+                </div>
+                <div class="recommendation low">
+                    <strong>🟢 Thấp:</strong> Tiếp tục giám sát các xu hướng chính
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ga4Dates = ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20"];
+        const ga4Sessions = [37266, 37881, 37765, 31425, 29064, 27297, 28041, 29350, 33372, 31879, 23095, 24337, 27616, 30260, 31777, 38429, 42233, 34794, 31141, 32647, 34579, 35284, 42036, 42242, 30519, 32292, 35900, 36135, 39527, 47820, 56561, 70247, 37883, 37719, 37996, 40207, 50410, 51092, 39456, 33485, 36533, 39379, 42807, 52657, 54394, 43301, 39555, 42764, 45005, 50003, 56832, 57952, 46474, 43423, 47451, 46853, 50898, 63313, 99269, 51793, 43592, 51054, 50854, 54088, 39442];
+        const ga4Users = [31680, 31966, 31763, 26964, 23806, 23053, 24187, 25228, 28511, 26454, 18868, 20383, 23657, 25646, 27229, 33116, 35014, 29705, 26344, 28792, 29961, 30509, 36173, 35658, 25637, 27516, 30575, 31842, 33671, 40187, 48049, 61014, 32110, 31914, 32787, 35180, 44075, 42432, 34062, 28397, 31475, 33554, 37237, 46356, 45683, 37900, 33247, 35722, 40969, 43115, 49260, 50551, 38625, 37059, 39440, 40712, 43251, 53707, 90799, 42602, 37459, 43318, 43703, 45244, 35091];
+        const ga4Bounce = [0.4206, 0.3538, 0.3581, 0.3846, 0.3931, 0.3828, 0.3512, 0.3585, 0.3336, 0.3709, 0.3879, 0.3853, 0.3691, 0.3694, 0.3587, 0.3497, 0.4077, 0.4341, 0.4004, 0.391, 0.3896, 0.3632, 0.352, 0.351, 0.3854, 0.3913, 0.3886, 0.3498, 0.3263, 0.3518, 0.3509, 0.3844, 0.3724, 0.3602, 0.3312, 0.3404, 0.3468, 0.3568, 0.3999, 0.3855, 0.36, 0.3499, 0.3541, 0.3413, 0.3781, 0.3878, 0.3801, 0.3758, 0.3651, 0.3635, 0.3446, 0.3536, 0.4028, 0.3836, 0.358, 0.3419, 0.3377, 0.3578, 0.3817, 0.3908, 0.3565, 0.3526, 0.3608, 0.3574, 0.9958];
+        const ga4Engage = [0.5794, 0.6462, 0.6419, 0.6154, 0.6069, 0.6172, 0.6488, 0.6415, 0.6664, 0.6291, 0.6121, 0.6147, 0.6309, 0.6306, 0.6413, 0.6503, 0.5923, 0.5659, 0.5996, 0.609, 0.6104, 0.6368, 0.648, 0.649, 0.6146, 0.6087, 0.6114, 0.6502, 0.6737, 0.6482, 0.6491, 0.6156, 0.6276, 0.6398, 0.6688, 0.6596, 0.6532, 0.6432, 0.6001, 0.6145, 0.64, 0.6501, 0.6459, 0.6587, 0.6219, 0.6122, 0.6199, 0.6242, 0.6349, 0.6365, 0.6554, 0.6464, 0.5972, 0.6164, 0.642, 0.6581, 0.6623, 0.6422, 0.6183, 0.6092, 0.6435, 0.6474, 0.6392, 0.6426, 0.0042];
+        const ga4PVs = [55317, 60909, 60144, 50506, 43565, 42047, 44591, 46549, 54294, 50020, 35038, 37730, 43118, 46939, 49599, 61305, 63344, 52228, 46751, 51585, 53151, 55592, 67763, 67571, 48177, 49121, 54825, 58064, 62472, 77123, 90906, 108370, 59580, 60117, 60998, 64719, 81682, 78759, 61026, 51768, 57860, 62411, 67883, 84615, 84141, 67957, 59652, 65127, 72298, 77226, 91579, 92693, 71674, 65000, 69513, 73419, 79367, 97864, 155838, 77960, 67569, 77473, 79320, 82952, 53376];
+        const ga4Duration = [107.1664, 119.8246, 116.745, 113.9468, 117.1594, 110.1036, 115.1121, 117.2805, 121.3816, 107.1835, 106.6778, 107.0343, 116.438, 111.1797, 116.1715, 120.6218, 103.5738, 101.8689, 102.8444, 110.4826, 110.4729, 113.7184, 122.0176, 120.5588, 114.9684, 107.7987, 121.652, 120.2569, 120.488, 125.9051, 118.5521, 87.7667, 111.3132, 116.3558, 123.3674, 126.168, 120.5412, 113.0236, 109.5455, 110.6052, 115.453, 120.9971, 118.5818, 118.6598, 115.786, 106.7309, 107.3842, 110.0345, 117.1416, 109.5933, 121.8248, 119.2767, 107.1944, 103.5098, 101.4076, 112.5582, 119.4271, 117.2166, 85.2651, 108.0675, 112.1379, 111.2013, 113.5963, 111.8024, 102.7174];
+
+        const gscDates = ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18"];
+        const gscClicks = [13463, 16488, 16808, 13018, 11125, 10315, 10911, 11994, 14735, 13796, 8715, 8938, 10973, 12277, 13670, 17401, 17597, 12703, 11025, 12726, 13522, 14774, 19089, 20200, 13220, 12366, 14344, 16064, 18017, 22624, 28976, 20411, 17064, 17071, 18086, 19321, 24699, 25093, 17618, 14430, 16735, 18356, 19743, 25713, 27024, 20025, 17050, 19276, 21425, 23093, 29917, 31148, 22894, 18612, 20078, 22742, 26436, 34415, 35708, 26909, 22713, 26767, 26833];
+        const gscImpressions = [720111, 846316, 833104, 721821, 662633, 619570, 635610, 674576, 773806, 766442, 607204, 615290, 666451, 642173, 718427, 833320, 838395, 712049, 636017, 688510, 730599, 810888, 957467, 1036405, 790871, 730505, 807952, 884721, 973454, 1198396, 1436878, 1059368, 932618, 929656, 951124, 1020553, 1277796, 1341238, 1049300, 894225, 960460, 995839, 1042810, 1320801, 1346175, 1166680, 994230, 1095402, 1179308, 1296930, 1618058, 1737808, 1417281, 1168081, 1258885, 1452296, 1607530, 2035676, 2144067, 1795835, 1502900, 1749217, 1812792];
+        const gscCtr = [0.0187, 0.0195, 0.0202, 0.018, 0.0168, 0.0166, 0.0172, 0.0178, 0.019, 0.018, 0.0144, 0.0145, 0.0165, 0.0191, 0.019, 0.0209, 0.021, 0.0178, 0.0173, 0.0185, 0.0185, 0.0182, 0.0199, 0.0195, 0.0167, 0.0169, 0.0178, 0.0182, 0.0185, 0.0189, 0.0202, 0.0193, 0.0183, 0.0184, 0.019, 0.0189, 0.0193, 0.0187, 0.0168, 0.0161, 0.0174, 0.0184, 0.0189, 0.0195, 0.0201, 0.0172, 0.0171, 0.0176, 0.0182, 0.0178, 0.0185, 0.0179, 0.0162, 0.0159, 0.0159, 0.0157, 0.0164, 0.0169, 0.0167, 0.015, 0.0151, 0.0153, 0.0148];
+        const gscPosition = [9.7522, 9.838, 9.0226, 10.5895, 11.9539, 12.2724, 12.3887, 12.1364, 10.5147, 10.0446, 11.694, 11.1752, 10.7812, 10.4905, 9.9634, 10.2653, 10.1, 11.2852, 12.031, 10.7876, 10.7529, 10.7551, 9.9877, 9.7696, 9.7948, 9.8795, 10.0533, 10.4837, 10.2803, 9.5524, 9.0356, 9.1068, 9.7802, 10.3525, 10.0516, 9.7683, 9.4853, 9.309, 9.7578, 10.0804, 10.2956, 9.8401, 9.5924, 9.2182, 8.666, 9.4921, 10.0534, 9.9055, 9.8771, 9.9512, 9.5451, 9.4033, 9.6085, 9.6534, 10.0518, 10.0549, 9.5393, 9.2181, 8.8629, 9.1671, 9.4495, 9.466, 9.4778];
+
+        const dailyData = [{"date": "2026-01-15", "sessions": 37266, "users": 31680, "pvs": 55317, "bounce": 0.4206, "clicks": 13463, "impressions": 720111, "ctr": 0.0187, "position": 9.7522}, {"date": "2026-01-16", "sessions": 37881, "users": 31966, "pvs": 60909, "bounce": 0.3538, "clicks": 16488, "impressions": 846316, "ctr": 0.0195, "position": 9.838}, {"date": "2026-01-17", "sessions": 37765, "users": 31763, "pvs": 60144, "bounce": 0.3581, "clicks": 16808, "impressions": 833104, "ctr": 0.0202, "position": 9.0226}, {"date": "2026-01-18", "sessions": 31425, "users": 26964, "pvs": 50506, "bounce": 0.3846, "clicks": 13018, "impressions": 721821, "ctr": 0.018, "position": 10.5895}, {"date": "2026-01-19", "sessions": 29064, "users": 23806, "pvs": 43565, "bounce": 0.3931, "clicks": 11125, "impressions": 662633, "ctr": 0.0168, "position": 11.9539}, {"date": "2026-01-20", "sessions": 27297, "users": 23053, "pvs": 42047, "bounce": 0.3828, "clicks": 10315, "impressions": 619570, "ctr": 0.0166, "position": 12.2724}, {"date": "2026-01-21", "sessions": 28041, "users": 24187, "pvs": 44591, "bounce": 0.3512, "clicks": 10911, "impressions": 635610, "ctr": 0.0172, "position": 12.3887}, {"date": "2026-01-22", "sessions": 29350, "users": 25228, "pvs": 46549, "bounce": 0.3585, "clicks": 11994, "impressions": 674576, "ctr": 0.0178, "position": 12.1364}, {"date": "2026-01-23", "sessions": 33372, "users": 28511, "pvs": 54294, "bounce": 0.3336, "clicks": 14735, "impressions": 773806, "ctr": 0.019, "position": 10.5147}, {"date": "2026-01-24", "sessions": 31879, "users": 26454, "pvs": 50020, "bounce": 0.3709, "clicks": 13796, "impressions": 766442, "ctr": 0.018, "position": 10.0446}, {"date": "2026-01-25", "sessions": 23095, "users": 18868, "pvs": 35038, "bounce": 0.3879, "clicks": 8715, "impressions": 607204, "ctr": 0.0144, "position": 11.694}, {"date": "2026-01-26", "sessions": 24337, "users": 20383, "pvs": 37730, "bounce": 0.3853, "clicks": 8938, "impressions": 615290, "ctr": 0.0145, "position": 11.1752}, {"date": "2026-01-27", "sessions": 27616, "users": 23657, "pvs": 43118, "bounce": 0.3691, "clicks": 10973, "impressions": 666451, "ctr": 0.0165, "position": 10.7812}, {"date": "2026-01-28", "sessions": 30260, "users": 25646, "pvs": 46939, "bounce": 0.3694, "clicks": 12277, "impressions": 642173, "ctr": 0.0191, "position": 10.4905}, {"date": "2026-01-29", "sessions": 31777, "users": 27229, "pvs": 49599, "bounce": 0.3587, "clicks": 13670, "impressions": 718427, "ctr": 0.019, "position": 9.9634}, {"date": "2026-01-30", "sessions": 38429, "users": 33116, "pvs": 61305, "bounce": 0.3497, "clicks": 17401, "impressions": 833320, "ctr": 0.0209, "position": 10.2653}, {"date": "2026-01-31", "sessions": 42233, "users": 35014, "pvs": 63344, "bounce": 0.4077, "clicks": 17597, "impressions": 838395, "ctr": 0.021, "position": 10.1}, {"date": "2026-02-01", "sessions": 34794, "users": 29705, "pvs": 52228, "bounce": 0.4341, "clicks": 12703, "impressions": 712049, "ctr": 0.0178, "position": 11.2852}, {"date": "2026-02-02", "sessions": 31141, "users": 26344, "pvs": 46751, "bounce": 0.4004, "clicks": 11025, "impressions": 636017, "ctr": 0.0173, "position": 12.031}, {"date": "2026-02-03", "sessions": 32647, "users": 28792, "pvs": 51585, "bounce": 0.391, "clicks": 12726, "impressions": 688510, "ctr": 0.0185, "position": 10.7876}, {"date": "2026-02-04", "sessions": 34579, "users": 29961, "pvs": 53151, "bounce": 0.3896, "clicks": 13522, "impressions": 730599, "ctr": 0.0185, "position": 10.7529}, {"date": "2026-02-05", "sessions": 35284, "users": 30509, "pvs": 55592, "bounce": 0.3632, "clicks": 14774, "impressions": 810888, "ctr": 0.0182, "position": 10.7551}, {"date": "2026-02-06", "sessions": 42036, "users": 36173, "pvs": 67763, "bounce": 0.352, "clicks": 19089, "impressions": 957467, "ctr": 0.0199, "position": 9.9877}, {"date": "2026-02-07", "sessions": 42242, "users": 35658, "pvs": 67571, "bounce": 0.351, "clicks": 20200, "impressions": 1036405, "ctr": 0.0195, "position": 9.7696}, {"date": "2026-02-08", "sessions": 30519, "users": 25637, "pvs": 48177, "bounce": 0.3854, "clicks": 13220, "impressions": 790871, "ctr": 0.0167, "position": 9.7948}, {"date": "2026-02-09", "sessions": 32292, "users": 27516, "pvs": 49121, "bounce": 0.3913, "clicks": 12366, "impressions": 730505, "ctr": 0.0169, "position": 9.8795}, {"date": "2026-02-10", "sessions": 35900, "users": 30575, "pvs": 54825, "bounce": 0.3886, "clicks": 14344, "impressions": 807952, "ctr": 0.0178, "position": 10.0533}, {"date": "2026-02-11", "sessions": 36135, "users": 31842, "pvs": 58064, "bounce": 0.3498, "clicks": 16064, "impressions": 884721, "ctr": 0.0182, "position": 10.4837}, {"date": "2026-02-12", "sessions": 39527, "users": 33671, "pvs": 62472, "bounce": 0.3263, "clicks": 18017, "impressions": 973454, "ctr": 0.0185, "position": 10.2803}, {"date": "2026-02-13", "sessions": 47820, "users": 40187, "pvs": 77123, "bounce": 0.3518, "clicks": 22624, "impressions": 1198396, "ctr": 0.0189, "position": 9.5524}, {"date": "2026-02-14", "sessions": 56561, "users": 48049, "pvs": 90906, "bounce": 0.3509, "clicks": 28976, "impressions": 1436878, "ctr": 0.0202, "position": 9.0356}, {"date": "2026-02-15", "sessions": 70247, "users": 61014, "pvs": 108370, "bounce": 0.3844, "clicks": 20411, "impressions": 1059368, "ctr": 0.0193, "position": 9.1068}, {"date": "2026-02-16", "sessions": 37883, "users": 32110, "pvs": 59580, "bounce": 0.3724, "clicks": 17064, "impressions": 932618, "ctr": 0.0183, "position": 9.7802}, {"date": "2026-02-17", "sessions": 37719, "users": 31914, "pvs": 60117, "bounce": 0.3602, "clicks": 17071, "impressions": 929656, "ctr": 0.0184, "position": 10.3525}, {"date": "2026-02-18", "sessions": 37996, "users": 32787, "pvs": 60998, "bounce": 0.3312, "clicks": 18086, "impressions": 951124, "ctr": 0.019, "position": 10.0516}, {"date": "2026-02-19", "sessions": 40207, "users": 35180, "pvs": 64719, "bounce": 0.3404, "clicks": 19321, "impressions": 1020553, "ctr": 0.0189, "position": 9.7683}, {"date": "2026-02-20", "sessions": 50410, "users": 44075, "pvs": 81682, "bounce": 0.3468, "clicks": 24699, "impressions": 1277796, "ctr": 0.0193, "position": 9.4853}, {"date": "2026-02-21", "sessions": 51092, "users": 42432, "pvs": 78759, "bounce": 0.3568, "clicks": 25093, "impressions": 1341238, "ctr": 0.0187, "position": 9.309}, {"date": "2026-02-22", "sessions": 39456, "users": 34062, "pvs": 61026, "bounce": 0.3999, "clicks": 17618, "impressions": 1049300, "ctr": 0.0168, "position": 9.7578}, {"date": "2026-02-23", "sessions": 33485, "users": 28397, "pvs": 51768, "bounce": 0.3855, "clicks": 14430, "impressions": 894225, "ctr": 0.0161, "position": 10.0804}, {"date": "2026-02-24", "sessions": 36533, "users": 31475, "pvs": 57860, "bounce": 0.36, "clicks": 16735, "impressions": 960460, "ctr": 0.0174, "position": 10.2956}, {"date": "2026-02-25", "sessions": 39379, "users": 33554, "pvs": 62411, "bounce": 0.3499, "clicks": 18356, "impressions": 995839, "ctr": 0.0184, "position": 9.8401}, {"date": "2026-02-26", "sessions": 42807, "users": 37237, "pvs": 67883, "bounce": 0.3541, "clicks": 19743, "impressions": 1042810, "ctr": 0.0189, "position": 9.5924}, {"date": "2026-02-27", "sessions": 52657, "users": 46356, "pvs": 84615, "bounce": 0.3413, "clicks": 25713, "impressions": 1320801, "ctr": 0.0195, "position": 9.2182}, {"date": "2026-02-28", "sessions": 54394, "users": 45683, "pvs": 84141, "bounce": 0.3781, "clicks": 27024, "impressions": 1346175, "ctr": 0.0201, "position": 8.666}, {"date": "2026-03-01", "sessions": 43301, "users": 37900, "pvs": 67957, "bounce": 0.3878, "clicks": 20025, "impressions": 1166680, "ctr": 0.0172, "position": 9.4921}, {"date": "2026-03-02", "sessions": 39555, "users": 33247, "pvs": 59652, "bounce": 0.3801, "clicks": 17050, "impressions": 994230, "ctr": 0.0171, "position": 10.0534}, {"date": "2026-03-03", "sessions": 42764, "users": 35722, "pvs": 65127, "bounce": 0.3758, "clicks": 19276, "impressions": 1095402, "ctr": 0.0176, "position": 9.9055}, {"date": "2026-03-04", "sessions": 45005, "users": 40969, "pvs": 72298, "bounce": 0.3651, "clicks": 21425, "impressions": 1179308, "ctr": 0.0182, "position": 9.8771}, {"date": "2026-03-05", "sessions": 50003, "users": 43115, "pvs": 77226, "bounce": 0.3635, "clicks": 23093, "impressions": 1296930, "ctr": 0.0178, "position": 9.9512}, {"date": "2026-03-06", "sessions": 56832, "users": 49260, "pvs": 91579, "bounce": 0.3446, "clicks": 29917, "impressions": 1618058, "ctr": 0.0185, "position": 9.5451}, {"date": "2026-03-07", "sessions": 57952, "users": 50551, "pvs": 92693, "bounce": 0.3536, "clicks": 31148, "impressions": 1737808, "ctr": 0.0179, "position": 9.4033}, {"date": "2026-03-08", "sessions": 46474, "users": 38625, "pvs": 71674, "bounce": 0.4028, "clicks": 22894, "impressions": 1417281, "ctr": 0.0162, "position": 9.6085}, {"date": "2026-03-09", "sessions": 43423, "users": 37059, "pvs": 65000, "bounce": 0.3836, "clicks": 18612, "impressions": 1168081, "ctr": 0.0159, "position": 9.6534}, {"date": "2026-03-10", "sessions": 47451, "users": 39440, "pvs": 69513, "bounce": 0.358, "clicks": 20078, "impressions": 1258885, "ctr": 0.0159, "position": 10.0518}, {"date": "2026-03-11", "sessions": 46853, "users": 40712, "pvs": 73419, "bounce": 0.3419, "clicks": 22742, "impressions": 1452296, "ctr": 0.0157, "position": 10.0549}, {"date": "2026-03-12", "sessions": 50898, "users": 43251, "pvs": 79367, "bounce": 0.3377, "clicks": 26436, "impressions": 1607530, "ctr": 0.0164, "position": 9.5393}, {"date": "2026-03-13", "sessions": 63313, "users": 53707, "pvs": 97864, "bounce": 0.3578, "clicks": 34415, "impressions": 2035676, "ctr": 0.0169, "position": 9.2181}, {"date": "2026-03-14", "sessions": 99269, "users": 90799, "pvs": 155838, "bounce": 0.3817, "clicks": 35708, "impressions": 2144067, "ctr": 0.0167, "position": 8.8629}, {"date": "2026-03-15", "sessions": 51793, "users": 42602, "pvs": 77960, "bounce": 0.3908, "clicks": 26909, "impressions": 1795835, "ctr": 0.015, "position": 9.1671}, {"date": "2026-03-16", "sessions": 43592, "users": 37459, "pvs": 67569, "bounce": 0.3565, "clicks": 22713, "impressions": 1502900, "ctr": 0.0151, "position": 9.4495}, {"date": "2026-03-17", "sessions": 51054, "users": 43318, "pvs": 77473, "bounce": 0.3526, "clicks": 26767, "impressions": 1749217, "ctr": 0.0153, "position": 9.466}, {"date": "2026-03-18", "sessions": 50854, "users": 43703, "pvs": 79320, "bounce": 0.3608, "clicks": 26833, "impressions": 1812792, "ctr": 0.0148, "position": 9.4778}, {"date": "2026-03-19", "sessions": 54088, "users": 45244, "pvs": 82952, "bounce": 0.3574, "clicks": 0, "impressions": 0, "ctr": 0, "position": 0}, {"date": "2026-03-20", "sessions": 39442, "users": 35091, "pvs": 53376, "bounce": 0.9958, "clicks": 0, "impressions": 0, "ctr": 0, "position": 0}];
+
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#ddd' }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#ddd'
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: '#999' }, grid: { color: '#333' } },
+                    y: { ticks: { color: '#999' }, grid: { color: '#333' } }
+                }
+            };
+
+            // GA4 Sessions + Users Line Chart
+            new Chart(document.getElementById('ga4SessionsChart'), {
+                type: 'line',
+                data: {
+                    labels: ga4Dates,
+                    datasets: [
+                        {
+                            label: 'Phiên',
+                            data: ga4Sessions,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59,130,246,0.1)',
+                            yAxisID: 'y',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Người dùng',
+                            data: ga4Users,
+                            borderColor: '#f97316',
+                            backgroundColor: 'rgba(249,115,22,0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y: { ...chartOptions.scales.y, position: 'left' },
+                        y1: { position: 'right', ticks: { color: '#999' }, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+
+            // GA4 Bounce + Engagement Line Chart
+            new Chart(document.getElementById('ga4BounceChart'), {
+                type: 'line',
+                data: {
+                    labels: ga4Dates,
+                    datasets: [
+                        {
+                            label: 'Tỷ lệ thoát (%)',
+                            data: ga4Bounce,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239,68,68,0.1)',
+                            yAxisID: 'y',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Tỷ lệ tương tác (%)',
+                            data: ga4Engage,
+                            borderColor: '#4ade80',
+                            backgroundColor: 'rgba(74,222,128,0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y: { ...chartOptions.scales.y, position: 'left' },
+                        y1: { position: 'right', ticks: { color: '#999' }, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+
+            // GA4 Pageviews Bar Chart
+            new Chart(document.getElementById('ga4PvChart'), {
+                type: 'bar',
+                data: {
+                    labels: ga4Dates,
+                    datasets: [{
+                        label: 'Lượt xem trang',
+                        data: ga4PVs,
+                        backgroundColor: '#8b5cf6'
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // GA4 Duration Line Chart
+            new Chart(document.getElementById('ga4DurationChart'), {
+                type: 'line',
+                data: {
+                    labels: ga4Dates,
+                    datasets: [{
+                        label: 'Thời lượng trung bình (giây)',
+                        data: ga4Duration,
+                        borderColor: '#06b6d4',
+                        backgroundColor: 'rgba(6,182,212,0.1)',
+                        tension: 0.3
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // GSC Clicks + Impressions Dual Axis
+            new Chart(document.getElementById('gscClicksChart'), {
+                type: 'line',
+                data: {
+                    labels: gscDates,
+                    datasets: [
+                        {
+                            label: 'Nhấp',
+                            data: gscClicks,
+                            borderColor: '#ec4899',
+                            backgroundColor: 'rgba(236,72,153,0.1)',
+                            yAxisID: 'y',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Ấn tượng',
+                            data: gscImpressions,
+                            borderColor: '#14b8a6',
+                            backgroundColor: 'rgba(20,184,166,0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y: { ...chartOptions.scales.y, position: 'left' },
+                        y1: { position: 'right', ticks: { color: '#999' }, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+
+            // GSC CTR Line Chart
+            new Chart(document.getElementById('gscCtrChart'), {
+                type: 'line',
+                data: {
+                    labels: gscDates,
+                    datasets: [{
+                        label: 'Tỷ lệ nhấp chuột',
+                        data: gscCtr,
+                        borderColor: '#fbbf24',
+                        backgroundColor: 'rgba(251,191,36,0.1)',
+                        tension: 0.3
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // GSC Position Line Chart (reversed)
+            new Chart(document.getElementById('gscPositionChart'), {
+                type: 'line',
+                data: {
+                    labels: gscDates,
+                    datasets: [{
+                        label: 'Vị trí trung bình',
+                        data: gscPosition,
+                        borderColor: '#a78bfa',
+                        backgroundColor: 'rgba(167,139,250,0.1)',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y: {
+                            ...chartOptions.scales.y,
+                            reverse: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function populateDailyTable() {
+            const tbody = document.getElementById('dailyTable');
+            tbody.innerHTML = '';
+
+            let totals = {
+                sessions: 0, users: 0, pvs: 0, bounce: 0,
+                clicks: 0, impr: 0, ctr: 0, pos: 0, count: 0
+            };
+
+            dailyData.forEach(day => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${day.date}</td>
+                    <td style="text-align:right">${day.sessions}</td>
+                    <td style="text-align:right">${day.users}</td>
+                    <td style="text-align:right">${day.pvs}</td>
+                    <td style="text-align:right">${(day.bounce * 100).toFixed(1)}</td>
+                    <td style="text-align:right">${day.clicks}</td>
+                    <td style="text-align:right">${day.impressions}</td>
+                    <td style="text-align:right">${day.ctr.toFixed(4)}</td>
+                    <td style="text-align:right">${day.position.toFixed(1)}</td>
+                `;
+                tbody.appendChild(tr);
+
+                totals.sessions += day.sessions;
+                totals.users += day.users;
+                totals.pvs += day.pvs;
+                totals.bounce += day.bounce;
+                totals.clicks += day.clicks;
+                totals.impr += day.impressions;
+                totals.ctr += day.ctr;
+                totals.pos += day.position;
+                totals.count++;
+            });
+
+            // Add summary row
+            const summaryRow = document.createElement('tr');
+            summaryRow.className = 'summary-row';
+            summaryRow.innerHTML = `
+                <td style="background-color:#1a1a1a"><strong>Tổng/TB</strong></td>
+                <td style="text-align:right;background-color:#1a1a1a">${totals.sessions.toLocaleString()}</td>
+                <td style="text-align:right;background-color:#1a1a1a">${totals.users.toLocaleString()}</td>
+                <td style="text-align:right;background-color:#1a1a1a">${totals.pvs.toLocaleString()}</td>
+                <td style="text-align:right;background-color:#1a1a1a">${(totals.bounce / totals.count * 100).toFixed(1)}</td>
+                <td style="text-align:right;background-color:#1a1a1a">${totals.clicks.toLocaleString()}</td>
+                <td style="text-align:right;background-color:#1a1a1a">${totals.impr.toLocaleString()}</td>
+                <td style="text-align:right;background-color:#1a1a1a">${(totals.ctr / totals.count).toFixed(4)}</td>
+                <td style="text-align:right;background-color:#1a1a1a">${(totals.pos / totals.count).toFixed(1)}</td>
+            `;
+            tbody.appendChild(summaryRow);
+        }
+
+        function sortTable(columnIndex) {
+            const tbody = document.getElementById('dailyTable');
+            const rows = Array.from(tbody.querySelectorAll('tr:not(.summary-row)'));
+
+            rows.sort((a, b) => {
+                const aVal = a.children[columnIndex].textContent.replace(/[^0-9.-]/g, '');
+                const bVal = b.children[columnIndex].textContent.replace(/[^0-9.-]/g, '');
+                return isNaN(aVal) ? aVal.localeCompare(bVal) : parseFloat(aVal) - parseFloat(bVal);
+            });
+
+            tbody.innerHTML = '';
+            rows.forEach(r => tbody.appendChild(r.cloneNode(true)));
+
+            const summaryRow = document.createElement('tr');
+            summaryRow.className = 'summary-row';
+            summaryRow.innerHTML = `
+                <td style="background-color:#1a1a1a"><strong>Tổng/TB</strong></td>
+                <td colspan="8" style="text-align:center;background-color:#1a1a1a">Tổng hợp dữ liệu</td>
+            `;
+            tbody.appendChild(summaryRow);
+        }
+
+        function toggleDarkMode() {
+            document.body.style.filter = document.body.style.filter === 'invert(1)' ? 'invert(0)' : 'invert(1)';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            populateDailyTable();
+            initCharts();
+        });
+    </script>
+</body>
+</html>
