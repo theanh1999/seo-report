@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Dashboard - Nhà hàng</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        body.light-mode {
+            --bg-dark: #ffffff;
+            --bg-card: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header-info {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .cross-link-bar {
+            background-color: var(--bg-card);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .cross-link-bar a {
+            color: var(--info);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .cross-link-bar a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .toc-container {
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0;
+            margin: -2rem -2rem 2rem -2rem;
+            padding: 0 2rem;
+            overflow-x: auto;
+        }
+
+        .toc {
+            display: flex;
+            gap: 0;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex-wrap: nowrap;
+            min-height: 50px;
+            align-items: center;
+        }
+
+        .toc li {
+            margin: 0;
+            padding: 0;
+            border-bottom: 3px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .toc a {
+            display: block;
+            padding: 1rem 1.2rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .toc li.active a {
+            color: var(--info);
+            border-bottom-color: var(--info);
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 101;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .kpi-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .kpi-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .kpi-change {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .kpi-change.positive {
+            color: var(--success);
+        }
+
+        .kpi-change.negative {
+            color: var(--danger);
+        }
+
+        .filter-section {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-section h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .filter-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-container h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 100%;
+        }
+
+        section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 150px;
+        }
+
+        section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .table-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: var(--border-color);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background-color: var(--bg-dark);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background-color: var(--border-color);
+        }
+
+        .sortable::after {
+            content: ' ⇅';
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        .sortable.asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+
+        .sortable.desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+
+        .domain-link {
+            color: var(--info);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .domain-link:hover {
+            text-decoration: underline;
+        }
+
+        .anomaly-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .anomaly-card {
+            background-color: var(--bg-card);
+            border-left: 4px solid;
+            border-radius: 4px;
+            padding: 1.5rem;
+        }
+
+        .anomaly-card.critical {
+            border-left-color: var(--danger);
+        }
+
+        .anomaly-card.warning {
+            border-left-color: var(--warning);
+        }
+
+        .anomaly-card.info {
+            border-left-color: var(--info);
+        }
+
+        .anomaly-card h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .anomaly-type {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0.5rem 0;
+            opacity: 0.7;
+        }
+
+        .recommendation-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .priority-high {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .priority-medium {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .priority-low {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-checkboxes {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-cards {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .toc {
+                flex-wrap: wrap;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙 Dark/Light</button>
+
+    <div class="header">
+        <h1>🔍 SEO Monitor Dashboard</h1>
+        <div class="header-info">Mảng Nhà hàng • 12 website • Cập nhật: 28/03/2026</div>
+    </div>
+
+    <div class="cross-link-bar">
+        <span>📊 Bạn đang xem: <strong>Mảng Nhà hàng</strong> (12 website)</span>
+        <span>|</span>
+        <span>Ngày: <strong>28/03/2026</strong></span>
+        <span>|</span>
+        <a href="seo-hotels-2026-03-28.html">→ Xem báo cáo Mảng Khách sạn</a>
+        <span>|</span>
+        <a href="index.html">→ Tất cả báo cáo</a>
+    </div>
+
+    <div class="toc-container">
+        <ul class="toc" id="toc">
+            <li><a href="#kpi">KPI Tổng hợp</a></li>
+            <li><a href="#filter">Lọc & Tìm kiếm</a></li>
+            <li><a href="#trends">Biểu đồ Xu hướng</a></li>
+            <li><a href="#comparison">So sánh Website</a></li>
+            <li><a href="#keywords">Top Từ khóa</a></li>
+            <li><a href="#anomalies">Phát hiện Bất thường</a></li>
+            <li><a href="#analysis">Phân tích Xu hướng</a></li>
+            <li><a href="#recommendations">Khuyến nghị Tối ưu</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <section id="kpi">
+            <h2>📊 KPI Tổng hợp</h2>
+            <div class="kpi-cards">
+                <div class="kpi-card">
+                    <h3>Phiên làm việc</h3>
+                    <div class="kpi-value">6,713,419</div>
+                    <div class="kpi-change positive">
+                        +20.6%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Người dùng</h3>
+                    <div class="kpi-value">5,861,590</div>
+                    <div class="kpi-change positive">
+                        +22.1%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Lượt xem trang</h3>
+                    <div class="kpi-value">10,270,419</div>
+                    <div class="kpi-change positive">
+                        +15.9%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Click GSC</h3>
+                    <div class="kpi-value">2,548,312</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Impr. GSC</h3>
+                    <div class="kpi-value">244,762,837</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Bounce Rate</h3>
+                    <div class="kpi-value">42.6%</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Engagement</h3>
+                    <div class="kpi-value">49.7%</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Vị trí TB</h3>
+                    <div class="kpi-value">7.6</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="filter">
+            <h2>🔍 Lọc & Tìm kiếm</h2>
+            <div class="filter-section">
+                <h3>Chọn website để hiển thị</h3>
+                <div class="filter-checkboxes" id="filterCheckboxes">
+                    <div class="checkbox-item"><input type="checkbox" id="website-localoria.com" value="localoria.com" checked onchange="updateCharts()"><label for="website-localoria.com">localoria.com</label></div> <div class="checkbox-item"><input type="checkbox" id="website-wherebly.com" value="wherebly.com" checked onchange="updateCharts()"><label for="website-wherebly.com">wherebly.com</label></div> <div class="checkbox-item"><input type="checkbox" id="website-res-menu.net" value="res-menu.net" checked onchange="updateCharts()"><label for="website-res-menu.net">res-menu.net</label></div> <div class="checkbox-item"><input type="checkbox" id="website-foodplacee.com" value="foodplacee.com" checked onchange="updateCharts()"><label for="website-foodplacee.com">foodplacee.com</label></div> <div class="checkbox-item"><input type="checkbox" id="website-restaurants-world.net" value="restaurants-world.net" checked onchange="updateCharts()"><label for="website-restaurants-world.net">restaurants-world.net</label></div> <div class="checkbox-item"><input type="checkbox" id="website-goto-where.com" value="goto-where.com" checked onchange="updateCharts()"><label for="website-goto-where.com">goto-where.com</label></div> <div class="checkbox-item"><input type="checkbox" id="website-menu-world.com" value="menu-world.com" checked onchange="updateCharts()"><label for="website-menu-world.com">menu-world.com</label></div> <div class="checkbox-item"><input type="checkbox" id="website-grubbio.com" value="grubbio.com" checked onchange="updateCharts()"><label for="website-grubbio.com">grubbio.com</label></div> <div class="checkbox-item"><input type="checkbox" id="website-menustic.com" value="menustic.com" checked onchange="updateCharts()"><label for="website-menustic.com">menustic.com</label></div> <div class="checkbox-item"><input type="checkbox" id="website-menufyy.com" value="menufyy.com" checked onchange="updateCharts()"><label for="website-menufyy.com">menufyy.com</label></div> <div class="checkbox-item"><input type="checkbox" id="website-wherevi.com" value="wherevi.com" checked onchange="updateCharts()"><label for="website-wherevi.com">wherevi.com</label></div> <div class="checkbox-item"><input type="checkbox" id="website-placejoys.com" value="placejoys.com" checked onchange="updateCharts()"><label for="website-placejoys.com">placejoys.com</label></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="trends">
+            <h2>📈 Biểu đồ Xu hướng (30 ngày gần nhất)</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Phiên làm việc/Ngày</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="sessionsChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Click GSC/Ngày</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="clicksChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Impr. GSC/Ngày</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="impressionsChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Vị trí TB/Ngày (Thấp=Tốt)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="positionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison">
+            <h2>🆚 So sánh Website</h2>
+            <div class="table-container">
+                <table id="comparisonTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="sortTable(this, 'text')">Website</th>
+                            <th class="sortable" onclick="sortTable(this, 'number')">Phiên</th>
+                            <th class="sortable" onclick="sortTable(this, 'number')">User</th>
+                            <th class="sortable" onclick="sortTable(this, 'number')">PV</th>
+                            <th class="sortable" onclick="sortTable(this, 'number')">Click</th>
+                            <th class="sortable" onclick="sortTable(this, 'number')">Impr.</th>
+                            <th class="sortable" onclick="sortTable(this, 'number')">CTR</th>
+                            <th class="sortable" onclick="sortTable(this, 'number')">Vị trí</th>
+                            <th class="sortable" onclick="sortTable(this, 'number')">Chg %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+        <tr>
+            <td><a href="seo-detail-localoria.com-2026-03-28.html" class="domain-link">localoria.com</a></td>
+            <td>145,584</td>
+            <td>129,269</td>
+            <td>209,148</td>
+            <td>7,776</td>
+            <td>808,187</td>
+            <td>0.96%</td>
+            <td>8.6</td>
+            <td class="positive">+26.3%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-wherebly.com-2026-03-28.html" class="domain-link">wherebly.com</a></td>
+            <td>5,606</td>
+            <td>4,904</td>
+            <td>8,876</td>
+            <td>444</td>
+            <td>27,884</td>
+            <td>1.59%</td>
+            <td>6.8</td>
+            <td class="positive">+13915.0%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-res-menu.net-2026-03-28.html" class="domain-link">res-menu.net</a></td>
+            <td>1,552,849</td>
+            <td>1,330,635</td>
+            <td>2,388,954</td>
+            <td>751,096</td>
+            <td>46,115,038</td>
+            <td>1.63%</td>
+            <td>9.5</td>
+            <td class="positive">+35.3%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-foodplacee.com-2026-03-28.html" class="domain-link">foodplacee.com</a></td>
+            <td>6,387</td>
+            <td>5,604</td>
+            <td>12,002</td>
+            <td>447</td>
+            <td>37,870</td>
+            <td>1.18%</td>
+            <td>6.7</td>
+            <td class="positive">+21190.0%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-restaurants-world.net-2026-03-28.html" class="domain-link">restaurants-world.net</a></td>
+            <td>659,476</td>
+            <td>573,092</td>
+            <td>910,348</td>
+            <td>305,342</td>
+            <td>30,617,042</td>
+            <td>1.00%</td>
+            <td>9.4</td>
+            <td class="positive">+15.4%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-goto-where.com-2026-03-28.html" class="domain-link">goto-where.com</a></td>
+            <td>1,117,271</td>
+            <td>1,018,659</td>
+            <td>1,467,870</td>
+            <td>262,417</td>
+            <td>57,173,719</td>
+            <td>0.46%</td>
+            <td>8.6</td>
+            <td class="positive">+76.2%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-menu-world.com-2026-03-28.html" class="domain-link">menu-world.com</a></td>
+            <td>1,535,478</td>
+            <td>1,290,979</td>
+            <td>2,710,758</td>
+            <td>840,865</td>
+            <td>72,798,161</td>
+            <td>1.16%</td>
+            <td>8.6</td>
+            <td class="negative">-6.5%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-grubbio.com-2026-03-28.html" class="domain-link">grubbio.com</a></td>
+            <td>167,685</td>
+            <td>152,411</td>
+            <td>228,398</td>
+            <td>25,958</td>
+            <td>3,182,778</td>
+            <td>0.82%</td>
+            <td>8.6</td>
+            <td class="positive">+25.4%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-menustic.com-2026-03-28.html" class="domain-link">menustic.com</a></td>
+            <td>195,791</td>
+            <td>172,551</td>
+            <td>296,139</td>
+            <td>68,391</td>
+            <td>8,214,925</td>
+            <td>0.83%</td>
+            <td>7.3</td>
+            <td class="positive">+14.5%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-menufyy.com-2026-03-28.html" class="domain-link">menufyy.com</a></td>
+            <td>396,135</td>
+            <td>356,788</td>
+            <td>545,026</td>
+            <td>134,323</td>
+            <td>14,208,452</td>
+            <td>0.95%</td>
+            <td>7.9</td>
+            <td class="positive">+82.7%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-wherevi.com-2026-03-28.html" class="domain-link">wherevi.com</a></td>
+            <td>238,059</td>
+            <td>224,168</td>
+            <td>321,601</td>
+            <td>35,838</td>
+            <td>2,853,337</td>
+            <td>1.26%</td>
+            <td>8.8</td>
+            <td class="positive">+10.8%</td>
+        </tr>
+        
+
+        <tr>
+            <td><a href="seo-detail-placejoys.com-2026-03-28.html" class="domain-link">placejoys.com</a></td>
+            <td>693,098</td>
+            <td>602,530</td>
+            <td>1,171,299</td>
+            <td>115,415</td>
+            <td>8,725,444</td>
+            <td>1.32%</td>
+            <td>7.9</td>
+            <td class="positive">+1.1%</td>
+        </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="keywords">
+            <h2>🔑 Top 20 Từ khóa</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Từ khóa</th>
+                            <th>Click</th>
+                            <th>Impr.</th>
+                            <th>CTR</th>
+                            <th>Vị trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+        <tr>
+            <td>1</td>
+            <td>chez lucien</td>
+            <td>982</td>
+            <td>5,193</td>
+            <td>18.91%</td>
+            <td>2.9</td>
+        </tr>
+        
+
+        <tr>
+            <td>2</td>
+            <td>pjs oyster bar</td>
+            <td>923</td>
+            <td>2,569</td>
+            <td>35.93%</td>
+            <td>1.3</td>
+        </tr>
+        
+
+        <tr>
+            <td>3</td>
+            <td>los betos menu</td>
+            <td>816</td>
+            <td>2,547</td>
+            <td>32.04%</td>
+            <td>1.2</td>
+        </tr>
+        
+
+        <tr>
+            <td>4</td>
+            <td>kawa revolving sushi menu</td>
+            <td>727</td>
+            <td>1,968</td>
+            <td>36.94%</td>
+            <td>2.1</td>
+        </tr>
+        
+
+        <tr>
+            <td>5</td>
+            <td>sofia's pizza & roast beef menu</td>
+            <td>696</td>
+            <td>1,626</td>
+            <td>42.80%</td>
+            <td>2.5</td>
+        </tr>
+        
+
+        <tr>
+            <td>6</td>
+            <td>bistrot paul bert menu</td>
+            <td>659</td>
+            <td>2,677</td>
+            <td>24.62%</td>
+            <td>2.4</td>
+        </tr>
+        
+
+        <tr>
+            <td>7</td>
+            <td>panoramic 34 menu</td>
+            <td>600</td>
+            <td>1,655</td>
+            <td>36.25%</td>
+            <td>2.2</td>
+        </tr>
+        
+
+        <tr>
+            <td>8</td>
+            <td>bell city diner menu</td>
+            <td>587</td>
+            <td>2,210</td>
+            <td>26.56%</td>
+            <td>2.0</td>
+        </tr>
+        
+
+        <tr>
+            <td>9</td>
+            <td>shukette menu</td>
+            <td>565</td>
+            <td>2,766</td>
+            <td>20.43%</td>
+            <td>1.9</td>
+        </tr>
+        
+
+        <tr>
+            <td>10</td>
+            <td>sushi kushi</td>
+            <td>560</td>
+            <td>4,754</td>
+            <td>11.78%</td>
+            <td>2.1</td>
+        </tr>
+        
+
+        <tr>
+            <td>11</td>
+            <td>johnny longboats menu</td>
+            <td>548</td>
+            <td>2,266</td>
+            <td>24.18%</td>
+            <td>2.1</td>
+        </tr>
+        
+
+        <tr>
+            <td>12</td>
+            <td>ok cafe menu</td>
+            <td>519</td>
+            <td>2,412</td>
+            <td>21.52%</td>
+            <td>2.9</td>
+        </tr>
+        
+
+        <tr>
+            <td>13</td>
+            <td>the hive waterfront restaurant & tiki menu</td>
+            <td>507</td>
+            <td>2,868</td>
+            <td>17.68%</td>
+            <td>2.1</td>
+        </tr>
+        
+
+        <tr>
+            <td>14</td>
+            <td>osteria santo spirito</td>
+            <td>503</td>
+            <td>5,112</td>
+            <td>9.84%</td>
+            <td>5.3</td>
+        </tr>
+        
+
+        <tr>
+            <td>15</td>
+            <td>josephine chamonix</td>
+            <td>491</td>
+            <td>5,667</td>
+            <td>8.66%</td>
+            <td>3.7</td>
+        </tr>
+        
+
+        <tr>
+            <td>16</td>
+            <td>meat me liverpool</td>
+            <td>488</td>
+            <td>3,636</td>
+            <td>13.42%</td>
+            <td>3.2</td>
+        </tr>
+        
+
+        <tr>
+            <td>17</td>
+            <td>cafe continental menu</td>
+            <td>469</td>
+            <td>3,949</td>
+            <td>11.88%</td>
+            <td>4.3</td>
+        </tr>
+        
+
+        <tr>
+            <td>18</td>
+            <td>lj shanghai menu</td>
+            <td>467</td>
+            <td>2,113</td>
+            <td>22.10%</td>
+            <td>2.1</td>
+        </tr>
+        
+
+        <tr>
+            <td>19</td>
+            <td>terra madre dublin</td>
+            <td>459</td>
+            <td>2,277</td>
+            <td>20.16%</td>
+            <td>3.0</td>
+        </tr>
+        
+
+        <tr>
+            <td>20</td>
+            <td>zest sushi</td>
+            <td>454</td>
+            <td>4,063</td>
+            <td>11.17%</td>
+            <td>4.0</td>
+        </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="anomalies">
+            <h2>⚠️ Phát hiện Bất thường (7 ngày gần nhất)</h2>
+            <div class="anomaly-cards">
+        <div class="anomaly-card warning">
+            <h4><a href="seo-detail-localoria.com-2026-03-28.html" class="domain-link">localoria.com</a></h4>
+            <div class="anomaly-type">BOUNCE_RATE</div>
+            <p style="margin: 0.5rem 0;">Bounce rate 99.8%</p>
+        </div>
+        
+
+        <div class="anomaly-card warning">
+            <h4><a href="seo-detail-wherebly.com-2026-03-28.html" class="domain-link">wherebly.com</a></h4>
+            <div class="anomaly-type">BOUNCE_RATE</div>
+            <p style="margin: 0.5rem 0;">Bounce rate 100.0%</p>
+        </div>
+        
+
+        <div class="anomaly-card warning">
+            <h4><a href="seo-detail-res-menu.net-2026-03-28.html" class="domain-link">res-menu.net</a></h4>
+            <div class="anomaly-type">BOUNCE_RATE</div>
+            <p style="margin: 0.5rem 0;">Bounce rate 99.0%</p>
+        </div>
+        
+
+        <div class="anomaly-card warning">
+            <h4><a href="seo-detail-foodplacee.com-2026-03-28.html" class="domain-link">foodplacee.com</a></h4>
+            <div class="anomaly-type">BOUNCE_RATE</div>
+            <p style="margin: 0.5rem 0;">Bounce rate 99.9%</p>
+        </div>
+        
+
+        <div class="anomaly-card warning">
+            <h4><a href="seo-detail-restaurants-world.net-2026-03-28.html" class="domain-link">restaurants-world.net</a></h4>
+            <div class="anomaly-type">BOUNCE_RATE</div>
+            <p style="margin: 0.5rem 0;">Bounce rate 99.5%</p>
+        </div>
+        
+
+        <div class="anomaly-card warning">
+            <h4><a href="seo-detail-wherevi.com-2026-03-28.html" class="domain-link">wherevi.com</a></h4>
+            <div class="anomaly-type">BOUNCE_RATE</div>
+            <p style="margin: 0.5rem 0;">Bounce rate 99.6%</p>
+        </div>
+        
+
+        <div class="anomaly-card warning">
+            <h4><a href="seo-detail-wherevi.com-2026-03-28.html" class="domain-link">wherevi.com</a></h4>
+            <div class="anomaly-type">CLICKS</div>
+            <p style="margin: 0.5rem 0;">Clicks dropped to 28%</p>
+        </div>
+        
+
+        <div class="anomaly-card warning">
+            <h4><a href="seo-detail-placejoys.com-2026-03-28.html" class="domain-link">placejoys.com</a></h4>
+            <div class="anomaly-type">BOUNCE_RATE</div>
+            <p style="margin: 0.5rem 0;">Bounce rate 99.0%</p>
+        </div>
+        </div>
+        </section>
+
+        <section id="analysis">
+            <h2>📊 Phân tích Xu hướng</h2>
+            <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem;">
+                
+    <p><strong>📈 Top 3 Website tăng trưởng:</strong></p>
+    <p>• <a href="seo-detail-foodplacee.com-2026-03-28.html" class="domain-link">foodplacee.com</a>: +21190.0% phiên<br>• <a href="seo-detail-wherebly.com-2026-03-28.html" class="domain-link">wherebly.com</a>: +13915.0% phiên<br>• <a href="seo-detail-menufyy.com-2026-03-28.html" class="domain-link">menufyy.com</a>: +82.7% phiên</p>
+    <p><strong>📉 Top 3 Website cần chú ý:</strong></p>
+    <p>• <a href="seo-detail-menu-world.com-2026-03-28.html" class="domain-link">menu-world.com</a>: -6.5% phiên<br>• <a href="seo-detail-gohotelly.com-2026-03-28.html" class="domain-link">gohotelly.com</a>: 0.0% phiên<br>• <a href="seo-detail-placejoys.com-2026-03-28.html" class="domain-link">placejoys.com</a>: 1.1% phiên</p>
+    <p><strong>💡 Nhận xét chung:</strong> Các website trong mảng này đang có xu hướng hỗn hợp. Cần tập trung vào tối ưu SEO cho các trang cần cải thiện vị trí xếp hạng và tăng lưu lượng organic.</p>
+    
+            </div>
+        </section>
+
+        <section id="recommendations">
+            <h2>💡 Khuyến nghị Tối ưu</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mức độ ưu tiên</th>
+                            <th>Khuyến nghị</th>
+                            <th>Áp dụng cho Website</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+        <tr>
+            <td><span class="priority-high">CAO</span></td>
+            <td>Cải thiện tương tác người dùng (Engagement hiện tại: 0.0%)</td>
+            <td><a href="seo-detail-gohotelly.com-2026-03-28.html" class="domain-link">gohotelly.com</a></td>
+        </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Chart.js instances
+        let chartsInstances = {};
+        let originalData = {};
+
+        // Initialize charts
+        function initCharts() {
+            const chartConfig = {};
+
+            // Sessions Chart
+            chartConfig.sessions = {
+                type: 'line',
+                data: {"labels": ["2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26"], "datasets": [{"label": "localoria.com", "data": [3278, 3310, 3688, 3699, 3306, 2762, 2713, 2812, 2955, 3483, 4193, 3468, 2867, 2826, 2975, 3019, 42753, 3699, 3455.0, 3596.0, 3778.0, 3731.0, 3811.0, 2282.0, 4503, 4594, 3518, 3758, 4032, 3891], "borderColor": "#FF6B6B", "backgroundColor": "#FF6B6B20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "wherebly.com", "data": [1, 18, 155, 258, 237, 178, 178, 174, 202, 237, 221, 206, 147, 159, 212, 209, 237, 268, 267.0, 165.0, 195.0, 185.0, 181.0, 157.0, 266, 198, 150, 175, 187, 179], "borderColor": "#4ECDC4", "backgroundColor": "#4ECDC420", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "res-menu.net", "data": [39379, 42807, 52657, 54394, 43301, 39555, 42764, 45005, 50003, 56832, 57952, 46474, 43423, 47451, 46853, 50898, 63313, 99269, 51793.0, 43592.0, 51054.0, 50854.0, 54088.0, 39442.0, 63780, 51125, 43830, 47827, 48897, 47704], "borderColor": "#45B7D1", "backgroundColor": "#45B7D120", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "foodplacee.com", "data": [6, 4, 96, 232, 211, 204, 167, 221, 191, 217, 245, 205, 157, 170, 145, 171, 236, 260, 219.0, 156.0, 174.0, 175.0, 138.0, 134.0, 261, 218, 200, 436, 451, 686], "borderColor": "#FFA07A", "backgroundColor": "#FFA07A20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "restaurants-world.net", "data": [18523, 22190, 24904, 26927, 22826, 18637, 20441, 21133, 21784, 23749, 26535, 22145, 19197, 19935, 18331, 18285, 22355, 24789, 23655.0, 19130.0, 23463.0, 18201.0, 20037.0, 13758.0, 40359, 20308, 17500, 18399, 17864, 16594], "borderColor": "#98D8C8", "backgroundColor": "#98D8C820", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "goto-where.com", "data": [32900, 26506, 31043, 54996, 57261, 23910, 24653, 27825, 27820, 31407, 32436, 154957, 133654, 31624, 25432, 23628, 29654, 31992, 29249.0, 25313.0, 25513.0, 24767.0, 25344.0, 10799.0, 28727, 26065, 22682, 23136, 23856, 24262], "borderColor": "#F7DC6F", "backgroundColor": "#F7DC6F20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menu-world.com", "data": [46308, 50685, 60262, 76862, 49829, 43401, 44329, 50163, 50348, 59621, 60016, 46611, 44795, 45604, 49507, 50230, 56591, 83349, 49257.0, 42716.0, 47224.0, 45095.0, 45726.0, 18101.0, 54466, 44286, 40882, 44242, 44303, 45525], "borderColor": "#BB8FCE", "backgroundColor": "#BB8FCE20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "grubbio.com", "data": [22749, 5068, 5190, 5421, 4851, 4216, 4304, 4245, 4622, 4763, 4952, 10828, 4274, 4296, 4300, 4706, 4961, 5075, 4810.0, 4386.0, 4745.0, 4566.0, 4611.0, 2035.0, 4739, 4718, 3905, 3923, 4076, 3978], "borderColor": "#85C1E2", "backgroundColor": "#85C1E220", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menustic.com", "data": [6251, 6372, 6984, 7452, 6393, 5731, 5777, 6290, 6450, 6989, 7493, 6778, 6113, 6259, 6082, 6364, 6943, 7385, 6788.0, 6036.0, 6401.0, 6144.0, 6320.0, 3027.0, 7287, 6390, 5588, 5846, 5787, 6051], "borderColor": "#F8B739", "backgroundColor": "#F8B73920", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menufyy.com", "data": [7465, 7976, 8961, 9956, 9067, 7616, 8302, 8452, 9075, 11350, 12001, 10907, 9818, 10234, 79260, 11336, 12699, 13943, 12465.0, 11261.0, 12278.0, 11799.0, 11969.0, 5785.0, 14003, 13128, 11261, 12030, 12222, 12277], "borderColor": "#52B788", "backgroundColor": "#52B78820", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "wherevi.com", "data": [5999, 5505, 6797, 6520, 5866, 5077, 5378, 5104, 5908, 6358, 6435, 5372, 4922, 20330, 5324, 5442, 5924, 6455, 5512.0, 4883.0, 5521.0, 5269.0, 5179.0, 3385.0, 5366, 5035, 4514, 60260, 4413, 4325], "borderColor": "#FF8C42", "backgroundColor": "#FF8C4220", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "placejoys.com", "data": [19256, 20496, 25006, 24145, 23104, 17889, 17483, 19206, 53112, 22530, 25590, 20582, 17924, 18423, 18987, 21678, 24153, 26451, 22989.0, 20573.0, 21432.0, 21309.0, 22292.0, 16809.0, 27312, 24316, 19595, 21126, 20705, 20169], "borderColor": "#A8DADC", "backgroundColor": "#A8DADC20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "gohotelly.com", "data": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "borderColor": "#C1121F", "backgroundColor": "#C1121F20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}]},
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            };
+
+            // Clicks Chart
+            chartConfig.clicks = {
+                type: 'line',
+                data: {"labels": ["2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25"], "datasets": [{"label": "localoria.com", "data": [229, 201, 239, 260, 257, 233, 194, 221, 244, 214, 238, 236, 179, 174, 188, 193, 198, 267, 246, 233.0, 239.0, 299.0, 270.0, 322, 398, 364, 359, 332, 376, 373], "borderColor": "#FF6B6B", "backgroundColor": "#FF6B6B20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "wherebly.com", "data": [2, 0, 0, 0, 2, 8, 0, 3, 6, 16, 28, 17, 15, 8, 25, 28, 10, 27, 26, 16.0, 11.0, 24.0, 17.0, 17, 24, 25, 27, 20, 21, 21], "borderColor": "#4ECDC4", "backgroundColor": "#4ECDC420", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "res-menu.net", "data": [16735, 18356, 19743, 25713, 27024, 20025, 17050, 19276, 21425, 23093, 29917, 31148, 22894, 18612, 20078, 22742, 26436, 34415, 35708, 26909.0, 22713.0, 26767.0, 26833.0, 28515, 35090, 35179, 27157, 21878, 23944, 25721], "borderColor": "#45B7D1", "backgroundColor": "#45B7D120", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "foodplacee.com", "data": [1, 2, 0, 0, 1, 3, 1, 0, 3, 12, 14, 17, 25, 25, 16, 14, 21, 33, 22, 6.0, 7.0, 7.0, 13.0, 19, 20, 34, 38, 26, 29, 38], "borderColor": "#FFA07A", "backgroundColor": "#FFA07A20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "restaurants-world.net", "data": [9051, 9820, 10964, 13559, 14153, 10680, 8597, 9684, 10346, 10635, 12763, 13264, 9718, 7514, 8233, 8285, 9025, 11808, 12356, 9240.0, 8299.0, 9099.0, 9156.0, 9929, 11881, 11918, 9349, 8086, 8932, 8998], "borderColor": "#98D8C8", "backgroundColor": "#98D8C820", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "goto-where.com", "data": [6883, 7276, 7982, 9017, 9254, 7950, 6864, 7637, 7835, 8558, 11011, 11158, 8931, 7891, 8326, 8472, 9249, 10877, 10672, 9074.0, 8510.0, 8519.0, 8548.0, 8944, 10128, 10098, 8631, 7672, 7937, 8513], "borderColor": "#F7DC6F", "backgroundColor": "#F7DC6F20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menu-world.com", "data": [24314, 26021, 28748, 35416, 35280, 27419, 23418, 25829, 27090, 28940, 36556, 35824, 26237, 23187, 24418, 25349, 28334, 34230, 33281, 26349.0, 23412.0, 25566.0, 25589.0, 27270, 32896, 31899, 25555, 22539, 24295, 25604], "borderColor": "#BB8FCE", "backgroundColor": "#BB8FCE20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "grubbio.com", "data": [923, 958, 1089, 1164, 1095, 909, 750, 803, 800, 873, 972, 1032, 907, 716, 731, 701, 789, 958, 954, 807.0, 785.0, 788.0, 813.0, 866, 883, 904, 815, 682, 746, 745], "borderColor": "#85C1E2", "backgroundColor": "#85C1E220", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menustic.com", "data": [1969, 2067, 2161, 2433, 2530, 2304, 1935, 2146, 2187, 2343, 2883, 2797, 2418, 2099, 2149, 2173, 2295, 2599, 2607, 2361.0, 2160.0, 2098.0, 2112.0, 2212, 2443, 2492, 2203, 1906, 2156, 2153], "borderColor": "#F8B739", "backgroundColor": "#F8B73920", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menufyy.com", "data": [2820, 2768, 3030, 3391, 3783, 3303, 2852, 3134, 3313, 3573, 4797, 5126, 4640, 3939, 4122, 4323, 4858, 5636, 6162, 5365.0, 4621.0, 4877.0, 5040.0, 5267, 6054, 6421, 5689, 4766, 5155, 5498], "borderColor": "#52B788", "backgroundColor": "#52B78820", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "wherevi.com", "data": [1324, 1369, 1477, 1988, 1903, 1438, 1121, 1276, 1319, 1449, 1893, 1866, 1436, 1099, 1210, 1107, 1246, 1470, 1516, 1000.0, 899.0, 830.0, 801.0, 788, 990, 911, 716, 615, 570, 211], "borderColor": "#FF8C42", "backgroundColor": "#FF8C4220", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "placejoys.com", "data": [2788, 2799, 3077, 3631, 3618, 3180, 2594, 2752, 3091, 3292, 3783, 4024, 3188, 2815, 3017, 3472, 4032, 4911, 4870, 4340.0, 3581.0, 4202.0, 4211.0, 4564, 5636, 5799, 4873, 4196, 4441, 4638], "borderColor": "#A8DADC", "backgroundColor": "#A8DADC20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "gohotelly.com", "data": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "borderColor": "#C1121F", "backgroundColor": "#C1121F20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}]},
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            };
+
+            // Impressions Chart
+            chartConfig.impressions = {
+                type: 'line',
+                data: {"labels": ["2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25"], "datasets": [{"label": "localoria.com", "data": [19102, 18021, 17294, 22095, 20980, 20702, 18282, 19192, 19080, 18116, 18945, 19423, 16855, 13928, 13762, 14655, 15724, 22003, 23719, 21339.0, 23733.0, 32858.0, 36498.0, 39979, 51362, 55569, 54085, 46173, 46442, 48271], "borderColor": "#FF6B6B", "backgroundColor": "#FF6B6B20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "wherebly.com", "data": [31, 32, 36, 36, 213, 258, 127, 386, 627, 1082, 1285, 1561, 1426, 1119, 1369, 1530, 1774, 2093, 2015, 1763.0, 1535.0, 1195.0, 719.0, 786, 1019, 1097, 792, 566, 672, 740], "borderColor": "#4ECDC4", "backgroundColor": "#4ECDC420", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "res-menu.net", "data": [960460, 995839, 1042810, 1320801, 1346175, 1166680, 994230, 1095402, 1179308, 1296930, 1618058, 1737808, 1417281, 1168081, 1258885, 1452296, 1607530, 2035676, 2144067, 1795835.0, 1502900.0, 1749217.0, 1812792.0, 1894266, 2307567, 2375670, 1968940, 1556607, 1622073, 1690854], "borderColor": "#45B7D1", "backgroundColor": "#45B7D120", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "foodplacee.com", "data": [10, 13, 13, 21, 161, 405, 283, 158, 393, 554, 1058, 1178, 1085, 815, 790, 716, 834, 1126, 1176, 627.0, 375.0, 418.0, 764.0, 957, 2245, 3768, 4557, 4296, 4205, 4869], "borderColor": "#FFA07A", "backgroundColor": "#FFA07A20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "restaurants-world.net", "data": [901914, 928217, 991583, 1218598, 1187910, 1009779, 830468, 899723, 920621, 983153, 1194907, 1220058, 964421, 792100, 829056, 873211, 949987, 1178796, 1216973, 1023044.0, 892833.0, 977846.0, 1011099.0, 1063880, 1291670, 1310065, 1114022, 907059, 944297, 989752], "borderColor": "#98D8C8", "backgroundColor": "#98D8C820", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "goto-where.com", "data": [1455817, 1544356, 1664474, 1983897, 1958623, 1695871, 1445545, 1540728, 1603461, 1764721, 2203671, 2347689, 1944091, 1645215, 1743066, 1849489, 1961916, 2364553, 2439982, 2103379.0, 1797734.0, 1916441.0, 1929541.0, 2029705, 2375304, 2411395, 2081964, 1751451, 1785239, 1834401], "borderColor": "#F7DC6F", "backgroundColor": "#F7DC6F20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menu-world.com", "data": [2155374, 2291546, 2398752, 2889094, 2827812, 2381248, 1990925, 2113331, 2179719, 2337993, 2875640, 2989346, 2356093, 1982121, 2076535, 2233040, 2343762, 2869603, 2920476, 2453627.0, 2108450.0, 2315180.0, 2333606.0, 2447244, 2962688, 2997426, 2501787, 2085883, 2150593, 2229267], "borderColor": "#BB8FCE", "backgroundColor": "#BB8FCE20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "grubbio.com", "data": [102961, 107600, 116980, 133031, 129946, 113095, 89515, 95576, 95039, 101446, 116494, 124026, 109243, 87204, 91154, 95807, 99567, 115827, 122026, 108916.0, 90652.0, 96142.0, 98352.0, 106485, 117988, 123772, 112293, 92916, 93583, 95142], "borderColor": "#85C1E2", "backgroundColor": "#85C1E220", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menustic.com", "data": [225548, 239140, 257497, 297381, 301383, 271081, 222946, 236842, 241720, 261139, 310446, 331112, 293128, 238187, 244061, 249975, 261926, 307478, 326834, 298186.0, 245925.0, 257824.0, 257600.0, 277988, 323887, 339891, 311453, 259234, 260887, 264226], "borderColor": "#F8B739", "backgroundColor": "#F8B73920", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menufyy.com", "data": [333056, 340129, 318139, 376736, 381373, 350987, 290021, 321131, 336671, 365456, 454601, 514222, 469557, 387892, 412406, 439510, 480376, 575004, 630389, 591051.0, 475508.0, 507256.0, 539553.0, 576537, 673800, 718825, 656828, 543354, 566166, 581918], "borderColor": "#52B788", "backgroundColor": "#52B78820", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "wherevi.com", "data": [87448, 90967, 97447, 118323, 115904, 96004, 76838, 82741, 85730, 92588, 117187, 124900, 99045, 80988, 85830, 88332, 97283, 118304, 122667, 99910.0, 84354.0, 91681.0, 93620.0, 98313, 119471, 124235, 103676, 82594, 63607, 13350], "borderColor": "#FF8C42", "backgroundColor": "#FF8C4220", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "placejoys.com", "data": [194559, 194715, 205414, 247326, 247812, 215976, 183657, 200940, 211243, 222875, 265775, 291409, 255557, 225257, 233016, 277674, 301846, 368239, 391583, 327050.0, 269907.0, 330576.0, 341172.0, 369324, 451840, 464806, 400732, 330852, 345478, 358834], "borderColor": "#A8DADC", "backgroundColor": "#A8DADC20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "gohotelly.com", "data": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "borderColor": "#C1121F", "backgroundColor": "#C1121F20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}]},
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            };
+
+            // Position Chart (reversed Y axis)
+            chartConfig.position = {
+                type: 'line',
+                data: {"labels": ["2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25"], "datasets": [{"label": "localoria.com", "data": [7.5033, 7.5741, 7.5877, 6.9713, 6.7863, 6.9457, 6.9407, 7.2007, 7.6189, 8.3076, 8.4796, 8.6586, 8.4635, 8.3405, 9.0496, 9.6377, 8.9654, 9.4803, 9.2092, 9.5084, 9.8669, 10.2483, 9.9604, 9.8295, 9.5619, 9.113, 8.9609, 9.067, 8.6619, 9.4419], "borderColor": "#FF6B6B", "backgroundColor": "#FF6B6B20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "wherebly.com", "data": [6.6774, 6.9688, 5.8611, 10.3056, 5.277, 6.376, 6.7874, 6.6606, 8.2041, 6.6303, 6.8623, 6.991, 6.636, 7.3378, 8.1351, 7.332, 6.9301, 6.5308, 7.5385, 7.6398, 7.3075, 7.79, 6.0195, 6.4898, 5.946, 5.443, 6.173, 6.0512, 4.8095, 5.8297], "borderColor": "#4ECDC4", "backgroundColor": "#4ECDC420", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "res-menu.net", "data": [10.2956, 9.8401, 9.5924, 9.2182, 8.666, 9.4921, 10.0534, 9.9055, 9.8771, 9.9512, 9.5451, 9.4033, 9.6085, 9.6534, 10.0518, 10.0549, 9.5393, 9.2181, 8.8629, 9.1671, 9.4495, 9.466, 9.4778, 9.3204, 9.4809, 9.1331, 9.3361, 9.2975, 8.9338, 9.2382], "borderColor": "#45B7D1", "backgroundColor": "#45B7D120", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "foodplacee.com", "data": [5.4, 5.1538, 7.0769, 5.381, 6.3727, 5.1333, 6.7703, 8.981, 6.5674, 5.7347, 6.4972, 5.9745, 6.1806, 5.589, 5.9519, 6.0559, 4.7374, 4.5595, 5.6088, 7.134, 6.9307, 8.4904, 6.3678, 6.5298, 7.3385, 8.1388, 8.582, 8.9169, 8.7239, 9.2707], "borderColor": "#FFA07A", "backgroundColor": "#FFA07A20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "restaurants-world.net", "data": [9.9172, 9.4482, 9.2038, 8.976, 8.4563, 9.1037, 9.5656, 9.3836, 9.3543, 9.4846, 9.205, 9.1353, 9.2377, 9.3817, 9.8656, 10.2052, 9.7375, 9.4445, 9.0517, 9.3876, 9.5878, 9.8448, 9.7877, 9.5199, 9.8066, 9.4667, 9.6479, 9.552, 9.1821, 9.5461], "borderColor": "#98D8C8", "backgroundColor": "#98D8C820", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "goto-where.com", "data": [9.3007, 9.105, 8.9278, 8.7683, 8.3827, 8.6806, 8.8521, 8.7417, 8.6704, 8.5997, 8.4143, 8.3187, 8.3357, 8.2459, 8.4602, 8.6151, 8.3818, 8.3663, 8.2647, 8.4065, 8.4316, 8.6081, 8.634, 8.5885, 8.69, 8.5372, 8.5941, 8.4553, 8.2382, 8.48], "borderColor": "#F7DC6F", "backgroundColor": "#F7DC6F20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menu-world.com", "data": [9.1408, 8.8284, 8.5929, 8.3816, 7.936, 8.4348, 8.6774, 8.6081, 8.6486, 8.5983, 8.3151, 8.2371, 8.4448, 8.4136, 8.7714, 8.9361, 8.4674, 8.3721, 8.1566, 8.497, 8.6846, 8.8462, 8.8681, 8.7245, 8.8062, 8.5617, 8.7729, 8.6511, 8.2707, 8.6332], "borderColor": "#BB8FCE", "backgroundColor": "#BB8FCE20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "grubbio.com", "data": [8.6578, 8.6239, 8.227, 8.1468, 7.9571, 8.272, 8.6862, 8.6749, 8.6375, 8.6448, 8.6683, 8.5967, 8.6205, 8.5055, 8.8728, 8.8985, 8.5495, 8.6169, 8.5696, 8.8515, 8.7858, 8.9206, 8.8988, 8.8255, 9.0241, 8.8498, 8.7953, 8.6575, 8.3136, 8.7325], "borderColor": "#85C1E2", "backgroundColor": "#85C1E220", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menustic.com", "data": [7.3656, 7.399, 7.2346, 7.2048, 7.0757, 7.1604, 7.3105, 7.5206, 7.1735, 7.14, 7.1686, 7.1781, 7.1571, 7.0583, 7.234, 7.4057, 7.2474, 7.3253, 7.3348, 7.4635, 7.3488, 7.4878, 7.521, 7.4793, 7.5135, 7.4601, 7.4622, 7.3169, 7.1788, 7.3859], "borderColor": "#F8B739", "backgroundColor": "#F8B73920", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "menufyy.com", "data": [8.296, 8.3594, 8.3574, 8.231, 7.9351, 8.0826, 8.3291, 8.2116, 8.0537, 8.0325, 7.958, 7.8593, 7.8568, 7.6737, 7.9561, 7.9462, 7.6879, 7.7635, 7.7412, 7.7906, 7.8852, 7.9414, 7.8533, 7.9074, 7.9267, 7.8733, 7.8585, 7.7515, 7.5483, 7.7402], "borderColor": "#52B788", "backgroundColor": "#52B78820", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "wherevi.com", "data": [9.1102, 8.6989, 8.4276, 8.2179, 7.7607, 8.3693, 8.9943, 8.9174, 9.0685, 9.0446, 8.5705, 8.3907, 8.4079, 8.5401, 8.8614, 9.2969, 8.9397, 8.6305, 8.2011, 8.3929, 8.593, 8.9453, 8.8088, 8.4458, 8.731, 8.5004, 8.5896, 8.494, 8.2789, 12.689], "borderColor": "#FF8C42", "backgroundColor": "#FF8C4220", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "placejoys.com", "data": [8.4373, 8.0693, 7.9376, 7.6732, 7.219, 7.6483, 7.8504, 7.9667, 8.0804, 8.2675, 8.3116, 8.0778, 8.0757, 7.9834, 8.3646, 8.2244, 7.8342, 7.8677, 7.6255, 7.6823, 8.0022, 7.9466, 7.812, 7.6807, 7.9067, 7.6418, 7.716, 7.5242, 7.3189, 7.7656], "borderColor": "#A8DADC", "backgroundColor": "#A8DADC20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}, {"label": "gohotelly.com", "data": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "borderColor": "#C1121F", "backgroundColor": "#C1121F20", "tension": 0.4, "fill": false, "pointRadius": 3, "pointHoverRadius": 6}]},
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { reverse: true, beginAtZero: false } }
+                }
+            };
+
+            // Create chart instances
+            chartsInstances.sessions = new Chart(
+                document.getElementById('sessionsChart'),
+                chartConfig.sessions
+            );
+            chartsInstances.clicks = new Chart(
+                document.getElementById('clicksChart'),
+                chartConfig.clicks
+            );
+            chartsInstances.impressions = new Chart(
+                document.getElementById('impressionsChart'),
+                chartConfig.impressions
+            );
+            chartsInstances.position = new Chart(
+                document.getElementById('positionChart'),
+                chartConfig.position
+            );
+
+            // Store original data for filtering
+            originalData = chartConfig;
+        }
+
+        function updateCharts() {
+            const selectedWebsites = [];
+            document.querySelectorAll('#filterCheckboxes input:checked').forEach(cb => {
+                selectedWebsites.push(cb.value);
+            });
+
+            const charts = ['sessions', 'clicks', 'impressions', 'position'];
+            charts.forEach(chart => {
+                const config = originalData[chart];
+                const filtered = {
+                    ...config.data,
+                    datasets: config.data.datasets.filter(ds => selectedWebsites.includes(ds.label))
+                };
+                chartsInstances[chart].data = filtered;
+                chartsInstances[chart].update();
+            });
+        }
+
+        function sortTable(header, type) {
+            const table = header.closest('table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const colIndex = Array.from(header.parentNode.children).indexOf(header);
+            const isAsc = header.classList.toggle('asc');
+            header.classList.toggle('desc', !isAsc);
+
+            // Remove sort indicators from other headers
+            header.parentNode.querySelectorAll('th').forEach((th, i) => {
+                if (i !== colIndex) {
+                    th.classList.remove('asc', 'desc');
+                }
+            });
+
+            rows.sort((a, b) => {
+                let aVal = a.children[colIndex].textContent.trim();
+                let bVal = b.children[colIndex].textContent.trim();
+
+                if (type === 'number') {
+                    aVal = parseFloat(aVal.replace(/[^0-9.-]/g, '')) || 0;
+                    bVal = parseFloat(bVal.replace(/[^0-9.-]/g, '')) || 0;
+                }
+
+                return isAsc ?
+                    (type === 'number' ? aVal - bVal : aVal.localeCompare(bVal)) :
+                    (type === 'number' ? bVal - aVal : bVal.localeCompare(aVal));
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('darkMode', !document.body.classList.contains('light-mode'));
+        }
+
+        // Initialize TOC observer
+        function initTOC() {
+            const sections = document.querySelectorAll('section');
+            const tocItems = document.querySelectorAll('.toc li');
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        tocItems.forEach(item => item.classList.remove('active'));
+                        const activeLink = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
+                        if (activeLink) {
+                            activeLink.closest('li').classList.add('active');
+                        }
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            sections.forEach(section => observer.observe(section));
+        }
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('light-mode');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            initTOC();
+
+            // Smooth scroll for TOC
+            document.querySelectorAll('.toc a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = document.querySelector(link.getAttribute('href'));
+                    target.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
