@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Báo cáo - Nhà hàng</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --bg-dark: #1a1a1a;
+            --bg-light: #ffffff;
+            --text-dark: #ffffff;
+            --text-light: #000000;
+            --border-dark: #333333;
+            --border-light: #dddddd;
+            --card-dark: #2a2a2a;
+            --card-light: #f5f5f5;
+        }
+        
+        body.light-mode {
+            --bg-dark: #ffffff;
+            --bg-light: #ffffff;
+            --text-dark: #000000;
+            --text-light: #000000;
+            --border-dark: #dddddd;
+            --border-light: #dddddd;
+            --card-dark: #f5f5f5;
+            --card-light: #f5f5f5;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            transition: all 0.3s;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .cross-link-bar {
+            background: var(--card-dark);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-dark);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .cross-link-bar a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid #667eea;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .cross-link-bar a:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .toc {
+            position: sticky;
+            top: 0;
+            background: var(--card-dark);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-dark);
+            z-index: 100;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .toc h4 {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .toc a {
+            display: inline-block;
+            margin-right: 1rem;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .section {
+            margin: 2rem 0;
+            scroll-margin-top: 200px;
+        }
+        
+        .section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .kpi-card {
+            background: var(--card-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        .kpi-label {
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+        
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .kpi-change {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        .kpi-change.up {
+            color: #4caf50;
+        }
+        
+        .kpi-change.down {
+            color: #f44336;
+        }
+        
+        .chart-container {
+            background: var(--card-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            position: relative;
+            height: 400px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.9rem;
+        }
+        
+        th:hover {
+            background: #5568d3;
+        }
+        
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--border-dark);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .color-green { color: #4caf50; font-weight: bold; }
+        .color-red { color: #f44336; font-weight: bold; }
+        .color-orange { color: #ff9800; font-weight: bold; }
+        
+        .anomaly-card {
+            background: #ff6b6b;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+        
+        .dark-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .recommendation {
+            background: var(--card-dark);
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Chế độ tối</button>
+    <div class="header">
+        <h1>SEO Báo cáo - Nhà hàng</h1>
+        <p>Báo cáo SEO - 2026-03-30</p>
+    </div>
+    
+    <div class="toc">
+        <h4>Mục lục</h4>
+        <a href="#kpi">KPI</a>
+        <a href="#comparison">So sánh</a>
+        <a href="#anomalies">Bất thường</a>
+        <a href="#recommendations">Khuyến nghị</a>
+    </div>
+    
+    <div class="cross-link-bar">
+        <a href="seo-hotels-2026-03-30.html">📍 Báo cáo Khách sạn</a>
+        <a href="index.html">📊 Tất cả Báo cáo</a>
+    </div>
+    
+    <div class="container">
+    <section class="section" id="kpi">
+        <h2>Chỉ số chính (KPI)</h2>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Tổng Phiên</div>
+                <div class="kpi-value">6,456,065.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Tổng Người Dùng</div>
+                <div class="kpi-value">5,638,731.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Tổng Lượt Xem</div>
+                <div class="kpi-value">9,863,732.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Tổng Click (GSC)</div>
+                <div class="kpi-value">5,238,876.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Tổng Impression</div>
+                <div class="kpi-value">502,273,102.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Bounce Rate</div>
+                <div class="kpi-value color-green">47.4%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Engagement Rate</div>
+                <div class="kpi-value">52.6%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Vị trí trung bình</div>
+                <div class="kpi-value color-red">8.4</div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section" id="comparison">
+        <h2>So sánh các Website</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Domain</th>
+                    <th>Phiên (30d)</th>
+                    <th>Thay đổi %</th>
+                    <th>Người dùng</th>
+                    <th>Click GSC</th>
+                    <th>Impression</th>
+                    <th>Vị trí</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            <tr>
+                <td><a href="seo-detail-localoria.com-2026-03-30.html">localoria.com</a></td>
+                <td>139,638.00</td>
+                <td class="color-green">+21.2%</td>
+                <td>124,161.00</td>
+                <td>20,140.00</td>
+                <td>1,782,750.00</td>
+                <td class="color-red">8.6</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-wherebly.com-2026-03-30.html">wherebly.com</a></td>
+                <td>5,611.00</td>
+                <td class="color-green">+13585.4%</td>
+                <td>4,910.00</td>
+                <td>456.00</td>
+                <td>28,459.00</td>
+                <td class="color-red">6.1</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-res-menu.net-2026-03-30.html">res-menu.net</a></td>
+                <td>1,478,120.00</td>
+                <td class="color-green">+25.7%</td>
+                <td>1,266,602.00</td>
+                <td>1,376,763.00</td>
+                <td>80,140,877.00</td>
+                <td class="color-red">10.0</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-foodplacee.com-2026-03-30.html">foodplacee.com</a></td>
+                <td>6,447.00</td>
+                <td class="color-green">+17324.3%</td>
+                <td>5,660.00</td>
+                <td>116,408.00</td>
+                <td>10,343,772.00</td>
+                <td class="color-red">6.9</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-restaurants-world.net-2026-03-30.html">restaurants-world.net</a></td>
+                <td>623,815.00</td>
+                <td class="color-green">+7.5%</td>
+                <td>541,782.00</td>
+                <td>658,805.00</td>
+                <td>63,133,806.00</td>
+                <td class="color-red">9.7</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-goto-where.com-2026-03-30.html">goto-where.com</a></td>
+                <td>1,091,411.00</td>
+                <td class="color-green">+70.3%</td>
+                <td>996,035.00</td>
+                <td>488,606.00</td>
+                <td>107,666,798.00</td>
+                <td class="color-red">9.1</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-menu-world.com-2026-03-30.html">menu-world.com</a></td>
+                <td>1,490,334.00</td>
+                <td class="color-red">-9.2%</td>
+                <td>1,252,932.00</td>
+                <td>1,889,125.00</td>
+                <td>171,359,329.00</td>
+                <td class="color-red">8.8</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-grubbio.com-2026-03-30.html">grubbio.com</a></td>
+                <td>159,313.00</td>
+                <td class="color-green">+15.3%</td>
+                <td>144,482.00</td>
+                <td>57,242.00</td>
+                <td>6,885,738.00</td>
+                <td class="color-red">8.5</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-menustic.com-2026-03-30.html">menustic.com</a></td>
+                <td>189,771.00</td>
+                <td class="color-green">+10.1%</td>
+                <td>167,109.00</td>
+                <td>140,464.00</td>
+                <td>16,919,564.00</td>
+                <td class="color-red">7.2</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-menufyy.com-2026-03-30.html">menufyy.com</a></td>
+                <td>388,896.00</td>
+                <td class="color-green">+77.3%</td>
+                <td>350,403.00</td>
+                <td>212,434.00</td>
+                <td>23,412,945.00</td>
+                <td class="color-red">8.1</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-wherevi.com-2026-03-30.html">wherevi.com</a></td>
+                <td>226,521.00</td>
+                <td class="color-green">+7.3%</td>
+                <td>213,575.00</td>
+                <td>112,383.00</td>
+                <td>8,207,411.00</td>
+                <td class="color-red">9.0</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-placejoys.com-2026-03-30.html">placejoys.com</a></td>
+                <td>656,188.00</td>
+                <td class="color-red">-6.4%</td>
+                <td>571,080.00</td>
+                <td>166,050.00</td>
+                <td>12,391,653.00</td>
+                <td class="color-red">8.4</td>
+            </tr>
+        
+            </tbody>
+        </table>
+    </section>
+    
+    <section class="section" id="anomalies">
+        <h2>Phát hiện Bất thường</h2>
+        <div class='anomaly-card'><strong>localoria.com:</strong> High bounce: 2026-03-26 99.8%</div><div class='anomaly-card'><strong>localoria.com:</strong> High bounce: 2026-03-27 100.0%</div><div class='anomaly-card'><strong>wherebly.com:</strong> High bounce: 2026-03-26 100.0%</div><div class='anomaly-card'><strong>wherebly.com:</strong> High bounce: 2026-03-27 100.0%</div><div class='anomaly-card'><strong>res-menu.net:</strong> High bounce: 2026-03-26 99.0%</div><div class='anomaly-card'><strong>res-menu.net:</strong> High bounce: 2026-03-27 99.9%</div><div class='anomaly-card'><strong>foodplacee.com:</strong> High bounce: 2026-03-26 99.9%</div><div class='anomaly-card'><strong>foodplacee.com:</strong> High bounce: 2026-03-27 100.0%</div><div class='anomaly-card'><strong>restaurants-world.net:</strong> High bounce: 2026-03-26 99.5%</div><div class='anomaly-card'><strong>restaurants-world.net:</strong> High bounce: 2026-03-27 99.7%</div><div class='anomaly-card'><strong>wherevi.com:</strong> Spike: 2026-03-24 sessions 60260 (avg 12008)</div><div class='anomaly-card'><strong>wherevi.com:</strong> High bounce: 2026-03-26 99.6%</div><div class='anomaly-card'><strong>wherevi.com:</strong> High bounce: 2026-03-27 100.0%</div><div class='anomaly-card'><strong>placejoys.com:</strong> High bounce: 2026-03-26 99.0%</div><div class='anomaly-card'><strong>placejoys.com:</strong> High bounce: 2026-03-27 99.1%</div>
+    </section>
+    
+    <section class="section" id="recommendations">
+        <h2>Khuyến nghị Tối ưu hóa</h2>
+        <div class="recommendation">
+            <h4>Tăng cường Nội dung SEO</h4>
+            <p>Tập trung vào các từ khóa có vị trí cao (3-5) để cải thiện CTR và đẩy chúng lên vị trí 1-2.</p>
+        </div>
+        <div class="recommendation">
+            <h4>Giảm Bounce Rate</h4>
+            <p>Cải thiện UX trên các trang có bounce rate cao (>70%) bằng cách tối ưu tốc độ và nội dung.</p>
+        </div>
+        <div class="recommendation">
+            <h4>Xây dựng Liên kết Backlink</h4>
+            <p>Tăng số lượng backlink chất lượng để cải thiện vị trí trung bình và tăng impression.</p>
+        </div>
+    </section>
+    </div>
+    
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+        
+        window.addEventListener('load', function() {
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        });
+    </script>
+</body>
+</html>
