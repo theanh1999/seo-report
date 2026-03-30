@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Báo cáo - Khách sạn</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --bg-dark: #1a1a1a;
+            --bg-light: #ffffff;
+            --text-dark: #ffffff;
+            --text-light: #000000;
+            --border-dark: #333333;
+            --border-light: #dddddd;
+            --card-dark: #2a2a2a;
+            --card-light: #f5f5f5;
+        }
+        
+        body.light-mode {
+            --bg-dark: #ffffff;
+            --bg-light: #ffffff;
+            --text-dark: #000000;
+            --text-light: #000000;
+            --border-dark: #dddddd;
+            --border-light: #dddddd;
+            --card-dark: #f5f5f5;
+            --card-light: #f5f5f5;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            transition: all 0.3s;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .cross-link-bar {
+            background: var(--card-dark);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-dark);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .cross-link-bar a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid #667eea;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .cross-link-bar a:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .toc {
+            position: sticky;
+            top: 0;
+            background: var(--card-dark);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-dark);
+            z-index: 100;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .toc h4 {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .toc a {
+            display: inline-block;
+            margin-right: 1rem;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .section {
+            margin: 2rem 0;
+            scroll-margin-top: 200px;
+        }
+        
+        .section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .kpi-card {
+            background: var(--card-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        .kpi-label {
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+        
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .kpi-change {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        .kpi-change.up {
+            color: #4caf50;
+        }
+        
+        .kpi-change.down {
+            color: #f44336;
+        }
+        
+        .chart-container {
+            background: var(--card-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            position: relative;
+            height: 400px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.9rem;
+        }
+        
+        th:hover {
+            background: #5568d3;
+        }
+        
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--border-dark);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .color-green { color: #4caf50; font-weight: bold; }
+        .color-red { color: #f44336; font-weight: bold; }
+        .color-orange { color: #ff9800; font-weight: bold; }
+        
+        .anomaly-card {
+            background: #ff6b6b;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+        
+        .dark-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .recommendation {
+            background: var(--card-dark);
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Chế độ tối</button>
+    <div class="header">
+        <h1>SEO Báo cáo - Khách sạn</h1>
+        <p>Báo cáo SEO - 2026-03-30</p>
+    </div>
+    
+    <div class="toc">
+        <h4>Mục lục</h4>
+        <a href="#kpi">KPI</a>
+        <a href="#keywords">Từ khóa</a>
+        <a href="#anomalies">Bất thường</a>
+        <a href="#recommendations">Khuyến nghị</a>
+    </div>
+    
+    <div class="cross-link-bar">
+        <a href="seo-restaurants-2026-03-30.html">🍽️ Báo cáo Nhà hàng</a>
+        <a href="index.html">📊 Tất cả Báo cáo</a>
+    </div>
+    
+    <div class="container">
+    <section class="section" id="kpi">
+        <h2>Chỉ số chính (KPI)</h2>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Tổng Phiên</div>
+                <div class="kpi-value">20,935.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Tổng Người Dùng</div>
+                <div class="kpi-value">18,610.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Tổng Lượt Xem</div>
+                <div class="kpi-value">23,980.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Tổng Click (GSC)</div>
+                <div class="kpi-value">4,231.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Tổng Impression</div>
+                <div class="kpi-value">458,280.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Bounce Rate</div>
+                <div class="kpi-value color-green">55.8%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Engagement Rate</div>
+                <div class="kpi-value">44.2%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Vị trí trung bình</div>
+                <div class="kpi-value color-red">9.7</div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section" id="keywords">
+        <h2>Top Từ khóa</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Từ khóa</th>
+                    <th>Click</th>
+                    <th>Impression</th>
+                    <th>CTR</th>
+                    <th>Vị trí</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            <tr>
+                <td>nau salgados dunas suites</td>
+                <td>100</td>
+                <td>1,369</td>
+                <td>7.30%</td>
+                <td class="color-orange">3.4</td>
+            </tr>
+        
+            <tr>
+                <td>ariyana reach hotel</td>
+                <td>65</td>
+                <td>2,283</td>
+                <td>2.85%</td>
+                <td class="color-green">2.9</td>
+            </tr>
+        
+            <tr>
+                <td>ariyana reach</td>
+                <td>58</td>
+                <td>2,208</td>
+                <td>2.63%</td>
+                <td class="color-green">2.9</td>
+            </tr>
+        
+            <tr>
+                <td>motel urban</td>
+                <td>43</td>
+                <td>1,311</td>
+                <td>3.28%</td>
+                <td class="color-red">9.4</td>
+            </tr>
+        
+            <tr>
+                <td>ariyana reach hotel maharagama</td>
+                <td>37</td>
+                <td>617</td>
+                <td>6.00%</td>
+                <td class="color-green">2.5</td>
+            </tr>
+        
+            <tr>
+                <td>hotel luzino</td>
+                <td>37</td>
+                <td>1,065</td>
+                <td>3.47%</td>
+                <td class="color-orange">4.6</td>
+            </tr>
+        
+            <tr>
+                <td>the village resort & waterpark</td>
+                <td>36</td>
+                <td>666</td>
+                <td>5.41%</td>
+                <td class="color-red">6.4</td>
+            </tr>
+        
+            <tr>
+                <td>udayachal tourist lodge</td>
+                <td>30</td>
+                <td>929</td>
+                <td>3.23%</td>
+                <td class="color-orange">3.4</td>
+            </tr>
+        
+            <tr>
+                <td>matara rest house</td>
+                <td>29</td>
+                <td>2,291</td>
+                <td>1.27%</td>
+                <td class="color-red">5.8</td>
+            </tr>
+        
+            <tr>
+                <td>precios de motel urban villas & suites</td>
+                <td>28</td>
+                <td>572</td>
+                <td>4.90%</td>
+                <td class="color-red">7.8</td>
+            </tr>
+        
+            <tr>
+                <td>volets resort</td>
+                <td>27</td>
+                <td>2,784</td>
+                <td>0.97%</td>
+                <td class="color-red">5.7</td>
+            </tr>
+        
+            <tr>
+                <td>university of ghana guest centre prices</td>
+                <td>26</td>
+                <td>285</td>
+                <td>9.12%</td>
+                <td class="color-red">7.2</td>
+            </tr>
+        
+            <tr>
+                <td>salgados dunas suites</td>
+                <td>25</td>
+                <td>832</td>
+                <td>3.00%</td>
+                <td class="color-orange">4.6</td>
+            </tr>
+        
+            <tr>
+                <td>motel urban villas & suites</td>
+                <td>22</td>
+                <td>926</td>
+                <td>2.38%</td>
+                <td class="color-red">7.9</td>
+            </tr>
+        
+            <tr>
+                <td>mehran lodges</td>
+                <td>20</td>
+                <td>586</td>
+                <td>3.41%</td>
+                <td class="color-green">2.3</td>
+            </tr>
+        
+            <tr>
+                <td>ranowell hotel</td>
+                <td>18</td>
+                <td>2,307</td>
+                <td>0.78%</td>
+                <td class="color-red">7.9</td>
+            </tr>
+        
+            <tr>
+                <td>hôtel magic iliade djerba</td>
+                <td>17</td>
+                <td>844</td>
+                <td>2.01%</td>
+                <td class="color-red">8.4</td>
+            </tr>
+        
+            <tr>
+                <td>mehran lodges murree</td>
+                <td>17</td>
+                <td>643</td>
+                <td>2.64%</td>
+                <td class="color-green">2.5</td>
+            </tr>
+        
+            <tr>
+                <td>udírna jindřichův hradec</td>
+                <td>17</td>
+                <td>671</td>
+                <td>2.53%</td>
+                <td class="color-orange">4.6</td>
+            </tr>
+        
+            <tr>
+                <td>tui suneo dunas</td>
+                <td>16</td>
+                <td>539</td>
+                <td>2.97%</td>
+                <td class="color-red">8.4</td>
+            </tr>
+        
+            <tr>
+                <td>udírna jindřichův hradec menu</td>
+                <td>15</td>
+                <td>143</td>
+                <td>10.49%</td>
+                <td class="color-orange">3.7</td>
+            </tr>
+        
+            <tr>
+                <td>volets</td>
+                <td>15</td>
+                <td>2,098</td>
+                <td>0.71%</td>
+                <td class="color-red">6.9</td>
+            </tr>
+        
+            <tr>
+                <td>rest house matara</td>
+                <td>14</td>
+                <td>2,063</td>
+                <td>0.68%</td>
+                <td class="color-red">6.8</td>
+            </tr>
+        
+            <tr>
+                <td>university of ghana guest house</td>
+                <td>14</td>
+                <td>324</td>
+                <td>4.32%</td>
+                <td class="color-orange">3.2</td>
+            </tr>
+        
+            <tr>
+                <td>the village resort and waterpark crete</td>
+                <td>13</td>
+                <td>153</td>
+                <td>8.50%</td>
+                <td class="color-orange">4.3</td>
+            </tr>
+        
+            <tr>
+                <td>hotel uruguay brasil</td>
+                <td>11</td>
+                <td>721</td>
+                <td>1.53%</td>
+                <td class="color-red">9.5</td>
+            </tr>
+        
+            <tr>
+                <td>magic iliade aquapark</td>
+                <td>11</td>
+                <td>203</td>
+                <td>5.42%</td>
+                <td class="color-red">11.1</td>
+            </tr>
+        
+            <tr>
+                <td>magic iliade djerba</td>
+                <td>11</td>
+                <td>310</td>
+                <td>3.55%</td>
+                <td class="color-red">8.2</td>
+            </tr>
+        
+            <tr>
+                <td>hotel royal grand paradise</td>
+                <td>10</td>
+                <td>3,414</td>
+                <td>0.29%</td>
+                <td class="color-red">7.8</td>
+            </tr>
+        
+            <tr>
+                <td>kings motel</td>
+                <td>10</td>
+                <td>297</td>
+                <td>3.37%</td>
+                <td class="color-orange">4.3</td>
+            </tr>
+        
+            </tbody>
+        </table>
+    </section>
+    
+    <section class="section" id="anomalies">
+        <h2>Phát hiện Bất thường</h2>
+        <p>Không có bất thường nào được phát hiện.</p>
+    </section>
+    
+    <section class="section" id="recommendations">
+        <h2>Khuyến nghị Tối ưu hóa</h2>
+        <div class="recommendation">
+            <h4>Cải thiện Rich Snippet</h4>
+            <p>Thêm schema markup cho các sản phẩm khách sạn để cải thiện CTR trong search results.</p>
+        </div>
+        <div class="recommendation">
+            <h4>Tối ưu Local SEO</h4>
+            <p>Cập nhật thông tin địa phương và reviews để cải thiện vị trí trong kết quả tìm kiếm địa phương.</p>
+        </div>
+    </section>
+    </div>
+    
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+        
+        window.addEventListener('load', function() {
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        });
+    </script>
+</body>
+</html>
