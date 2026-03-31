@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo SEO - Nhà Hàng - 2026-03-31</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --bg-alt: #f3f4f6;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #3b82f6;
+            --success: #22c55e;
+            --warning: #f97316;
+            --danger: #ef4444;
+        }
+        body.dark {
+            --bg: #111827;
+            --bg-alt: #1f2937;
+            --text: #f3f4f6;
+            --text-muted: #d1d5db;
+            --border: #374151;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; transition: background 0.3s, color 0.3s; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 20px; gap: 20px; flex-wrap: wrap; }
+        h1 { font-size: 2em; margin: 0; }
+        .header-meta { font-size: 0.9em; color: var(--text-muted); }
+
+        .crosslinks { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; font-size: 0.9em; }
+        .crosslinks a { padding: 6px 12px; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; }
+
+        .theme-toggle { cursor: pointer; padding: 8px 16px; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 6px; }
+
+        .sticky-toc {
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 0;
+            margin-bottom: 30px;
+            z-index: 100;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .toc-link {
+            padding: 8px 12px;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .toc-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .toc-link:hover {
+            color: var(--primary);
+        }
+
+        .filter-group { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filter-group label { font-weight: 500; }
+        select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .kpi-card { background: var(--bg-alt); padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
+        .kpi-label { font-size: 0.85em; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-value { font-size: 1.8em; font-weight: bold; margin-bottom: 8px; }
+        .kpi-change { font-size: 0.95em; }
+
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 0.95em; }
+        .data-table th { background: var(--bg-alt); padding: 12px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
+        .data-table th:hover { background: var(--border); }
+        .data-table td { padding: 12px; border-bottom: 1px solid var(--border); }
+        .data-table tr:hover { background: var(--bg-alt); }
+        .data-table tbody tr:nth-child(even) { background: rgba(0,0,0,0.01); }
+
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .anomalies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .anomaly-card { background: var(--bg-alt); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        .anomaly-severity { font-weight: bold; font-size: 0.85em; margin-bottom: 5px; }
+        .anomaly-domain { font-weight: 600; margin-bottom: 5px; }
+        .anomaly-message { font-size: 0.9em; color: var(--text-muted); margin-bottom: 5px; }
+        .anomaly-date { font-size: 0.85em; color: var(--text-muted); }
+
+        .chart-container { position: relative; height: 350px; margin-bottom: 30px; background: var(--bg-alt); padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; margin-bottom: 30px; }
+
+        .section { margin-bottom: 40px; padding: 20px 0; scroll-margin-top: 120px; }
+        h2 { font-size: 1.5em; margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        h3 { font-size: 1.2em; margin-bottom: 15px; }
+
+        .recommendations-table td:first-child { width: 10%; text-align: center; font-weight: bold; color: var(--primary); }
+        .recommendations-table td:nth-child(2) { width: 50%; }
+        .recommendations-table td:nth-child(3) { width: 40%; }
+
+        @media (max-width: 768px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .anomalies-grid { grid-template-columns: 1fr; }
+            header { flex-direction: column; align-items: flex-start; }
+            .sticky-toc { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>📊 Báo Cáo SEO - Nhà Hàng</h1>
+                <p class="header-meta">Ngày: 2026-03-31 | Khoảng: 2026-01-15 đến 2026-03-25</p>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center; margin-left: auto;">
+                <div class="crosslinks">
+                    <a href="index.html">📑 Danh Sách Báo Cáo</a>
+                    <a href="seo-hotels-2026-03-31.html">🔄 Khách Sạn</a>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙 Tối</button>
+            </div>
+        </header>
+
+        <nav class="sticky-toc">
+            <a class="toc-link active" href="#overview" onclick="scrollToSection(0); return false;">Tổng Quan KPI</a>
+            <a class="toc-link" href="#charts" onclick="scrollToSection(1); return false;">Biểu Đồ Xu Hướng</a>
+            <a class="toc-link" href="#comparison" onclick="scrollToSection(2); return false;">So Sánh Website</a>
+            <a class="toc-link" href="#keywords" onclick="scrollToSection(3); return false;">Top Keywords</a>
+            <a class="toc-link" href="#anomalies" onclick="scrollToSection(4); return false;">Phát Hiện Bất Thường</a>
+            <a class="toc-link" href="#trends" onclick="scrollToSection(5); return false;">Phân Tích Xu Hướng</a>
+            <a class="toc-link" href="#recommendations" onclick="scrollToSection(6); return false;">Đề Xuất Tối Ưu</a>
+        </nav>
+
+        <div class="filter-group">
+            <label for="websiteFilter">Lọc Website:</label>
+            <select id="websiteFilter" onchange="filterCharts()">
+                <option value="">Tất cả</option>
+                <option value="localoria.com">localoria.com</option><option value="wherebly.com">wherebly.com</option><option value="res-menu.net">res-menu.net</option><option value="foodplacee.com">foodplacee.com</option><option value="restaurants-world.net">restaurants-world.net</option><option value="goto-where.com">goto-where.com</option><option value="menu-world.com">menu-world.com</option><option value="grubbio.com">grubbio.com</option><option value="menustic.com">menustic.com</option><option value="menufyy.com">menufyy.com</option><option value="wherevi.com">wherevi.com</option><option value="placejoys.com">placejoys.com</option>
+            </select>
+        </div>
+
+        <div class="section" id="overview">
+            <h2>🎯 Tổng Quan KPI</h2>
+            <div class="kpi-grid">
+                
+        <div class="kpi-card">
+            <div class="kpi-label">Tổng phiên làm việc</div>
+            <div class="kpi-value">14,012,597</div>
+            <div class="kpi-change" style="color: #ef4444;">
+                -30.2% so với kỳ trước
+            </div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-label">Người dùng hoạt động</div>
+            <div class="kpi-value">15,082</div>
+            <div class="kpi-change" style="color: #ef4444;">
+                -29.8% so với kỳ trước
+            </div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-label">Lượt xem trang</div>
+            <div class="kpi-value">27,091</div>
+            <div class="kpi-change" style="color: #ef4444;">
+                -24.5% so với kỳ trước
+            </div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-label">Lượt click từ GSC</div>
+            <div class="kpi-value">6,237</div>
+            <div class="kpi-change" style="color: #ef4444;">
+                -3.1% so với kỳ trước
+            </div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-label">Lượt hiển thị</div>
+            <div class="kpi-value">597,944</div>
+            <div class="kpi-change" style="color: #ef4444;">
+                -9.1% so với kỳ trước
+            </div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-label">Bounce rate trung bình</div>
+            <div class="kpi-value">0</div>
+            <div class="kpi-change" style="color: #ef4444;">
+                +3.9% so với kỳ trước
+            </div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-label">Engagement rate trung bình</div>
+            <div class="kpi-value">1</div>
+            <div class="kpi-change" style="color: #ef4444;">
+                -3.4% so với kỳ trước
+            </div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-label">Vị trí SERP trung bình</div>
+            <div class="kpi-value">8</div>
+            <div class="kpi-change" style="color: #22c55e;">
+                -0.9% so với kỳ trước
+            </div>
+        </div>
+        
+            </div>
+        </div>
+
+        <div class="section" id="charts">
+            <h2>📈 Biểu Đồ Xu Hướng</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="sessionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="clicksChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="impressionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="positionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="comparison">
+            <h2>🔍 So Sánh Website</h2>
+            
+    <table class="data-table sortable">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Website</th>
+                <th onclick="sortTable(1)" style="text-align:right;">Sessions</th>
+                <th onclick="sortTable(2)" style="text-align:right;">Users</th>
+                <th onclick="sortTable(3)" style="text-align:right;">Pageviews</th>
+                <th onclick="sortTable(4)" style="text-align:right;">Clicks</th>
+                <th onclick="sortTable(5)" style="text-align:right;">Impressions</th>
+                <th onclick="sortTable(6)" style="text-align:right;">CTR (%)</th>
+                <th onclick="sortTable(7)" style="text-align:right;">Position</th>
+                <th onclick="sortTable(8)" style="text-align:right;">% Change</th>
+            </tr>
+        </thead>
+        <tbody>
+    
+            <tr>
+                <td><a href="seo-detail-menu-world.com-2026-03-31.html">menu-world.com</a></td>
+                <td style="text-align:right;">3,843,195</td>
+                <td style="text-align:right;">3,254,697</td>
+                <td style="text-align:right;">6,575,836</td>
+                <td style="text-align:right;">1,889,125</td>
+                <td style="text-align:right;">171,359,329</td>
+                <td style="text-align:right;">1.10</td>
+                <td style="text-align:right;">8.63</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-res-menu.net-2026-03-31.html">res-menu.net</a></td>
+                <td style="text-align:right;">3,025,091</td>
+                <td style="text-align:right;">2,585,746</td>
+                <td style="text-align:right;">4,697,871</td>
+                <td style="text-align:right;">1,376,763</td>
+                <td style="text-align:right;">80,140,877</td>
+                <td style="text-align:right;">1.72</td>
+                <td style="text-align:right;">9.24</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-goto-where.com-2026-03-31.html">goto-where.com</a></td>
+                <td style="text-align:right;">1,992,089</td>
+                <td style="text-align:right;">1,775,260</td>
+                <td style="text-align:right;">2,771,343</td>
+                <td style="text-align:right;">488,606</td>
+                <td style="text-align:right;">107,666,798</td>
+                <td style="text-align:right;">0.45</td>
+                <td style="text-align:right;">8.48</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-placejoys.com-2026-03-31.html">placejoys.com</a></td>
+                <td style="text-align:right;">1,436,136</td>
+                <td style="text-align:right;">1,263,837</td>
+                <td style="text-align:right;">2,385,779</td>
+                <td style="text-align:right;">166,050</td>
+                <td style="text-align:right;">12,391,653</td>
+                <td style="text-align:right;">1.34</td>
+                <td style="text-align:right;">7.77</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-restaurants-world.net-2026-03-31.html">restaurants-world.net</a></td>
+                <td style="text-align:right;">1,420,623</td>
+                <td style="text-align:right;">1,218,810</td>
+                <td style="text-align:right;">2,051,403</td>
+                <td style="text-align:right;">658,805</td>
+                <td style="text-align:right;">63,133,806</td>
+                <td style="text-align:right;">1.04</td>
+                <td style="text-align:right;">9.55</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-menufyy.com-2026-03-31.html">menufyy.com</a></td>
+                <td style="text-align:right;">672,498</td>
+                <td style="text-align:right;">601,016</td>
+                <td style="text-align:right;">956,884</td>
+                <td style="text-align:right;">212,434</td>
+                <td style="text-align:right;">23,412,945</td>
+                <td style="text-align:right;">0.91</td>
+                <td style="text-align:right;">7.74</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-wherevi.com-2026-03-31.html">wherevi.com</a></td>
+                <td style="text-align:right;">562,640</td>
+                <td style="text-align:right;">520,283</td>
+                <td style="text-align:right;">818,554</td>
+                <td style="text-align:right;">112,383</td>
+                <td style="text-align:right;">8,207,411</td>
+                <td style="text-align:right;">1.37</td>
+                <td style="text-align:right;">12.69</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-menustic.com-2026-03-31.html">menustic.com</a></td>
+                <td style="text-align:right;">419,735</td>
+                <td style="text-align:right;">369,083</td>
+                <td style="text-align:right;">642,956</td>
+                <td style="text-align:right;">140,464</td>
+                <td style="text-align:right;">16,919,564</td>
+                <td style="text-align:right;">0.83</td>
+                <td style="text-align:right;">7.39</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-grubbio.com-2026-03-31.html">grubbio.com</a></td>
+                <td style="text-align:right;">348,671</td>
+                <td style="text-align:right;">311,552</td>
+                <td style="text-align:right;">493,801</td>
+                <td style="text-align:right;">57,242</td>
+                <td style="text-align:right;">6,885,738</td>
+                <td style="text-align:right;">0.83</td>
+                <td style="text-align:right;">8.73</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-localoria.com-2026-03-31.html">localoria.com</a></td>
+                <td style="text-align:right;">279,775</td>
+                <td style="text-align:right;">245,360</td>
+                <td style="text-align:right;">419,787</td>
+                <td style="text-align:right;">20,140</td>
+                <td style="text-align:right;">1,782,750</td>
+                <td style="text-align:right;">1.13</td>
+                <td style="text-align:right;">9.44</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-foodplacee.com-2026-03-31.html">foodplacee.com</a></td>
+                <td style="text-align:right;">6,484</td>
+                <td style="text-align:right;">5,696</td>
+                <td style="text-align:right;">12,112</td>
+                <td style="text-align:right;">116,408</td>
+                <td style="text-align:right;">10,343,772</td>
+                <td style="text-align:right;">1.13</td>
+                <td style="text-align:right;">9.27</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        
+            <tr>
+                <td><a href="seo-detail-wherebly.com-2026-03-31.html">wherebly.com</a></td>
+                <td style="text-align:right;">5,660</td>
+                <td style="text-align:right;">4,957</td>
+                <td style="text-align:right;">8,940</td>
+                <td style="text-align:right;">456</td>
+                <td style="text-align:right;">28,459</td>
+                <td style="text-align:right;">1.60</td>
+                <td style="text-align:right;">5.83</td>
+                <td style="text-align:right; color: #6b7280;">+0.0%</td>
+            </tr>
+        </tbody></table>
+        </div>
+
+        <div class="section" id="keywords">
+            <h2>🔑 Top 20 Keywords</h2>
+            
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 70%;">Keyword</th>
+                <th style="width: 10%; text-align: right;">Clicks</th>
+                <th style="width: 15%; text-align: right;">Impressions</th>
+            </tr>
+        </thead>
+        <tbody>
+    
+            <tr>
+                <td>1</td>
+                <td>chez lucien</td>
+                <td style="text-align: right;">982</td>
+                <td style="text-align: right;">5,193</td>
+            </tr>
+        
+            <tr>
+                <td>2</td>
+                <td>pjs oyster bar</td>
+                <td style="text-align: right;">923</td>
+                <td style="text-align: right;">2,569</td>
+            </tr>
+        
+            <tr>
+                <td>3</td>
+                <td>los betos menu</td>
+                <td style="text-align: right;">816</td>
+                <td style="text-align: right;">2,547</td>
+            </tr>
+        
+            <tr>
+                <td>4</td>
+                <td>kawa revolving sushi menu</td>
+                <td style="text-align: right;">727</td>
+                <td style="text-align: right;">1,968</td>
+            </tr>
+        
+            <tr>
+                <td>5</td>
+                <td>sofia's pizza & roast beef menu</td>
+                <td style="text-align: right;">696</td>
+                <td style="text-align: right;">1,626</td>
+            </tr>
+        
+            <tr>
+                <td>6</td>
+                <td>bistrot paul bert menu</td>
+                <td style="text-align: right;">659</td>
+                <td style="text-align: right;">2,677</td>
+            </tr>
+        
+            <tr>
+                <td>7</td>
+                <td>panoramic 34 menu</td>
+                <td style="text-align: right;">600</td>
+                <td style="text-align: right;">1,655</td>
+            </tr>
+        
+            <tr>
+                <td>8</td>
+                <td>bell city diner menu</td>
+                <td style="text-align: right;">587</td>
+                <td style="text-align: right;">2,210</td>
+            </tr>
+        
+            <tr>
+                <td>9</td>
+                <td>shukette menu</td>
+                <td style="text-align: right;">565</td>
+                <td style="text-align: right;">2,766</td>
+            </tr>
+        
+            <tr>
+                <td>10</td>
+                <td>sushi kushi</td>
+                <td style="text-align: right;">560</td>
+                <td style="text-align: right;">4,754</td>
+            </tr>
+        
+            <tr>
+                <td>11</td>
+                <td>johnny longboats menu</td>
+                <td style="text-align: right;">548</td>
+                <td style="text-align: right;">2,266</td>
+            </tr>
+        
+            <tr>
+                <td>12</td>
+                <td>ok cafe menu</td>
+                <td style="text-align: right;">519</td>
+                <td style="text-align: right;">2,412</td>
+            </tr>
+        
+            <tr>
+                <td>13</td>
+                <td>the hive waterfront restaurant & tiki menu</td>
+                <td style="text-align: right;">507</td>
+                <td style="text-align: right;">2,868</td>
+            </tr>
+        
+            <tr>
+                <td>14</td>
+                <td>osteria santo spirito</td>
+                <td style="text-align: right;">503</td>
+                <td style="text-align: right;">5,112</td>
+            </tr>
+        
+            <tr>
+                <td>15</td>
+                <td>josephine chamonix</td>
+                <td style="text-align: right;">491</td>
+                <td style="text-align: right;">5,667</td>
+            </tr>
+        
+            <tr>
+                <td>16</td>
+                <td>meat me liverpool</td>
+                <td style="text-align: right;">488</td>
+                <td style="text-align: right;">3,636</td>
+            </tr>
+        
+            <tr>
+                <td>17</td>
+                <td>cafe continental menu</td>
+                <td style="text-align: right;">469</td>
+                <td style="text-align: right;">3,949</td>
+            </tr>
+        
+            <tr>
+                <td>18</td>
+                <td>lj shanghai menu</td>
+                <td style="text-align: right;">467</td>
+                <td style="text-align: right;">2,113</td>
+            </tr>
+        
+            <tr>
+                <td>19</td>
+                <td>terra madre dublin</td>
+                <td style="text-align: right;">459</td>
+                <td style="text-align: right;">2,277</td>
+            </tr>
+        
+            <tr>
+                <td>20</td>
+                <td>zest sushi</td>
+                <td style="text-align: right;">454</td>
+                <td style="text-align: right;">4,063</td>
+            </tr>
+        </tbody></table>
+        </div>
+
+        <div class="section" id="anomalies">
+            <h2>🚨 Phát Hiện Bất Thường</h2>
+            <div class="anomalies-grid">
+                
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-localoria.com-2026-03-31.html">localoria.com</a></div>
+            <div class="anomaly-message">Sessions dropped 42.3% to 2282.0 (avg: 3954)</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-localoria.com-2026-03-31.html">localoria.com</a></div>
+            <div class="anomaly-message">Bounce rate increased 54.6% to 99.8%</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-wherebly.com-2026-03-31.html">wherebly.com</a></div>
+            <div class="anomaly-message">Bounce rate increased 48.2% to 100.0%</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-res-menu.net-2026-03-31.html">res-menu.net</a></div>
+            <div class="anomaly-message">Bounce rate increased 62.7% to 99.6%</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-foodplacee.com-2026-03-31.html">foodplacee.com</a></div>
+            <div class="anomaly-message">Bounce rate increased 57.0% to 100.0%</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-foodplacee.com-2026-03-31.html">foodplacee.com</a></div>
+            <div class="anomaly-message">Clicks dropped 98.9% to 20</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-restaurants-world.net-2026-03-31.html">restaurants-world.net</a></div>
+            <div class="anomaly-message">Bounce rate increased 56.2% to 99.7%</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-goto-where.com-2026-03-31.html">goto-where.com</a></div>
+            <div class="anomaly-message">Sessions dropped 62.3% to 10799.0 (avg: 28634)</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-menu-world.com-2026-03-31.html">menu-world.com</a></div>
+            <div class="anomaly-message">Sessions dropped 67.4% to 18101.0 (avg: 55490)</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-grubbio.com-2026-03-31.html">grubbio.com</a></div>
+            <div class="anomaly-message">Sessions dropped 59.5% to 2035.0 (avg: 5020)</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-menustic.com-2026-03-31.html">menustic.com</a></div>
+            <div class="anomaly-message">Sessions dropped 49.0% to 3027.0 (avg: 5934)</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+        <div class="anomaly-card" style="border-left: 4px solid #dc2626">
+            <div class="anomaly-severity" style="color: #dc2626;">CRITICAL</div>
+            <div class="anomaly-domain"><a href="seo-detail-wherevi.com-2026-03-31.html">wherevi.com</a></div>
+            <div class="anomaly-message">Sessions dropped 54.4% to 3385.0 (avg: 7425)</div>
+            <div class="anomaly-date">2026-03-20</div>
+        </div>
+        
+            </div>
+        </div>
+
+        <div class="section" id="trends">
+            <h2>📊 Phân Tích Xu Hướng SEO</h2>
+            
+    <div style="background: var(--bg-alt); padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary);">
+        <h3 style="margin-bottom: 15px;">Tóm Tắt Xu Hướng</h3>
+        <p><strong>Khoảng thời gian phân tích:</strong> 2026-01-15 đến 2026-03-25</p>
+        <p style="margin-top: 10px;">
+            Tổng sessions: <strong>14,012,597</strong> |
+            Tổng clicks: <strong>5,238,876</strong> |
+            Tổng impressions: <strong>502,273,102</strong>
+        </p>
+    </div>
+    
+        </div>
+
+        <div class="section" id="recommendations">
+            <h2>💡 Đề Xuất Tối Ưu</h2>
+            <table class="data-table recommendations-table">
+                <thead>
+                    <tr>
+                        <th>Ưu Tiên</th>
+                        <th>Đề Xuất</th>
+                        <th>Website Áp Dụng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>⭐⭐⭐</td>
+                        <td>Cải thiện tỷ lệ bounce cao trên các website có vấn đề</td>
+                        <td>Tất cả website có bounce rate > 70%</td>
+                    </tr>
+                    <tr>
+                        <td>⭐⭐⭐</td>
+                        <td>Tối ưu nội dung cho từ khóa có CTR thấp</td>
+                        <td>Tất cả website có CTR < 2%</td>
+                    </tr>
+                    <tr>
+                        <td>⭐⭐</td>
+                        <td>Cải thiện vị trí SERP qua backlinks và content optimization</td>
+                        <td>Website có vị trí > 10</td>
+                    </tr>
+                    <tr>
+                        <td>⭐⭐</td>
+                        <td>Phân tích và fix các trang bị indexing issue</td>
+                        <td>Website có drop đột ngột</td>
+                    </tr>
+                    <tr>
+                        <td>⭐</td>
+                        <td>A/B test heading, meta description để tăng CTR</td>
+                        <td>Tất cả website</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const chartDataJSON = {"dates": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27"], "sessions_by_day": {"localoria.com": [920, 972, 853, 839, 2030, 1838, 2122, 3057, 3088, 3084, 2869, 3238, 3420, 3338, 3409, 3679, 3844, 3481, 3154, 3286, 3266, 3603, 3684, 4799, 3932, 3038, 3029, 3011, 3097, 3784, 13030, 3705, 3165, 3182, 4709, 3650, 4128, 4047, 3668, 2982, 2829, 3278, 3310, 3688, 3699, 3306, 2762, 2713, 2812, 2955, 3483, 4193, 3468, 2867, 2826, 2975, 3019, 42753, 3699, 3455.0, 3596.0, 3778.0, 3731.0, 3811.0, 2282.0, 4503, 4594, 3518, 3758, 4032, 3891, 161], "wherebly.com": [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 4, 0, 0, 4, 1, 2, 1, 0, 0, 1, 1, 0, 14, 2, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 2, 0, 4, 1, 18, 155, 258, 237, 178, 178, 174, 202, 237, 221, 206, 147, 159, 212, 209, 237, 268, 267.0, 165.0, 195.0, 185.0, 181.0, 157.0, 266, 198, 150, 175, 187, 179, 10], "res-menu.net": [37266, 37881, 37765, 31425, 29064, 27297, 28041, 29350, 33372, 31879, 23095, 24337, 27616, 30260, 31777, 38429, 42233, 34794, 31141, 32647, 34579, 35284, 42036, 42242, 30519, 32292, 35900, 36135, 39527, 47820, 56561, 70247, 37883, 37719, 37996, 40207, 50410, 51092, 39456, 33485, 36533, 39379, 42807, 52657, 54394, 43301, 39555, 42764, 45005, 50003, 56832, 57952, 46474, 43423, 47451, 46853, 50898, 63313, 99269, 51793.0, 43592.0, 51054.0, 50854.0, 54088.0, 39442.0, 63780, 51125, 43830, 47827, 48897, 47704, 1183], "foodplacee.com": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 18, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 3, 1, 6, 4, 96, 232, 211, 204, 167, 221, 191, 217, 245, 205, 157, 170, 145, 171, 236, 260, 219.0, 156.0, 174.0, 175.0, 138.0, 134.0, 261, 218, 200, 436, 451, 686, 67], "restaurants-world.net": [21532, 22486, 22599, 19842, 16338, 15532, 16511, 16597, 19022, 18786, 13921, 13537, 15242, 16669, 17364, 20017, 21695, 18380, 15441, 16385, 17404, 17931, 21039, 22192, 15897, 17612, 17919, 17774, 18138, 22770, 28161, 21425, 19032, 18818, 18821, 19627, 24803, 25725, 20239, 17540, 17522, 18523, 22190, 24904, 26927, 22826, 18637, 20441, 21133, 21784, 23749, 26535, 22145, 19197, 19935, 18331, 18285, 22355, 24789, 23655.0, 19130.0, 23463.0, 18201.0, 20037.0, 13758.0, 40359, 20308, 17500, 18399, 17864, 16594, 384], "goto-where.com": [23729, 26230, 26666, 25599, 25818, 21775, 22795, 23698, 23031, 21402, 18872, 16582, 17347, 17816, 18647, 22092, 22355, 20288, 17776, 18860, 19136, 21322, 22754, 23620, 18844, 18697, 21043, 19168, 19285, 22391, 27436, 22911, 21124, 19626, 19631, 20695, 27620, 29114, 25266, 23757, 25860, 32900, 26506, 31043, 54996, 57261, 23910, 24653, 27825, 27820, 31407, 32436, 154957, 133654, 31624, 25432, 23628, 29654, 31992, 29249.0, 25313.0, 25513.0, 24767.0, 25344.0, 10799.0, 28727, 26065, 22682, 23136, 23856, 24262, 0], "menu-world.com": [63205, 79726, 81247, 101449, 51990, 52314, 57205, 54597, 64255, 59849, 45944, 46482, 49965, 53905, 58702, 65076, 63961, 69198, 51488, 57037, 56981, 59902, 63581, 65035, 50602, 52632, 52193, 43847, 45963, 56229, 88209, 50964, 47305, 43627, 45422, 50230, 58397, 57367, 47914, 43722, 45144, 46308, 50685, 60262, 76862, 49829, 43401, 44329, 50163, 50348, 59621, 60016, 46611, 44795, 45604, 49507, 50230, 56591, 83349, 49257.0, 42716.0, 47224.0, 45095.0, 45726.0, 18101.0, 54466, 44286, 40882, 44242, 44303, 45525, 0], "grubbio.com": [4308, 4990, 6177, 5053, 4859, 4260, 4277, 4386, 4293, 4611, 3919, 3691, 3790, 3994, 3923, 4416, 4920, 4386, 3923, 3906, 4193, 4470, 4934, 5106, 5020, 4126, 3952, 3966, 4206, 4763, 5235, 4817, 4387, 4197, 5411, 4537, 5406, 5104, 5149, 3925, 8372, 22749, 5068, 5190, 5421, 4851, 4216, 4304, 4245, 4622, 4763, 4952, 10828, 4274, 4296, 4300, 4706, 4961, 5075, 4810.0, 4386.0, 4745.0, 4566.0, 4611.0, 2035.0, 4739, 4718, 3905, 3923, 4076, 3978, 0], "menustic.com": [4788, 5670, 5443, 5582, 5183, 4668, 5355, 5362, 5550, 5306, 4705, 4475, 4643, 4802, 5042, 5633, 5617, 5432, 4692, 5128, 5315, 6042, 6240, 6547, 5671, 5352, 5432, 5482, 5498, 6161, 7269, 6079, 6146, 5595, 5397, 5852, 7075, 7038, 6356, 6321, 6020, 6251, 6372, 6984, 7452, 6393, 5731, 5777, 6290, 6450, 6989, 7493, 6778, 6113, 6259, 6082, 6364, 6943, 7385, 6788.0, 6036.0, 6401.0, 6144.0, 6320.0, 3027.0, 7287, 6390, 5588, 5846, 5787, 6051, 0], "menufyy.com": [5238, 6150, 9927, 6138, 5403, 4994, 5166, 5286, 5839, 5434, 4739, 4700, 5119, 4983, 5571, 6813, 7281, 6687, 5637, 5947, 6235, 7428, 10117, 9365, 8598, 7711, 6683, 6589, 6964, 8460, 9454, 7847, 7096, 7353, 9929, 8110, 8832, 8265, 7758, 6517, 7239, 7465, 7976, 8961, 9956, 9067, 7616, 8302, 8452, 9075, 11350, 12001, 10907, 9818, 10234, 79260, 11336, 12699, 13943, 12465.0, 11261.0, 12278.0, 11799.0, 11969.0, 5785.0, 14003, 13128, 11261, 12030, 12222, 12277, 0], "wherevi.com": [11765, 13420, 12933, 11815, 10843, 10236, 10242, 9431, 9672, 9309, 8266, 7010, 7264, 7425, 7743, 8280, 8715, 7550, 6850, 7461, 7038, 7423, 9912, 8879, 7838, 7707, 7104, 5839, 5867, 7142, 8143, 6774, 5642, 5933, 5660, 6196, 7088, 6902, 6016, 5106, 5681, 5999, 5505, 6797, 6520, 5866, 5077, 5378, 5104, 5908, 6358, 6435, 5372, 4922, 20330, 5324, 5442, 5924, 6455, 5512.0, 4883.0, 5521.0, 5269.0, 5179.0, 3385.0, 5366, 5035, 4514, 60260, 4413, 4325, 142], "placejoys.com": [1992, 2454, 2276, 4611, 4467, 3812, 4214, 9749, 11026, 11860, 11786, 10956, 13321, 13958, 16764, 20724, 21582, 21085, 17465, 18432, 18566, 28393, 32912, 41244, 36650, 33070, 24273, 18420, 18733, 23674, 27483, 22873, 19841, 17787, 20810, 41910, 25626, 25885, 23144, 18408, 18456, 19256, 20496, 25006, 24145, 23104, 17889, 17483, 19206, 53112, 22530, 25590, 20582, 17924, 18423, 18987, 21678, 24153, 26451, 22989.0, 20573.0, 21432.0, 21309.0, 22292.0, 16809.0, 27312, 24316, 19595, 21126, 20705, 20169, 802]}, "clicks_by_day": {"localoria.com": [562, 592, 538, 482, 389, 471, 421, 371, 448, 376, 348, 353, 399, 411, 460, 229, 223, 173, 148, 161, 196, 206, 230, 227, 208, 169, 189, 238, 219, 249, 308, 287, 265, 237, 235, 253, 289, 298, 270, 236, 229, 201, 239, 260, 257, 233, 194, 221, 244, 214, 238, 236, 179, 174, 188, 193, 198, 267, 246, 233.0, 239.0, 299.0, 270.0, 322, 398, 364, 359, 332, 376, 373, 0, 0], "wherebly.com": [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 2, 0, 0, 0, 2, 8, 0, 3, 6, 16, 28, 17, 15, 8, 25, 28, 10, 27, 26, 16.0, 11.0, 24.0, 17.0, 17, 24, 25, 27, 20, 21, 21, 0, 0], "res-menu.net": [13463, 16488, 16808, 13018, 11125, 10315, 10911, 11994, 14735, 13796, 8715, 8938, 10973, 12277, 13670, 17401, 17597, 12703, 11025, 12726, 13522, 14774, 19089, 20200, 13220, 12366, 14344, 16064, 18017, 22624, 28976, 20411, 17064, 17071, 18086, 19321, 24699, 25093, 17618, 14430, 16735, 18356, 19743, 25713, 27024, 20025, 17050, 19276, 21425, 23093, 29917, 31148, 22894, 18612, 20078, 22742, 26436, 34415, 35708, 26909.0, 22713.0, 26767.0, 26833.0, 28515, 35090, 35179, 27157, 21878, 23944, 25721, 0, 0], "foodplacee.com": [8019, 10511, 10775, 8662, 7051, 6769, 7238, 7060, 8546, 8279, 5300, 5431, 6671, 7456, 8190, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 3, 1, 0, 3, 12, 14, 17, 25, 25, 16, 14, 21, 33, 22, 6.0, 7.0, 7.0, 13.0, 19, 20, 34, 38, 26, 29, 38, 0, 0], "restaurants-world.net": [8019, 10511, 10775, 8662, 7051, 6769, 7238, 7060, 8546, 8279, 5300, 5431, 6671, 7456, 8190, 10010, 10239, 7700, 6184, 7261, 7650, 8380, 10492, 10859, 7235, 7008, 7833, 8468, 9430, 12033, 15468, 10724, 8856, 9064, 9437, 9880, 12650, 13359, 9353, 7932, 9051, 9820, 10964, 13559, 14153, 10680, 8597, 9684, 10346, 10635, 12763, 13264, 9718, 7514, 8233, 8285, 9025, 11808, 12356, 9240.0, 8299.0, 9099.0, 9156.0, 9929, 11881, 11918, 9349, 8086, 8932, 8998, 0, 0], "goto-where.com": [6887, 8065, 8114, 6935, 6276, 5994, 6294, 5794, 5288, 5001, 3928, 3944, 4333, 4608, 4799, 5844, 5470, 4565, 4260, 4543, 4827, 5160, 5936, 5926, 4676, 4481, 4827, 4849, 5256, 6207, 6822, 5115, 4727, 4882, 4768, 5231, 8947, 9137, 7028, 6445, 6883, 7276, 7982, 9017, 9254, 7950, 6864, 7637, 7835, 8558, 11011, 11158, 8931, 7891, 8326, 8472, 9249, 10877, 10672, 9074.0, 8510.0, 8519.0, 8548.0, 8944, 10128, 10098, 8631, 7672, 7937, 8513, 0, 0], "menu-world.com": [25629, 31716, 31625, 25458, 21662, 21372, 22585, 23987, 28508, 26313, 18511, 18890, 21991, 24255, 26820, 32476, 30430, 23074, 19792, 22456, 23992, 26014, 31299, 31005, 21700, 20914, 23730, 25348, 27431, 34672, 39386, 28841, 24932, 25323, 26107, 27696, 34131, 32975, 23786, 21428, 24314, 26021, 28748, 35416, 35280, 27419, 23418, 25829, 27090, 28940, 36556, 35824, 26237, 23187, 24418, 25349, 28334, 34230, 33281, 26349.0, 23412.0, 25566.0, 25589.0, 27270, 32896, 31899, 25555, 22539, 24295, 25604, 0, 0], "grubbio.com": [659, 631, 742, 677, 567, 576, 552, 592, 645, 662, 588, 490, 564, 635, 645, 809, 912, 744, 634, 689, 751, 833, 946, 1066, 819, 756, 824, 829, 892, 986, 1202, 906, 822, 915, 913, 967, 1051, 1109, 941, 743, 923, 958, 1089, 1164, 1095, 909, 750, 803, 800, 873, 972, 1032, 907, 716, 731, 701, 789, 958, 954, 807.0, 785.0, 788.0, 813.0, 866, 883, 904, 815, 682, 746, 745, 0, 0], "menustic.com": [1408, 1751, 1721, 1682, 1399, 1313, 1413, 1509, 1753, 1630, 1389, 1263, 1433, 1547, 1641, 1909, 1897, 1667, 1446, 1614, 1700, 1793, 2157, 2231, 1881, 1698, 1834, 1885, 1969, 2314, 2539, 2109, 1896, 1892, 1916, 2041, 2378, 2448, 2160, 1847, 1969, 2067, 2161, 2433, 2530, 2304, 1935, 2146, 2187, 2343, 2883, 2797, 2418, 2099, 2149, 2173, 2295, 2599, 2607, 2361.0, 2160.0, 2098.0, 2112.0, 2212, 2443, 2492, 2203, 1906, 2156, 2153, 0, 0], "menufyy.com": [1071, 1329, 1327, 1162, 1067, 1059, 1015, 1087, 1263, 1149, 981, 860, 972, 1113, 1508, 1945, 2133, 1879, 1642, 1779, 1886, 2267, 2633, 2742, 2348, 2054, 2232, 2332, 2538, 2951, 3467, 2831, 2494, 2490, 2619, 2776, 3019, 3108, 2670, 2313, 2820, 2768, 3030, 3391, 3783, 3303, 2852, 3134, 3313, 3573, 4797, 5126, 4640, 3939, 4122, 4323, 4858, 5636, 6162, 5365.0, 4621.0, 4877.0, 5040.0, 5267, 6054, 6421, 5689, 4766, 5155, 5498, 0, 0], "wherevi.com": [3362, 4531, 4693, 3618, 3122, 3035, 2526, 1922, 2105, 1822, 1137, 1158, 1374, 1504, 1721, 1931, 1805, 1326, 1102, 1199, 1334, 1413, 1805, 1936, 1269, 1165, 1316, 1400, 1546, 1965, 2579, 1828, 1448, 1466, 1407, 1550, 1787, 1994, 1307, 1037, 1324, 1369, 1477, 1988, 1903, 1438, 1121, 1276, 1319, 1449, 1893, 1866, 1436, 1099, 1210, 1107, 1246, 1470, 1516, 1000.0, 899.0, 830.0, 801.0, 788, 990, 911, 716, 615, 570, 211, 0, 0], "placejoys.com": [62, 181, 209, 213, 233, 201, 187, 253, 345, 319, 286, 349, 461, 621, 812, 626, 710, 475, 533, 600, 673, 817, 1292, 1460, 1190, 1302, 1583, 1907, 2286, 2855, 3186, 2426, 2162, 2083, 2313, 2616, 3571, 3689, 3039, 2509, 2788, 2799, 3077, 3631, 3618, 3180, 2594, 2752, 3091, 3292, 3783, 4024, 3188, 2815, 3017, 3472, 4032, 4911, 4870, 4340.0, 3581.0, 4202.0, 4211.0, 4564, 5636, 5799, 4873, 4196, 4441, 4638, 0, 0]}, "impressions_by_day": {"localoria.com": [34794, 38284, 34137, 34048, 34049, 34251, 34931, 35595, 39762, 41236, 38904, 35458, 37179, 38539, 44771, 16589, 14496, 13920, 11907, 12304, 13383, 14374, 16614, 17648, 15834, 15650, 14909, 16242, 17260, 20591, 21243, 18641, 20042, 16580, 16598, 15804, 18844, 20908, 19879, 18365, 19102, 18021, 17294, 22095, 20980, 20702, 18282, 19192, 19080, 18116, 18945, 19423, 16855, 13928, 13762, 14655, 15724, 22003, 23719, 21339.0, 23733.0, 32858.0, 36498.0, 39979, 51362, 55569, 54085, 46173, 46442, 48271, 0, 0], "wherebly.com": [1, 1, 1, 4, 0, 2, 1, 0, 3, 3, 1, 6, 1, 0, 1, 1, 1, 9, 12, 12, 22, 11, 24, 38, 16, 19, 32, 30, 23, 27, 27, 26, 23, 17, 28, 40, 22, 36, 38, 16, 31, 32, 36, 36, 213, 258, 127, 386, 627, 1082, 1285, 1561, 1426, 1119, 1369, 1530, 1774, 2093, 2015, 1763.0, 1535.0, 1195.0, 719.0, 786, 1019, 1097, 792, 566, 672, 740, 0, 0], "res-menu.net": [720111, 846316, 833104, 721821, 662633, 619570, 635610, 674576, 773806, 766442, 607204, 615290, 666451, 642173, 718427, 833320, 838395, 712049, 636017, 688510, 730599, 810888, 957467, 1036405, 790871, 730505, 807952, 884721, 973454, 1198396, 1436878, 1059368, 932618, 929656, 951124, 1020553, 1277796, 1341238, 1049300, 894225, 960460, 995839, 1042810, 1320801, 1346175, 1166680, 994230, 1095402, 1179308, 1296930, 1618058, 1737808, 1417281, 1168081, 1258885, 1452296, 1607530, 2035676, 2144067, 1795835.0, 1502900.0, 1749217.0, 1812792.0, 1894266, 2307567, 2375670, 1968940, 1556607, 1622073, 1690854, 0, 0], "foodplacee.com": [645804, 776047, 771574, 701622, 654714, 612432, 637815, 670780, 770724, 766271, 622539, 628652, 675952, 649504, 721280, 0, 0, 7, 12, 16, 12, 9, 3, 9, 5, 8, 4, 9, 8, 11, 14, 6, 6, 10, 6, 15, 5, 6, 6, 5, 10, 13, 13, 21, 161, 405, 283, 158, 393, 554, 1058, 1178, 1085, 815, 790, 716, 834, 1126, 1176, 627.0, 375.0, 418.0, 764.0, 957, 2245, 3768, 4557, 4296, 4205, 4869, 0, 0], "restaurants-world.net": [645804, 776047, 771574, 701622, 654714, 612432, 637815, 670780, 770724, 766271, 622539, 628652, 675952, 649504, 721280, 823935, 841267, 741930, 653851, 703136, 739682, 795019, 913099, 979674, 763368, 689132, 766006, 818662, 896256, 1080301, 1290365, 976747, 866144, 857799, 871867, 939044, 1164182, 1222312, 972312, 844964, 901914, 928217, 991583, 1218598, 1187910, 1009779, 830468, 899723, 920621, 983153, 1194907, 1220058, 964421, 792100, 829056, 873211, 949987, 1178796, 1216973, 1023044.0, 892833.0, 977846.0, 1011099.0, 1063880, 1291670, 1310065, 1114022, 907059, 944297, 989752, 0, 0], "goto-where.com": [1328510, 1585319, 1639453, 1435646, 1296447, 1269135, 1288358, 1223579, 1212096, 1213707, 1014241, 982159, 1015511, 1054490, 1323224, 1218147, 1243942, 1088786, 964308, 1010044, 1076552, 1190567, 1354976, 1376504, 1115884, 1049249, 1119126, 1128185, 1214409, 1444458, 1598149, 1183142, 1095262, 1074439, 1084484, 1123969, 1901236, 1953248, 1600105, 1402033, 1455817, 1544356, 1664474, 1983897, 1958623, 1695871, 1445545, 1540728, 1603461, 1764721, 2203671, 2347689, 1944091, 1645215, 1743066, 1849489, 1961916, 2364553, 2439982, 2103379.0, 1797734.0, 1916441.0, 1929541.0, 2029705, 2375304, 2411395, 2081964, 1751451, 1785239, 1834401, 0, 0], "menu-world.com": [2317357, 2773179, 2812322, 2442337, 2211411, 2124013, 2174376, 2296187, 2644748, 2643113, 2144604, 2097600, 2238200, 2295403, 2780064, 2842692, 2836633, 2367930, 2055094, 2147145, 2244680, 2450499, 2769291, 2860045, 2232371, 2046441, 2209798, 2336918, 2519312, 3038976, 3495889, 2575499, 2313702, 2319427, 2296496, 2392774, 2901174, 2951802, 2332167, 2029499, 2155374, 2291546, 2398752, 2889094, 2827812, 2381248, 1990925, 2113331, 2179719, 2337993, 2875640, 2989346, 2356093, 1982121, 2076535, 2233040, 2343762, 2869603, 2920476, 2453627.0, 2108450.0, 2315180.0, 2333606.0, 2447244, 2962688, 2997426, 2501787, 2085883, 2150593, 2229267, 0, 0], "grubbio.com": [63864, 72439, 76308, 69699, 60908, 60119, 61013, 65644, 76120, 82289, 72224, 63303, 64713, 74437, 96787, 84980, 94552, 91537, 78609, 85169, 90636, 103750, 117032, 125950, 109363, 99497, 100696, 103373, 108976, 131930, 140918, 110851, 102459, 102109, 102484, 105387, 118941, 126635, 110487, 96772, 102961, 107600, 116980, 133031, 129946, 113095, 89515, 95576, 95039, 101446, 116494, 124026, 109243, 87204, 91154, 95807, 99567, 115827, 122026, 108916.0, 90652.0, 96142.0, 98352.0, 106485, 117988, 123772, 112293, 92916, 93583, 95142, 0, 0], "menustic.com": [140594, 170399, 187303, 172560, 148548, 146816, 147155, 156633, 179700, 195493, 175560, 153656, 160972, 176758, 236429, 202028, 220067, 204611, 175412, 232410, 290934, 251324, 278201, 288064, 249472, 224403, 230488, 233101, 246662, 300239, 323809, 252161, 226114, 237222, 225208, 229833, 274604, 286619, 253316, 219761, 225548, 239140, 257497, 297381, 301383, 271081, 222946, 236842, 241720, 261139, 310446, 331112, 293128, 238187, 244061, 249975, 261926, 307478, 326834, 298186.0, 245925.0, 257824.0, 257600.0, 277988, 323887, 339891, 311453, 259234, 260887, 264226, 0, 0], "menufyy.com": [97384, 110175, 117384, 110653, 94260, 94109, 96025, 99058, 104732, 110222, 100882, 84342, 83924, 105062, 209913, 206054, 226313, 212153, 186608, 215002, 244373, 275563, 330666, 349525, 312509, 325498, 341696, 330148, 331626, 384893, 410260, 318931, 301860, 292663, 292165, 287113, 350167, 395438, 356512, 308632, 333056, 340129, 318139, 376736, 381373, 350987, 290021, 321131, 336671, 365456, 454601, 514222, 469557, 387892, 412406, 439510, 480376, 575004, 630389, 591051.0, 475508.0, 507256.0, 539553.0, 576537, 673800, 718825, 656828, 543354, 566166, 581918, 0, 0], "wherevi.com": [196539, 246907, 261439, 235822, 216630, 201624, 194164, 180850, 178909, 158284, 121351, 119763, 126594, 120867, 131294, 121008, 117254, 101794, 85039, 91315, 96893, 102573, 117432, 126160, 89964, 83934, 94334, 98331, 106613, 128984, 157159, 117937, 102124, 96784, 95166, 101768, 121022, 127484, 99433, 82532, 87448, 90967, 97447, 118323, 115904, 96004, 76838, 82741, 85730, 92588, 117187, 124900, 99045, 80988, 85830, 88332, 97283, 118304, 122667, 99910.0, 84354.0, 91681.0, 93620.0, 98313, 119471, 124235, 103676, 82594, 63607, 13350, 0, 0], "placejoys.com": [11576, 26733, 32581, 36283, 34562, 31466, 30853, 33150, 43492, 46966, 41468, 44391, 49854, 56076, 68149, 42100, 43479, 40707, 37358, 43650, 47463, 55726, 81884, 102678, 90693, 86211, 97182, 113396, 127696, 166704, 209075, 162190, 158163, 142598, 158579, 183657, 234321, 249809, 218142, 185148, 194559, 194715, 205414, 247326, 247812, 215976, 183657, 200940, 211243, 222875, 265775, 291409, 255557, 225257, 233016, 277674, 301846, 368239, 391583, 327050.0, 269907.0, 330576.0, 341172.0, 369324, 451840, 464806, 400732, 330852, 345478, 358834, 0, 0]}, "position_by_day": {"localoria.com": [8.2521, 8.3407, 8.0654, 9.2009, 9.4574, 9.1716, 9.7858, 9.4826, 8.6342, 8.5811, 9.0093, 9.0405, 8.9132, 8.568, 7.9932, 8.7668, 8.7253, 9.5707, 10.8211, 10.157, 9.6549, 8.9612, 8.3921, 8.2205, 8.0525, 7.9899, 7.9858, 8.0869, 8.1826, 7.4633, 7.3908, 7.1638, 8.3071, 8.4044, 8.1305, 8.3848, 7.8187, 7.714, 7.6744, 7.2551, 7.5033, 7.5741, 7.5877, 6.9713, 6.7863, 6.9457, 6.9407, 7.2007, 7.6189, 8.3076, 8.4796, 8.6586, 8.4635, 8.3405, 9.0496, 9.6377, 8.9654, 9.4803, 9.2092, 9.5084, 9.8669, 10.2483, 9.9604, 9.8295, 9.5619, 9.113, 8.9609, 9.067, 8.6619, 9.4419, 0, 0], "wherebly.com": [1, 1, 1, 5.25, 0, 1, 1, 0, 1, 28, 1, 1.1667, 1, 0, 1, 1, 1, 4.3333, 5, 6.4167, 4.1818, 6.8182, 4.875, 6.6579, 6.25, 7.1053, 6.5938, 12.4, 8.2174, 11.5926, 6.3704, 7.6154, 6.3913, 11.7059, 8.0357, 8.55, 11.1364, 7.3056, 9.5526, 7.75, 6.6774, 6.9688, 5.8611, 10.3056, 5.277, 6.376, 6.7874, 6.6606, 8.2041, 6.6303, 6.8623, 6.991, 6.636, 7.3378, 8.1351, 7.332, 6.9301, 6.5308, 7.5385, 7.6398, 7.3075, 7.79, 6.0195, 6.4898, 5.946, 5.443, 6.173, 6.0512, 4.8095, 5.8297, 0, 0], "res-menu.net": [9.7522, 9.838, 9.0226, 10.5895, 11.9539, 12.2724, 12.3887, 12.1364, 10.5147, 10.0446, 11.694, 11.1752, 10.7812, 10.4905, 9.9634, 10.2653, 10.1, 11.2852, 12.031, 10.7876, 10.7529, 10.7551, 9.9877, 9.7696, 9.7948, 9.8795, 10.0533, 10.4837, 10.2803, 9.5524, 9.0356, 9.1068, 9.7802, 10.3525, 10.0516, 9.7683, 9.4853, 9.309, 9.7578, 10.0804, 10.2956, 9.8401, 9.5924, 9.2182, 8.666, 9.4921, 10.0534, 9.9055, 9.8771, 9.9512, 9.5451, 9.4033, 9.6085, 9.6534, 10.0518, 10.0549, 9.5393, 9.2181, 8.8629, 9.1671, 9.4495, 9.466, 9.4778, 9.3204, 9.4809, 9.1331, 9.3361, 9.2975, 8.9338, 9.2382, 0, 0], "foodplacee.com": [9.5722, 9.5359, 8.797, 10.1651, 11.2007, 11.5061, 11.5656, 11.4091, 10.009, 9.6328, 10.8869, 10.478, 10.1983, 9.9232, 9.4786, 0, 0, 7.4286, 5.8333, 7.1875, 6.3333, 5.5556, 5.3333, 8.3333, 5.6, 4.375, 6.75, 6.3333, 4, 6.3636, 4.0714, 3.3333, 5, 3.8, 7.8333, 5.6, 7, 5.6667, 2.1667, 4.2, 5.4, 5.1538, 7.0769, 5.381, 6.3727, 5.1333, 6.7703, 8.981, 6.5674, 5.7347, 6.4972, 5.9745, 6.1806, 5.589, 5.9519, 6.0559, 4.7374, 4.5595, 5.6088, 7.134, 6.9307, 8.4904, 6.3678, 6.5298, 7.3385, 8.1388, 8.582, 8.9169, 8.7239, 9.2707, 0, 0], "restaurants-world.net": [9.5722, 9.5359, 8.797, 10.1651, 11.2007, 11.5061, 11.5656, 11.4091, 10.009, 9.6328, 10.8869, 10.478, 10.1983, 9.9232, 9.4786, 9.7848, 9.6881, 10.6299, 11.276, 10.189, 10.2265, 10.266, 9.5906, 9.4491, 9.3534, 9.4989, 9.6135, 10.0773, 9.8977, 9.2955, 8.8303, 8.8721, 9.4715, 10.0501, 9.7662, 9.4956, 9.2262, 9.1137, 9.4616, 9.7235, 9.9172, 9.4482, 9.2038, 8.976, 8.4563, 9.1037, 9.5656, 9.3836, 9.3543, 9.4846, 9.205, 9.1353, 9.2377, 9.3817, 9.8656, 10.2052, 9.7375, 9.4445, 9.0517, 9.3876, 9.5878, 9.8448, 9.7877, 9.5199, 9.8066, 9.4667, 9.6479, 9.552, 9.1821, 9.5461, 0, 0], "goto-where.com": [8.9779, 8.9961, 8.7246, 9.3583, 9.8366, 9.948, 9.925, 10.1235, 9.662, 9.5385, 10.2834, 10.1356, 9.89, 9.3978, 8.7253, 9.7155, 9.6029, 10.2637, 10.5819, 9.7063, 9.7916, 9.9324, 9.552, 9.1675, 9.284, 9.2771, 9.4693, 10.0191, 9.8732, 9.3601, 9.1912, 9.2316, 9.6185, 10.0355, 9.8384, 9.7229, 8.9076, 8.945, 9.0951, 9.108, 9.3007, 9.105, 8.9278, 8.7683, 8.3827, 8.6806, 8.8521, 8.7417, 8.6704, 8.5997, 8.4143, 8.3187, 8.3357, 8.2459, 8.4602, 8.6151, 8.3818, 8.3663, 8.2647, 8.4065, 8.4316, 8.6081, 8.634, 8.5885, 8.69, 8.5372, 8.5941, 8.4553, 8.2382, 8.48, 0, 0], "menu-world.com": [8.5114, 8.5541, 8.1288, 9.0033, 9.6739, 10.0342, 10.0072, 9.9769, 9.0112, 8.7979, 9.7223, 9.4702, 9.1064, 8.6787, 8.0015, 8.5829, 8.5788, 9.4125, 10.0038, 9.2145, 9.3487, 9.3777, 8.8133, 8.591, 8.6832, 8.7376, 8.8836, 9.1969, 9.1046, 8.5775, 8.3263, 8.4311, 8.8259, 8.9977, 8.9351, 8.8046, 8.568, 8.5819, 8.9306, 8.9782, 9.1408, 8.8284, 8.5929, 8.3816, 7.936, 8.4348, 8.6774, 8.6081, 8.6486, 8.5983, 8.3151, 8.2371, 8.4448, 8.4136, 8.7714, 8.9361, 8.4674, 8.3721, 8.1566, 8.497, 8.6846, 8.8462, 8.8681, 8.7245, 8.8062, 8.5617, 8.7729, 8.6511, 8.2707, 8.6332, 0, 0], "grubbio.com": [8.2122, 8.3297, 8.1329, 8.8218, 8.9914, 9.1668, 9.2821, 9.0481, 8.5097, 8.4385, 8.7814, 9.0453, 8.7221, 8.3868, 7.5651, 8.5476, 8.2946, 8.516, 8.7243, 8.1554, 8.1701, 8.344, 7.9643, 7.7437, 7.8321, 7.7167, 8.0146, 8.1598, 8.0238, 7.7383, 7.7968, 7.8635, 8.1046, 8.3788, 8.1749, 8.2475, 8.1681, 8.2157, 8.3002, 8.3742, 8.6578, 8.6239, 8.227, 8.1468, 7.9571, 8.272, 8.6862, 8.6749, 8.6375, 8.6448, 8.6683, 8.5967, 8.6205, 8.5055, 8.8728, 8.8985, 8.5495, 8.6169, 8.5696, 8.8515, 8.7858, 8.9206, 8.8988, 8.8255, 9.0241, 8.8498, 8.7953, 8.6575, 8.3136, 8.7325, 0, 0], "menustic.com": [7.1981, 7.2292, 7.1298, 7.4527, 7.5301, 7.6646, 7.699, 7.6804, 7.2892, 7.3208, 7.4411, 7.5338, 7.5275, 7.1597, 6.6384, 7.3965, 7.2918, 7.4686, 7.5491, 6.8208, 6.7595, 7.1277, 6.9972, 6.8669, 6.9391, 6.8918, 7.0721, 7.1707, 7.1392, 6.9355, 7.038, 7.0652, 7.1122, 6.9656, 7.0528, 7.1181, 7.0781, 7.1674, 7.2129, 7.0478, 7.3656, 7.399, 7.2346, 7.2048, 7.0757, 7.1604, 7.3105, 7.5206, 7.1735, 7.14, 7.1686, 7.1781, 7.1571, 7.0583, 7.234, 7.4057, 7.2474, 7.3253, 7.3348, 7.4635, 7.3488, 7.4878, 7.521, 7.4793, 7.5135, 7.4601, 7.4622, 7.3169, 7.1788, 7.3859, 0, 0], "menufyy.com": [7.6497, 7.8264, 7.8476, 8.2906, 8.2921, 8.4886, 8.5392, 8.6905, 8.3011, 8.2755, 8.4877, 8.6968, 8.6095, 8.0645, 7.64, 8.9121, 8.6346, 8.8038, 8.8912, 7.9685, 8.1449, 8.5009, 8.183, 7.8709, 8.0372, 7.5062, 7.5205, 7.745, 7.9514, 7.8537, 8.0491, 8.0696, 8.1017, 8.3957, 8.2042, 8.3444, 8.1476, 8.0782, 8.0716, 8.0325, 8.296, 8.3594, 8.3574, 8.231, 7.9351, 8.0826, 8.3291, 8.2116, 8.0537, 8.0325, 7.958, 7.8593, 7.8568, 7.6737, 7.9561, 7.9462, 7.6879, 7.7635, 7.7412, 7.7906, 7.8852, 7.9414, 7.8533, 7.9074, 7.9267, 7.8733, 7.8585, 7.7515, 7.5483, 7.7402, 0, 0], "wherevi.com": [8.5293, 8.5711, 7.8798, 9.2608, 9.9124, 10.2124, 10.6184, 10.7916, 9.4204, 9.0013, 10.2594, 9.929, 9.667, 9.2632, 8.8388, 9.0566, 8.8608, 9.8072, 10.7153, 9.9274, 9.6525, 9.4161, 8.7436, 8.6013, 8.6045, 8.6803, 8.7334, 9.2364, 9.1555, 8.4884, 7.9142, 8.0179, 8.5665, 9.0322, 8.8248, 8.5921, 8.4031, 8.3126, 8.6058, 9.0699, 9.1102, 8.6989, 8.4276, 8.2179, 7.7607, 8.3693, 8.9943, 8.9174, 9.0685, 9.0446, 8.5705, 8.3907, 8.4079, 8.5401, 8.8614, 9.2969, 8.9397, 8.6305, 8.2011, 8.3929, 8.593, 8.9453, 8.8088, 8.4458, 8.731, 8.5004, 8.5896, 8.494, 8.2789, 12.689, 0, 0], "placejoys.com": [9.3819, 9.9126, 9.2005, 10.0922, 10.6687, 10.6456, 10.5777, 10.1715, 9.2231, 8.9118, 9.6135, 9.5563, 9.3498, 8.7779, 8.2289, 8.5886, 8.2456, 9.1386, 9.9404, 9.6528, 9.0581, 8.681, 8.0239, 7.8738, 7.9082, 8.1532, 8.0299, 8.1058, 7.9887, 7.489, 7.5507, 7.5196, 8.1816, 8.4497, 8.2117, 8.2612, 7.7573, 7.6351, 7.7251, 8.0967, 8.4373, 8.0693, 7.9376, 7.6732, 7.219, 7.6483, 7.8504, 7.9667, 8.0804, 8.2675, 8.3116, 8.0778, 8.0757, 7.9834, 8.3646, 8.2244, 7.8342, 7.8677, 7.6255, 7.6823, 8.0022, 7.9466, 7.812, 7.6807, 7.9067, 7.6418, 7.716, 7.5242, 7.3189, 7.7656, 0, 0]}};
+        const domainsJSON = ["localoria.com", "wherebly.com", "res-menu.net", "foodplacee.com", "restaurants-world.net", "goto-where.com", "menu-world.com", "grubbio.com", "menustic.com", "menufyy.com", "wherevi.com", "placejoys.com"];
+
+        let charts = {};
+        let allCharts = {};
+
+        function domainLink(domain) {
+            return `<a href="seo-detail-${domain}-2026-03-31.html">${domain}</a>`;
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        // Load theme preference
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+
+        function scrollToSection(index) {
+            const sections = document.querySelectorAll('.section');
+            if (sections[index]) {
+                sections[index].scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // IntersectionObserver for active TOC highlighting
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    const activeLink = document.querySelector(`a[href="#${entry.target.id}"]`);
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                    }
+                }
+            });
+        }, { threshold: 0.2 });
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        function sortTable(n) {
+            const table = event.target.closest('table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                const aVal = a.cells[n].textContent;
+                const bVal = b.cells[n].textContent;
+
+                const aNum = parseFloat(aVal.replace(/[^0-9.-]/g, ''));
+                const bNum = parseFloat(bVal.replace(/[^0-9.-]/g, ''));
+
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return bNum - aNum;
+                } else {
+                    return aVal.localeCompare(bVal);
+                }
+            });
+
+            tbody.innerHTML = '';
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function filterCharts() {
+            const filter = document.getElementById('websiteFilter').value;
+
+            Object.values(charts).forEach(chart => {
+                if (filter) {
+                    chart.data.datasets.forEach(dataset => {
+                        dataset.hidden = dataset.label !== filter;
+                    });
+                } else {
+                    chart.data.datasets.forEach(dataset => {
+                        dataset.hidden = false;
+                    });
+                }
+                chart.update();
+            });
+        }
+
+        const chartConfig = {
+            borderColor: 'var(--border)',
+            textColor: 'var(--text)',
+            backgroundColor: 'var(--bg)',
+        };
+
+        Chart.defaults.color = 'var(--text-muted)';
+        Chart.defaults.borderColor = 'var(--border)';
+
+        // Create sessions chart
+        const sessionsCtx = document.getElementById('sessionsChart').getContext('2d');
+        charts.sessions = new Chart(sessionsCtx, {
+            type: 'line',
+            data: {
+                labels: chartDataJSON.dates,
+                datasets: [{"label": "localoria.com", "data": [920, 972, 853, 839, 2030, 1838, 2122, 3057, 3088, 3084, 2869, 3238, 3420, 3338, 3409, 3679, 3844, 3481, 3154, 3286, 3266, 3603, 3684, 4799, 3932, 3038, 3029, 3011, 3097, 3784, 13030, 3705, 3165, 3182, 4709, 3650, 4128, 4047, 3668, 2982, 2829, 3278, 3310, 3688, 3699, 3306, 2762, 2713, 2812, 2955, 3483, 4193, 3468, 2867, 2826, 2975, 3019, 42753, 3699, 3455.0, 3596.0, 3778.0, 3731.0, 3811.0, 2282.0, 4503, 4594, 3518, 3758, 4032, 3891, 161], "borderColor": "#3B82F6", "backgroundColor": "#3B82F620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "wherebly.com", "data": [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 4, 0, 0, 4, 1, 2, 1, 0, 0, 1, 1, 0, 14, 2, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 2, 0, 4, 1, 18, 155, 258, 237, 178, 178, 174, 202, 237, 221, 206, 147, 159, 212, 209, 237, 268, 267.0, 165.0, 195.0, 185.0, 181.0, 157.0, 266, 198, 150, 175, 187, 179, 10], "borderColor": "#EF4444", "backgroundColor": "#EF444420", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "res-menu.net", "data": [37266, 37881, 37765, 31425, 29064, 27297, 28041, 29350, 33372, 31879, 23095, 24337, 27616, 30260, 31777, 38429, 42233, 34794, 31141, 32647, 34579, 35284, 42036, 42242, 30519, 32292, 35900, 36135, 39527, 47820, 56561, 70247, 37883, 37719, 37996, 40207, 50410, 51092, 39456, 33485, 36533, 39379, 42807, 52657, 54394, 43301, 39555, 42764, 45005, 50003, 56832, 57952, 46474, 43423, 47451, 46853, 50898, 63313, 99269, 51793.0, 43592.0, 51054.0, 50854.0, 54088.0, 39442.0, 63780, 51125, 43830, 47827, 48897, 47704, 1183], "borderColor": "#22C55E", "backgroundColor": "#22C55E20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "foodplacee.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 18, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 3, 1, 6, 4, 96, 232, 211, 204, 167, 221, 191, 217, 245, 205, 157, 170, 145, 171, 236, 260, 219.0, 156.0, 174.0, 175.0, 138.0, 134.0, 261, 218, 200, 436, 451, 686, 67], "borderColor": "#F59E0B", "backgroundColor": "#F59E0B20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "restaurants-world.net", "data": [21532, 22486, 22599, 19842, 16338, 15532, 16511, 16597, 19022, 18786, 13921, 13537, 15242, 16669, 17364, 20017, 21695, 18380, 15441, 16385, 17404, 17931, 21039, 22192, 15897, 17612, 17919, 17774, 18138, 22770, 28161, 21425, 19032, 18818, 18821, 19627, 24803, 25725, 20239, 17540, 17522, 18523, 22190, 24904, 26927, 22826, 18637, 20441, 21133, 21784, 23749, 26535, 22145, 19197, 19935, 18331, 18285, 22355, 24789, 23655.0, 19130.0, 23463.0, 18201.0, 20037.0, 13758.0, 40359, 20308, 17500, 18399, 17864, 16594, 384], "borderColor": "#8B5CF6", "backgroundColor": "#8B5CF620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "goto-where.com", "data": [23729, 26230, 26666, 25599, 25818, 21775, 22795, 23698, 23031, 21402, 18872, 16582, 17347, 17816, 18647, 22092, 22355, 20288, 17776, 18860, 19136, 21322, 22754, 23620, 18844, 18697, 21043, 19168, 19285, 22391, 27436, 22911, 21124, 19626, 19631, 20695, 27620, 29114, 25266, 23757, 25860, 32900, 26506, 31043, 54996, 57261, 23910, 24653, 27825, 27820, 31407, 32436, 154957, 133654, 31624, 25432, 23628, 29654, 31992, 29249.0, 25313.0, 25513.0, 24767.0, 25344.0, 10799.0, 28727, 26065, 22682, 23136, 23856, 24262, 0], "borderColor": "#EC4899", "backgroundColor": "#EC489920", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menu-world.com", "data": [63205, 79726, 81247, 101449, 51990, 52314, 57205, 54597, 64255, 59849, 45944, 46482, 49965, 53905, 58702, 65076, 63961, 69198, 51488, 57037, 56981, 59902, 63581, 65035, 50602, 52632, 52193, 43847, 45963, 56229, 88209, 50964, 47305, 43627, 45422, 50230, 58397, 57367, 47914, 43722, 45144, 46308, 50685, 60262, 76862, 49829, 43401, 44329, 50163, 50348, 59621, 60016, 46611, 44795, 45604, 49507, 50230, 56591, 83349, 49257.0, 42716.0, 47224.0, 45095.0, 45726.0, 18101.0, 54466, 44286, 40882, 44242, 44303, 45525, 0], "borderColor": "#06B6D4", "backgroundColor": "#06B6D420", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "grubbio.com", "data": [4308, 4990, 6177, 5053, 4859, 4260, 4277, 4386, 4293, 4611, 3919, 3691, 3790, 3994, 3923, 4416, 4920, 4386, 3923, 3906, 4193, 4470, 4934, 5106, 5020, 4126, 3952, 3966, 4206, 4763, 5235, 4817, 4387, 4197, 5411, 4537, 5406, 5104, 5149, 3925, 8372, 22749, 5068, 5190, 5421, 4851, 4216, 4304, 4245, 4622, 4763, 4952, 10828, 4274, 4296, 4300, 4706, 4961, 5075, 4810.0, 4386.0, 4745.0, 4566.0, 4611.0, 2035.0, 4739, 4718, 3905, 3923, 4076, 3978, 0], "borderColor": "#14B8A6", "backgroundColor": "#14B8A620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menustic.com", "data": [4788, 5670, 5443, 5582, 5183, 4668, 5355, 5362, 5550, 5306, 4705, 4475, 4643, 4802, 5042, 5633, 5617, 5432, 4692, 5128, 5315, 6042, 6240, 6547, 5671, 5352, 5432, 5482, 5498, 6161, 7269, 6079, 6146, 5595, 5397, 5852, 7075, 7038, 6356, 6321, 6020, 6251, 6372, 6984, 7452, 6393, 5731, 5777, 6290, 6450, 6989, 7493, 6778, 6113, 6259, 6082, 6364, 6943, 7385, 6788.0, 6036.0, 6401.0, 6144.0, 6320.0, 3027.0, 7287, 6390, 5588, 5846, 5787, 6051, 0], "borderColor": "#F97316", "backgroundColor": "#F9731620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menufyy.com", "data": [5238, 6150, 9927, 6138, 5403, 4994, 5166, 5286, 5839, 5434, 4739, 4700, 5119, 4983, 5571, 6813, 7281, 6687, 5637, 5947, 6235, 7428, 10117, 9365, 8598, 7711, 6683, 6589, 6964, 8460, 9454, 7847, 7096, 7353, 9929, 8110, 8832, 8265, 7758, 6517, 7239, 7465, 7976, 8961, 9956, 9067, 7616, 8302, 8452, 9075, 11350, 12001, 10907, 9818, 10234, 79260, 11336, 12699, 13943, 12465.0, 11261.0, 12278.0, 11799.0, 11969.0, 5785.0, 14003, 13128, 11261, 12030, 12222, 12277, 0], "borderColor": "#6366F1", "backgroundColor": "#6366F120", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "wherevi.com", "data": [11765, 13420, 12933, 11815, 10843, 10236, 10242, 9431, 9672, 9309, 8266, 7010, 7264, 7425, 7743, 8280, 8715, 7550, 6850, 7461, 7038, 7423, 9912, 8879, 7838, 7707, 7104, 5839, 5867, 7142, 8143, 6774, 5642, 5933, 5660, 6196, 7088, 6902, 6016, 5106, 5681, 5999, 5505, 6797, 6520, 5866, 5077, 5378, 5104, 5908, 6358, 6435, 5372, 4922, 20330, 5324, 5442, 5924, 6455, 5512.0, 4883.0, 5521.0, 5269.0, 5179.0, 3385.0, 5366, 5035, 4514, 60260, 4413, 4325, 142], "borderColor": "#D946EF", "backgroundColor": "#D946EF20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "placejoys.com", "data": [1992, 2454, 2276, 4611, 4467, 3812, 4214, 9749, 11026, 11860, 11786, 10956, 13321, 13958, 16764, 20724, 21582, 21085, 17465, 18432, 18566, 28393, 32912, 41244, 36650, 33070, 24273, 18420, 18733, 23674, 27483, 22873, 19841, 17787, 20810, 41910, 25626, 25885, 23144, 18408, 18456, 19256, 20496, 25006, 24145, 23104, 17889, 17483, 19206, 53112, 22530, 25590, 20582, 17924, 18423, 18987, 21678, 24153, 26451, 22989.0, 20573.0, 21432.0, 21309.0, 22292.0, 16809.0, 27312, 24316, 19595, 21126, 20705, 20169, 802], "borderColor": "#0EA5E9", "backgroundColor": "#0EA5E920", "borderWidth": 2, "tension": 0.4, "fill": false}]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { font: { size: 10 } }
+                    },
+                    title: { display: true, text: 'Sessions by Day' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        allCharts.sessions = charts.sessions;
+
+        // Create clicks chart
+        const clicksCtx = document.getElementById('clicksChart').getContext('2d');
+        charts.clicks = new Chart(clicksCtx, {
+            type: 'line',
+            data: {
+                labels: chartDataJSON.dates,
+                datasets: [{"label": "localoria.com", "data": [562, 592, 538, 482, 389, 471, 421, 371, 448, 376, 348, 353, 399, 411, 460, 229, 223, 173, 148, 161, 196, 206, 230, 227, 208, 169, 189, 238, 219, 249, 308, 287, 265, 237, 235, 253, 289, 298, 270, 236, 229, 201, 239, 260, 257, 233, 194, 221, 244, 214, 238, 236, 179, 174, 188, 193, 198, 267, 246, 233.0, 239.0, 299.0, 270.0, 322, 398, 364, 359, 332, 376, 373, 0, 0], "borderColor": "#3B82F6", "backgroundColor": "#3B82F620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "wherebly.com", "data": [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 2, 0, 0, 0, 2, 8, 0, 3, 6, 16, 28, 17, 15, 8, 25, 28, 10, 27, 26, 16.0, 11.0, 24.0, 17.0, 17, 24, 25, 27, 20, 21, 21, 0, 0], "borderColor": "#EF4444", "backgroundColor": "#EF444420", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "res-menu.net", "data": [13463, 16488, 16808, 13018, 11125, 10315, 10911, 11994, 14735, 13796, 8715, 8938, 10973, 12277, 13670, 17401, 17597, 12703, 11025, 12726, 13522, 14774, 19089, 20200, 13220, 12366, 14344, 16064, 18017, 22624, 28976, 20411, 17064, 17071, 18086, 19321, 24699, 25093, 17618, 14430, 16735, 18356, 19743, 25713, 27024, 20025, 17050, 19276, 21425, 23093, 29917, 31148, 22894, 18612, 20078, 22742, 26436, 34415, 35708, 26909.0, 22713.0, 26767.0, 26833.0, 28515, 35090, 35179, 27157, 21878, 23944, 25721, 0, 0], "borderColor": "#22C55E", "backgroundColor": "#22C55E20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "foodplacee.com", "data": [8019, 10511, 10775, 8662, 7051, 6769, 7238, 7060, 8546, 8279, 5300, 5431, 6671, 7456, 8190, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 3, 1, 0, 3, 12, 14, 17, 25, 25, 16, 14, 21, 33, 22, 6.0, 7.0, 7.0, 13.0, 19, 20, 34, 38, 26, 29, 38, 0, 0], "borderColor": "#F59E0B", "backgroundColor": "#F59E0B20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "restaurants-world.net", "data": [8019, 10511, 10775, 8662, 7051, 6769, 7238, 7060, 8546, 8279, 5300, 5431, 6671, 7456, 8190, 10010, 10239, 7700, 6184, 7261, 7650, 8380, 10492, 10859, 7235, 7008, 7833, 8468, 9430, 12033, 15468, 10724, 8856, 9064, 9437, 9880, 12650, 13359, 9353, 7932, 9051, 9820, 10964, 13559, 14153, 10680, 8597, 9684, 10346, 10635, 12763, 13264, 9718, 7514, 8233, 8285, 9025, 11808, 12356, 9240.0, 8299.0, 9099.0, 9156.0, 9929, 11881, 11918, 9349, 8086, 8932, 8998, 0, 0], "borderColor": "#8B5CF6", "backgroundColor": "#8B5CF620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "goto-where.com", "data": [6887, 8065, 8114, 6935, 6276, 5994, 6294, 5794, 5288, 5001, 3928, 3944, 4333, 4608, 4799, 5844, 5470, 4565, 4260, 4543, 4827, 5160, 5936, 5926, 4676, 4481, 4827, 4849, 5256, 6207, 6822, 5115, 4727, 4882, 4768, 5231, 8947, 9137, 7028, 6445, 6883, 7276, 7982, 9017, 9254, 7950, 6864, 7637, 7835, 8558, 11011, 11158, 8931, 7891, 8326, 8472, 9249, 10877, 10672, 9074.0, 8510.0, 8519.0, 8548.0, 8944, 10128, 10098, 8631, 7672, 7937, 8513, 0, 0], "borderColor": "#EC4899", "backgroundColor": "#EC489920", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menu-world.com", "data": [25629, 31716, 31625, 25458, 21662, 21372, 22585, 23987, 28508, 26313, 18511, 18890, 21991, 24255, 26820, 32476, 30430, 23074, 19792, 22456, 23992, 26014, 31299, 31005, 21700, 20914, 23730, 25348, 27431, 34672, 39386, 28841, 24932, 25323, 26107, 27696, 34131, 32975, 23786, 21428, 24314, 26021, 28748, 35416, 35280, 27419, 23418, 25829, 27090, 28940, 36556, 35824, 26237, 23187, 24418, 25349, 28334, 34230, 33281, 26349.0, 23412.0, 25566.0, 25589.0, 27270, 32896, 31899, 25555, 22539, 24295, 25604, 0, 0], "borderColor": "#06B6D4", "backgroundColor": "#06B6D420", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "grubbio.com", "data": [659, 631, 742, 677, 567, 576, 552, 592, 645, 662, 588, 490, 564, 635, 645, 809, 912, 744, 634, 689, 751, 833, 946, 1066, 819, 756, 824, 829, 892, 986, 1202, 906, 822, 915, 913, 967, 1051, 1109, 941, 743, 923, 958, 1089, 1164, 1095, 909, 750, 803, 800, 873, 972, 1032, 907, 716, 731, 701, 789, 958, 954, 807.0, 785.0, 788.0, 813.0, 866, 883, 904, 815, 682, 746, 745, 0, 0], "borderColor": "#14B8A6", "backgroundColor": "#14B8A620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menustic.com", "data": [1408, 1751, 1721, 1682, 1399, 1313, 1413, 1509, 1753, 1630, 1389, 1263, 1433, 1547, 1641, 1909, 1897, 1667, 1446, 1614, 1700, 1793, 2157, 2231, 1881, 1698, 1834, 1885, 1969, 2314, 2539, 2109, 1896, 1892, 1916, 2041, 2378, 2448, 2160, 1847, 1969, 2067, 2161, 2433, 2530, 2304, 1935, 2146, 2187, 2343, 2883, 2797, 2418, 2099, 2149, 2173, 2295, 2599, 2607, 2361.0, 2160.0, 2098.0, 2112.0, 2212, 2443, 2492, 2203, 1906, 2156, 2153, 0, 0], "borderColor": "#F97316", "backgroundColor": "#F9731620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menufyy.com", "data": [1071, 1329, 1327, 1162, 1067, 1059, 1015, 1087, 1263, 1149, 981, 860, 972, 1113, 1508, 1945, 2133, 1879, 1642, 1779, 1886, 2267, 2633, 2742, 2348, 2054, 2232, 2332, 2538, 2951, 3467, 2831, 2494, 2490, 2619, 2776, 3019, 3108, 2670, 2313, 2820, 2768, 3030, 3391, 3783, 3303, 2852, 3134, 3313, 3573, 4797, 5126, 4640, 3939, 4122, 4323, 4858, 5636, 6162, 5365.0, 4621.0, 4877.0, 5040.0, 5267, 6054, 6421, 5689, 4766, 5155, 5498, 0, 0], "borderColor": "#6366F1", "backgroundColor": "#6366F120", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "wherevi.com", "data": [3362, 4531, 4693, 3618, 3122, 3035, 2526, 1922, 2105, 1822, 1137, 1158, 1374, 1504, 1721, 1931, 1805, 1326, 1102, 1199, 1334, 1413, 1805, 1936, 1269, 1165, 1316, 1400, 1546, 1965, 2579, 1828, 1448, 1466, 1407, 1550, 1787, 1994, 1307, 1037, 1324, 1369, 1477, 1988, 1903, 1438, 1121, 1276, 1319, 1449, 1893, 1866, 1436, 1099, 1210, 1107, 1246, 1470, 1516, 1000.0, 899.0, 830.0, 801.0, 788, 990, 911, 716, 615, 570, 211, 0, 0], "borderColor": "#D946EF", "backgroundColor": "#D946EF20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "placejoys.com", "data": [62, 181, 209, 213, 233, 201, 187, 253, 345, 319, 286, 349, 461, 621, 812, 626, 710, 475, 533, 600, 673, 817, 1292, 1460, 1190, 1302, 1583, 1907, 2286, 2855, 3186, 2426, 2162, 2083, 2313, 2616, 3571, 3689, 3039, 2509, 2788, 2799, 3077, 3631, 3618, 3180, 2594, 2752, 3091, 3292, 3783, 4024, 3188, 2815, 3017, 3472, 4032, 4911, 4870, 4340.0, 3581.0, 4202.0, 4211.0, 4564, 5636, 5799, 4873, 4196, 4441, 4638, 0, 0], "borderColor": "#0EA5E9", "backgroundColor": "#0EA5E920", "borderWidth": 2, "tension": 0.4, "fill": false}]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { font: { size: 10 } }
+                    },
+                    title: { display: true, text: 'Clicks by Day (GSC)' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        allCharts.clicks = charts.clicks;
+
+        // Create impressions chart
+        const impressionsCtx = document.getElementById('impressionsChart').getContext('2d');
+        charts.impressions = new Chart(impressionsCtx, {
+            type: 'line',
+            data: {
+                labels: chartDataJSON.dates,
+                datasets: [{"label": "localoria.com", "data": [34794, 38284, 34137, 34048, 34049, 34251, 34931, 35595, 39762, 41236, 38904, 35458, 37179, 38539, 44771, 16589, 14496, 13920, 11907, 12304, 13383, 14374, 16614, 17648, 15834, 15650, 14909, 16242, 17260, 20591, 21243, 18641, 20042, 16580, 16598, 15804, 18844, 20908, 19879, 18365, 19102, 18021, 17294, 22095, 20980, 20702, 18282, 19192, 19080, 18116, 18945, 19423, 16855, 13928, 13762, 14655, 15724, 22003, 23719, 21339.0, 23733.0, 32858.0, 36498.0, 39979, 51362, 55569, 54085, 46173, 46442, 48271, 0, 0], "borderColor": "#3B82F6", "backgroundColor": "#3B82F620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "wherebly.com", "data": [1, 1, 1, 4, 0, 2, 1, 0, 3, 3, 1, 6, 1, 0, 1, 1, 1, 9, 12, 12, 22, 11, 24, 38, 16, 19, 32, 30, 23, 27, 27, 26, 23, 17, 28, 40, 22, 36, 38, 16, 31, 32, 36, 36, 213, 258, 127, 386, 627, 1082, 1285, 1561, 1426, 1119, 1369, 1530, 1774, 2093, 2015, 1763.0, 1535.0, 1195.0, 719.0, 786, 1019, 1097, 792, 566, 672, 740, 0, 0], "borderColor": "#EF4444", "backgroundColor": "#EF444420", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "res-menu.net", "data": [720111, 846316, 833104, 721821, 662633, 619570, 635610, 674576, 773806, 766442, 607204, 615290, 666451, 642173, 718427, 833320, 838395, 712049, 636017, 688510, 730599, 810888, 957467, 1036405, 790871, 730505, 807952, 884721, 973454, 1198396, 1436878, 1059368, 932618, 929656, 951124, 1020553, 1277796, 1341238, 1049300, 894225, 960460, 995839, 1042810, 1320801, 1346175, 1166680, 994230, 1095402, 1179308, 1296930, 1618058, 1737808, 1417281, 1168081, 1258885, 1452296, 1607530, 2035676, 2144067, 1795835.0, 1502900.0, 1749217.0, 1812792.0, 1894266, 2307567, 2375670, 1968940, 1556607, 1622073, 1690854, 0, 0], "borderColor": "#22C55E", "backgroundColor": "#22C55E20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "foodplacee.com", "data": [645804, 776047, 771574, 701622, 654714, 612432, 637815, 670780, 770724, 766271, 622539, 628652, 675952, 649504, 721280, 0, 0, 7, 12, 16, 12, 9, 3, 9, 5, 8, 4, 9, 8, 11, 14, 6, 6, 10, 6, 15, 5, 6, 6, 5, 10, 13, 13, 21, 161, 405, 283, 158, 393, 554, 1058, 1178, 1085, 815, 790, 716, 834, 1126, 1176, 627.0, 375.0, 418.0, 764.0, 957, 2245, 3768, 4557, 4296, 4205, 4869, 0, 0], "borderColor": "#F59E0B", "backgroundColor": "#F59E0B20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "restaurants-world.net", "data": [645804, 776047, 771574, 701622, 654714, 612432, 637815, 670780, 770724, 766271, 622539, 628652, 675952, 649504, 721280, 823935, 841267, 741930, 653851, 703136, 739682, 795019, 913099, 979674, 763368, 689132, 766006, 818662, 896256, 1080301, 1290365, 976747, 866144, 857799, 871867, 939044, 1164182, 1222312, 972312, 844964, 901914, 928217, 991583, 1218598, 1187910, 1009779, 830468, 899723, 920621, 983153, 1194907, 1220058, 964421, 792100, 829056, 873211, 949987, 1178796, 1216973, 1023044.0, 892833.0, 977846.0, 1011099.0, 1063880, 1291670, 1310065, 1114022, 907059, 944297, 989752, 0, 0], "borderColor": "#8B5CF6", "backgroundColor": "#8B5CF620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "goto-where.com", "data": [1328510, 1585319, 1639453, 1435646, 1296447, 1269135, 1288358, 1223579, 1212096, 1213707, 1014241, 982159, 1015511, 1054490, 1323224, 1218147, 1243942, 1088786, 964308, 1010044, 1076552, 1190567, 1354976, 1376504, 1115884, 1049249, 1119126, 1128185, 1214409, 1444458, 1598149, 1183142, 1095262, 1074439, 1084484, 1123969, 1901236, 1953248, 1600105, 1402033, 1455817, 1544356, 1664474, 1983897, 1958623, 1695871, 1445545, 1540728, 1603461, 1764721, 2203671, 2347689, 1944091, 1645215, 1743066, 1849489, 1961916, 2364553, 2439982, 2103379.0, 1797734.0, 1916441.0, 1929541.0, 2029705, 2375304, 2411395, 2081964, 1751451, 1785239, 1834401, 0, 0], "borderColor": "#EC4899", "backgroundColor": "#EC489920", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menu-world.com", "data": [2317357, 2773179, 2812322, 2442337, 2211411, 2124013, 2174376, 2296187, 2644748, 2643113, 2144604, 2097600, 2238200, 2295403, 2780064, 2842692, 2836633, 2367930, 2055094, 2147145, 2244680, 2450499, 2769291, 2860045, 2232371, 2046441, 2209798, 2336918, 2519312, 3038976, 3495889, 2575499, 2313702, 2319427, 2296496, 2392774, 2901174, 2951802, 2332167, 2029499, 2155374, 2291546, 2398752, 2889094, 2827812, 2381248, 1990925, 2113331, 2179719, 2337993, 2875640, 2989346, 2356093, 1982121, 2076535, 2233040, 2343762, 2869603, 2920476, 2453627.0, 2108450.0, 2315180.0, 2333606.0, 2447244, 2962688, 2997426, 2501787, 2085883, 2150593, 2229267, 0, 0], "borderColor": "#06B6D4", "backgroundColor": "#06B6D420", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "grubbio.com", "data": [63864, 72439, 76308, 69699, 60908, 60119, 61013, 65644, 76120, 82289, 72224, 63303, 64713, 74437, 96787, 84980, 94552, 91537, 78609, 85169, 90636, 103750, 117032, 125950, 109363, 99497, 100696, 103373, 108976, 131930, 140918, 110851, 102459, 102109, 102484, 105387, 118941, 126635, 110487, 96772, 102961, 107600, 116980, 133031, 129946, 113095, 89515, 95576, 95039, 101446, 116494, 124026, 109243, 87204, 91154, 95807, 99567, 115827, 122026, 108916.0, 90652.0, 96142.0, 98352.0, 106485, 117988, 123772, 112293, 92916, 93583, 95142, 0, 0], "borderColor": "#14B8A6", "backgroundColor": "#14B8A620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menustic.com", "data": [140594, 170399, 187303, 172560, 148548, 146816, 147155, 156633, 179700, 195493, 175560, 153656, 160972, 176758, 236429, 202028, 220067, 204611, 175412, 232410, 290934, 251324, 278201, 288064, 249472, 224403, 230488, 233101, 246662, 300239, 323809, 252161, 226114, 237222, 225208, 229833, 274604, 286619, 253316, 219761, 225548, 239140, 257497, 297381, 301383, 271081, 222946, 236842, 241720, 261139, 310446, 331112, 293128, 238187, 244061, 249975, 261926, 307478, 326834, 298186.0, 245925.0, 257824.0, 257600.0, 277988, 323887, 339891, 311453, 259234, 260887, 264226, 0, 0], "borderColor": "#F97316", "backgroundColor": "#F9731620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menufyy.com", "data": [97384, 110175, 117384, 110653, 94260, 94109, 96025, 99058, 104732, 110222, 100882, 84342, 83924, 105062, 209913, 206054, 226313, 212153, 186608, 215002, 244373, 275563, 330666, 349525, 312509, 325498, 341696, 330148, 331626, 384893, 410260, 318931, 301860, 292663, 292165, 287113, 350167, 395438, 356512, 308632, 333056, 340129, 318139, 376736, 381373, 350987, 290021, 321131, 336671, 365456, 454601, 514222, 469557, 387892, 412406, 439510, 480376, 575004, 630389, 591051.0, 475508.0, 507256.0, 539553.0, 576537, 673800, 718825, 656828, 543354, 566166, 581918, 0, 0], "borderColor": "#6366F1", "backgroundColor": "#6366F120", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "wherevi.com", "data": [196539, 246907, 261439, 235822, 216630, 201624, 194164, 180850, 178909, 158284, 121351, 119763, 126594, 120867, 131294, 121008, 117254, 101794, 85039, 91315, 96893, 102573, 117432, 126160, 89964, 83934, 94334, 98331, 106613, 128984, 157159, 117937, 102124, 96784, 95166, 101768, 121022, 127484, 99433, 82532, 87448, 90967, 97447, 118323, 115904, 96004, 76838, 82741, 85730, 92588, 117187, 124900, 99045, 80988, 85830, 88332, 97283, 118304, 122667, 99910.0, 84354.0, 91681.0, 93620.0, 98313, 119471, 124235, 103676, 82594, 63607, 13350, 0, 0], "borderColor": "#D946EF", "backgroundColor": "#D946EF20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "placejoys.com", "data": [11576, 26733, 32581, 36283, 34562, 31466, 30853, 33150, 43492, 46966, 41468, 44391, 49854, 56076, 68149, 42100, 43479, 40707, 37358, 43650, 47463, 55726, 81884, 102678, 90693, 86211, 97182, 113396, 127696, 166704, 209075, 162190, 158163, 142598, 158579, 183657, 234321, 249809, 218142, 185148, 194559, 194715, 205414, 247326, 247812, 215976, 183657, 200940, 211243, 222875, 265775, 291409, 255557, 225257, 233016, 277674, 301846, 368239, 391583, 327050.0, 269907.0, 330576.0, 341172.0, 369324, 451840, 464806, 400732, 330852, 345478, 358834, 0, 0], "borderColor": "#0EA5E9", "backgroundColor": "#0EA5E920", "borderWidth": 2, "tension": 0.4, "fill": false}]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { font: { size: 10 } }
+                    },
+                    title: { display: true, text: 'Impressions by Day (GSC)' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        allCharts.impressions = charts.impressions;
+
+        // Create position chart (reversed Y-axis)
+        const positionCtx = document.getElementById('positionChart').getContext('2d');
+        charts.position = new Chart(positionCtx, {
+            type: 'line',
+            data: {
+                labels: chartDataJSON.dates,
+                datasets: [{"label": "localoria.com", "data": [8.2521, 8.3407, 8.0654, 9.2009, 9.4574, 9.1716, 9.7858, 9.4826, 8.6342, 8.5811, 9.0093, 9.0405, 8.9132, 8.568, 7.9932, 8.7668, 8.7253, 9.5707, 10.8211, 10.157, 9.6549, 8.9612, 8.3921, 8.2205, 8.0525, 7.9899, 7.9858, 8.0869, 8.1826, 7.4633, 7.3908, 7.1638, 8.3071, 8.4044, 8.1305, 8.3848, 7.8187, 7.714, 7.6744, 7.2551, 7.5033, 7.5741, 7.5877, 6.9713, 6.7863, 6.9457, 6.9407, 7.2007, 7.6189, 8.3076, 8.4796, 8.6586, 8.4635, 8.3405, 9.0496, 9.6377, 8.9654, 9.4803, 9.2092, 9.5084, 9.8669, 10.2483, 9.9604, 9.8295, 9.5619, 9.113, 8.9609, 9.067, 8.6619, 9.4419, 0, 0], "borderColor": "#3B82F6", "backgroundColor": "#3B82F620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "wherebly.com", "data": [1, 1, 1, 5.25, 0, 1, 1, 0, 1, 28, 1, 1.1667, 1, 0, 1, 1, 1, 4.3333, 5, 6.4167, 4.1818, 6.8182, 4.875, 6.6579, 6.25, 7.1053, 6.5938, 12.4, 8.2174, 11.5926, 6.3704, 7.6154, 6.3913, 11.7059, 8.0357, 8.55, 11.1364, 7.3056, 9.5526, 7.75, 6.6774, 6.9688, 5.8611, 10.3056, 5.277, 6.376, 6.7874, 6.6606, 8.2041, 6.6303, 6.8623, 6.991, 6.636, 7.3378, 8.1351, 7.332, 6.9301, 6.5308, 7.5385, 7.6398, 7.3075, 7.79, 6.0195, 6.4898, 5.946, 5.443, 6.173, 6.0512, 4.8095, 5.8297, 0, 0], "borderColor": "#EF4444", "backgroundColor": "#EF444420", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "res-menu.net", "data": [9.7522, 9.838, 9.0226, 10.5895, 11.9539, 12.2724, 12.3887, 12.1364, 10.5147, 10.0446, 11.694, 11.1752, 10.7812, 10.4905, 9.9634, 10.2653, 10.1, 11.2852, 12.031, 10.7876, 10.7529, 10.7551, 9.9877, 9.7696, 9.7948, 9.8795, 10.0533, 10.4837, 10.2803, 9.5524, 9.0356, 9.1068, 9.7802, 10.3525, 10.0516, 9.7683, 9.4853, 9.309, 9.7578, 10.0804, 10.2956, 9.8401, 9.5924, 9.2182, 8.666, 9.4921, 10.0534, 9.9055, 9.8771, 9.9512, 9.5451, 9.4033, 9.6085, 9.6534, 10.0518, 10.0549, 9.5393, 9.2181, 8.8629, 9.1671, 9.4495, 9.466, 9.4778, 9.3204, 9.4809, 9.1331, 9.3361, 9.2975, 8.9338, 9.2382, 0, 0], "borderColor": "#22C55E", "backgroundColor": "#22C55E20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "foodplacee.com", "data": [9.5722, 9.5359, 8.797, 10.1651, 11.2007, 11.5061, 11.5656, 11.4091, 10.009, 9.6328, 10.8869, 10.478, 10.1983, 9.9232, 9.4786, 0, 0, 7.4286, 5.8333, 7.1875, 6.3333, 5.5556, 5.3333, 8.3333, 5.6, 4.375, 6.75, 6.3333, 4, 6.3636, 4.0714, 3.3333, 5, 3.8, 7.8333, 5.6, 7, 5.6667, 2.1667, 4.2, 5.4, 5.1538, 7.0769, 5.381, 6.3727, 5.1333, 6.7703, 8.981, 6.5674, 5.7347, 6.4972, 5.9745, 6.1806, 5.589, 5.9519, 6.0559, 4.7374, 4.5595, 5.6088, 7.134, 6.9307, 8.4904, 6.3678, 6.5298, 7.3385, 8.1388, 8.582, 8.9169, 8.7239, 9.2707, 0, 0], "borderColor": "#F59E0B", "backgroundColor": "#F59E0B20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "restaurants-world.net", "data": [9.5722, 9.5359, 8.797, 10.1651, 11.2007, 11.5061, 11.5656, 11.4091, 10.009, 9.6328, 10.8869, 10.478, 10.1983, 9.9232, 9.4786, 9.7848, 9.6881, 10.6299, 11.276, 10.189, 10.2265, 10.266, 9.5906, 9.4491, 9.3534, 9.4989, 9.6135, 10.0773, 9.8977, 9.2955, 8.8303, 8.8721, 9.4715, 10.0501, 9.7662, 9.4956, 9.2262, 9.1137, 9.4616, 9.7235, 9.9172, 9.4482, 9.2038, 8.976, 8.4563, 9.1037, 9.5656, 9.3836, 9.3543, 9.4846, 9.205, 9.1353, 9.2377, 9.3817, 9.8656, 10.2052, 9.7375, 9.4445, 9.0517, 9.3876, 9.5878, 9.8448, 9.7877, 9.5199, 9.8066, 9.4667, 9.6479, 9.552, 9.1821, 9.5461, 0, 0], "borderColor": "#8B5CF6", "backgroundColor": "#8B5CF620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "goto-where.com", "data": [8.9779, 8.9961, 8.7246, 9.3583, 9.8366, 9.948, 9.925, 10.1235, 9.662, 9.5385, 10.2834, 10.1356, 9.89, 9.3978, 8.7253, 9.7155, 9.6029, 10.2637, 10.5819, 9.7063, 9.7916, 9.9324, 9.552, 9.1675, 9.284, 9.2771, 9.4693, 10.0191, 9.8732, 9.3601, 9.1912, 9.2316, 9.6185, 10.0355, 9.8384, 9.7229, 8.9076, 8.945, 9.0951, 9.108, 9.3007, 9.105, 8.9278, 8.7683, 8.3827, 8.6806, 8.8521, 8.7417, 8.6704, 8.5997, 8.4143, 8.3187, 8.3357, 8.2459, 8.4602, 8.6151, 8.3818, 8.3663, 8.2647, 8.4065, 8.4316, 8.6081, 8.634, 8.5885, 8.69, 8.5372, 8.5941, 8.4553, 8.2382, 8.48, 0, 0], "borderColor": "#EC4899", "backgroundColor": "#EC489920", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menu-world.com", "data": [8.5114, 8.5541, 8.1288, 9.0033, 9.6739, 10.0342, 10.0072, 9.9769, 9.0112, 8.7979, 9.7223, 9.4702, 9.1064, 8.6787, 8.0015, 8.5829, 8.5788, 9.4125, 10.0038, 9.2145, 9.3487, 9.3777, 8.8133, 8.591, 8.6832, 8.7376, 8.8836, 9.1969, 9.1046, 8.5775, 8.3263, 8.4311, 8.8259, 8.9977, 8.9351, 8.8046, 8.568, 8.5819, 8.9306, 8.9782, 9.1408, 8.8284, 8.5929, 8.3816, 7.936, 8.4348, 8.6774, 8.6081, 8.6486, 8.5983, 8.3151, 8.2371, 8.4448, 8.4136, 8.7714, 8.9361, 8.4674, 8.3721, 8.1566, 8.497, 8.6846, 8.8462, 8.8681, 8.7245, 8.8062, 8.5617, 8.7729, 8.6511, 8.2707, 8.6332, 0, 0], "borderColor": "#06B6D4", "backgroundColor": "#06B6D420", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "grubbio.com", "data": [8.2122, 8.3297, 8.1329, 8.8218, 8.9914, 9.1668, 9.2821, 9.0481, 8.5097, 8.4385, 8.7814, 9.0453, 8.7221, 8.3868, 7.5651, 8.5476, 8.2946, 8.516, 8.7243, 8.1554, 8.1701, 8.344, 7.9643, 7.7437, 7.8321, 7.7167, 8.0146, 8.1598, 8.0238, 7.7383, 7.7968, 7.8635, 8.1046, 8.3788, 8.1749, 8.2475, 8.1681, 8.2157, 8.3002, 8.3742, 8.6578, 8.6239, 8.227, 8.1468, 7.9571, 8.272, 8.6862, 8.6749, 8.6375, 8.6448, 8.6683, 8.5967, 8.6205, 8.5055, 8.8728, 8.8985, 8.5495, 8.6169, 8.5696, 8.8515, 8.7858, 8.9206, 8.8988, 8.8255, 9.0241, 8.8498, 8.7953, 8.6575, 8.3136, 8.7325, 0, 0], "borderColor": "#14B8A6", "backgroundColor": "#14B8A620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menustic.com", "data": [7.1981, 7.2292, 7.1298, 7.4527, 7.5301, 7.6646, 7.699, 7.6804, 7.2892, 7.3208, 7.4411, 7.5338, 7.5275, 7.1597, 6.6384, 7.3965, 7.2918, 7.4686, 7.5491, 6.8208, 6.7595, 7.1277, 6.9972, 6.8669, 6.9391, 6.8918, 7.0721, 7.1707, 7.1392, 6.9355, 7.038, 7.0652, 7.1122, 6.9656, 7.0528, 7.1181, 7.0781, 7.1674, 7.2129, 7.0478, 7.3656, 7.399, 7.2346, 7.2048, 7.0757, 7.1604, 7.3105, 7.5206, 7.1735, 7.14, 7.1686, 7.1781, 7.1571, 7.0583, 7.234, 7.4057, 7.2474, 7.3253, 7.3348, 7.4635, 7.3488, 7.4878, 7.521, 7.4793, 7.5135, 7.4601, 7.4622, 7.3169, 7.1788, 7.3859, 0, 0], "borderColor": "#F97316", "backgroundColor": "#F9731620", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "menufyy.com", "data": [7.6497, 7.8264, 7.8476, 8.2906, 8.2921, 8.4886, 8.5392, 8.6905, 8.3011, 8.2755, 8.4877, 8.6968, 8.6095, 8.0645, 7.64, 8.9121, 8.6346, 8.8038, 8.8912, 7.9685, 8.1449, 8.5009, 8.183, 7.8709, 8.0372, 7.5062, 7.5205, 7.745, 7.9514, 7.8537, 8.0491, 8.0696, 8.1017, 8.3957, 8.2042, 8.3444, 8.1476, 8.0782, 8.0716, 8.0325, 8.296, 8.3594, 8.3574, 8.231, 7.9351, 8.0826, 8.3291, 8.2116, 8.0537, 8.0325, 7.958, 7.8593, 7.8568, 7.6737, 7.9561, 7.9462, 7.6879, 7.7635, 7.7412, 7.7906, 7.8852, 7.9414, 7.8533, 7.9074, 7.9267, 7.8733, 7.8585, 7.7515, 7.5483, 7.7402, 0, 0], "borderColor": "#6366F1", "backgroundColor": "#6366F120", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "wherevi.com", "data": [8.5293, 8.5711, 7.8798, 9.2608, 9.9124, 10.2124, 10.6184, 10.7916, 9.4204, 9.0013, 10.2594, 9.929, 9.667, 9.2632, 8.8388, 9.0566, 8.8608, 9.8072, 10.7153, 9.9274, 9.6525, 9.4161, 8.7436, 8.6013, 8.6045, 8.6803, 8.7334, 9.2364, 9.1555, 8.4884, 7.9142, 8.0179, 8.5665, 9.0322, 8.8248, 8.5921, 8.4031, 8.3126, 8.6058, 9.0699, 9.1102, 8.6989, 8.4276, 8.2179, 7.7607, 8.3693, 8.9943, 8.9174, 9.0685, 9.0446, 8.5705, 8.3907, 8.4079, 8.5401, 8.8614, 9.2969, 8.9397, 8.6305, 8.2011, 8.3929, 8.593, 8.9453, 8.8088, 8.4458, 8.731, 8.5004, 8.5896, 8.494, 8.2789, 12.689, 0, 0], "borderColor": "#D946EF", "backgroundColor": "#D946EF20", "borderWidth": 2, "tension": 0.4, "fill": false}, {"label": "placejoys.com", "data": [9.3819, 9.9126, 9.2005, 10.0922, 10.6687, 10.6456, 10.5777, 10.1715, 9.2231, 8.9118, 9.6135, 9.5563, 9.3498, 8.7779, 8.2289, 8.5886, 8.2456, 9.1386, 9.9404, 9.6528, 9.0581, 8.681, 8.0239, 7.8738, 7.9082, 8.1532, 8.0299, 8.1058, 7.9887, 7.489, 7.5507, 7.5196, 8.1816, 8.4497, 8.2117, 8.2612, 7.7573, 7.6351, 7.7251, 8.0967, 8.4373, 8.0693, 7.9376, 7.6732, 7.219, 7.6483, 7.8504, 7.9667, 8.0804, 8.2675, 8.3116, 8.0778, 8.0757, 7.9834, 8.3646, 8.2244, 7.8342, 7.8677, 7.6255, 7.6823, 8.0022, 7.9466, 7.812, 7.6807, 7.9067, 7.6418, 7.716, 7.5242, 7.3189, 7.7656, 0, 0], "borderColor": "#0EA5E9", "backgroundColor": "#0EA5E920", "borderWidth": 2, "tension": 0.4, "fill": false}]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { font: { size: 10 } }
+                    },
+                    title: { display: true, text: 'Average Position by Day (Lower is Better)' }
+                },
+                scales: {
+                    y: {
+                        reverse: true,
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+        allCharts.position = charts.position;
+    </script>
+</body>
+</html>
