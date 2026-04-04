@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Dashboard - Hotels</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #f1f5f9;
+        }
+        .dark-mode { background: #0f172a; color: #f1f5f9; }
+        .light-mode { background: #ffffff; color: #1e293b; }
+        .light-mode .card { background: #f8fafc; border-color: #e2e8f0; }
+        .light-mode .header { background: #ffffff; border-bottom-color: #e2e8f0; }
+
+        header {
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 30px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 { font-size: 2em; margin-bottom: 10px; }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 0.95em;
+        }
+
+        button:hover { background: #2563eb; }
+
+        .cross-link {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .cross-link a {
+            background: #334155;
+            color: #f1f5f9;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .cross-link a:hover { background: #475569; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .toc {
+            position: fixed;
+            left: 20px;
+            top: 150px;
+            width: 200px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+            z-index: 50;
+        }
+
+        .toc a {
+            display: block;
+            color: #94a3b8;
+            text-decoration: none;
+            margin: 10px 0;
+            padding: 8px 12px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .toc a:hover { color: #f1f5f9; }
+        .toc a.active { color: #3b82f6; border-left-color: #3b82f6; }
+
+        .content { margin-left: 240px; }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .kpi-label { color: #94a3b8; font-size: 0.9em; margin-bottom: 10px; }
+        .kpi-value { font-size: 2.2em; font-weight: 600; margin-bottom: 8px; }
+        .kpi-change { font-size: 0.9em; }
+        .kpi-change.positive { color: #22c55e; }
+        .kpi-change.negative { color: #ef4444; }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #334155;
+        }
+
+        .chart-container {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .chart-title { font-size: 1.1em; margin-bottom: 15px; color: #f1f5f9; }
+
+        canvas {
+            display: block !important;
+            max-height: 300px;
+        }
+
+        .filter-container {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .filter-container label {
+            margin-right: 15px;
+            color: #94a3b8;
+        }
+
+        .filter-container select {
+            background: #334155;
+            color: #f1f5f9;
+            border: 1px solid #475569;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #334155;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover { background: #475569; }
+
+        td {
+            padding: 15px;
+            border-top: 1px solid #334155;
+        }
+
+        tr:hover { background: #334155; }
+
+        .anomaly-card {
+            background: #1e293b;
+            border-left: 4px solid #ef4444;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        .anomaly-card.warning { border-left-color: #eab308; }
+        .anomaly-card.success { border-left-color: #22c55e; }
+
+        .recommendation {
+            background: #1e293b;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid #334155;
+        }
+
+        @media (max-width: 1024px) {
+            .toc { display: none; }
+            .content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <header>
+        <div class="header-content">
+            <div>
+                <h1>SEO Dashboard</h1>
+                <p style="color: #94a3b8;">Hotels Websites</p>
+            </div>
+            <div class="header-controls">
+                <button onclick="toggleTheme()">🌙 Theme</button>
+                <a href="index.html" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none;">📊 Index</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="cross-link">
+            <a href="seo-restaurants-2026-04-04.html">↔️ View Restaurants Report</a>
+            <a href="index.html">📋 Back to Index</a>
+        </div>
+
+        <nav class="toc">
+            <a href="#kpis" class="toc-link">KPIs</a>
+            <a href="#filter" class="toc-link">Filter</a>
+            <a href="#trends" class="toc-link">Trends</a>
+            <a href="#websites" class="toc-link">Websites</a>
+            <a href="#keywords" class="toc-link">Keywords</a>
+            <a href="#anomalies" class="toc-link">Anomalies</a>
+        </nav>
+
+        <div class="content">
+            <!-- KPIs Section -->
+            <section class="section" id="kpis">
+                <h2 class="section-title">Key Performance Indicators (30 days)</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Sessions</div>
+                        <div class="kpi-value">22,496.0</div>
+                        <div class="kpi-change positive">+0.0%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Users</div>
+                        <div class="kpi-value">685.0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Page Views</div>
+                        <div class="kpi-value">25,607.0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">GSC Clicks</div>
+                        <div class="kpi-value">2,121.0</div>
+                        <div class="kpi-change positive">+0.0%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Impressions</div>
+                        <div class="kpi-value">227,708.0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Bounce Rate</div>
+                        <div class="kpi-value">57.5%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Engagement Rate</div>
+                        <div class="kpi-value">42.5%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Position</div>
+                        <div class="kpi-value">10.2</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filter Section -->
+            <section class="section" id="filter">
+                <h2 class="section-title">Website Filter</h2>
+                <div class="filter-container">
+                    <label for="domain-filter">Select Website:</label>
+                    <select id="domain-filter" onchange="filterTable()">
+                        <option value="">All Websites</option>
+                        <option value="gohotelly.com">gohotelly.com</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Trends Section -->
+            <section class="section" id="trends">
+                <h2 class="section-title">30-Day Trend Analysis</h2>
+                <div class="chart-container">
+                    <div class="chart-title">Sessions Trend</div>
+                    <canvas id="sessionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">GSC Clicks Trend</div>
+                    <canvas id="clicksChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Impressions Trend</div>
+                    <canvas id="impressionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Average Position Trend</div>
+                    <canvas id="positionChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Website Comparison -->
+            <section class="section" id="websites">
+                <h2 class="section-title">Website Comparison</h2>
+                <table id="websites-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('websites-table', 0)">Domain 🔄</th>
+                            <th onclick="sortTable('websites-table', 1)">Sessions 🔄</th>
+                            <th onclick="sortTable('websites-table', 2)">Clicks 🔄</th>
+                            <th onclick="sortTable('websites-table', 3)">Impressions 🔄</th>
+                            <th onclick="sortTable('websites-table', 4)">Position 🔄</th>
+                            <th onclick="sortTable('websites-table', 5)">Bounce Rate 🔄</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Top Keywords -->
+            <section class="section" id="keywords">
+                <h2 class="section-title">Top Keywords</h2>
+                <table id="keywords-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('keywords-table', 0)">Query 🔄</th>
+                            <th onclick="sortTable('keywords-table', 1)">Clicks 🔄</th>
+                            <th onclick="sortTable('keywords-table', 2)">Impressions 🔄</th>
+                            <th onclick="sortTable('keywords-table', 3)">CTR 🔄</th>
+                            <th onclick="sortTable('keywords-table', 4)">Position 🔄</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Anomalies -->
+            <section class="section" id="anomalies">
+                <h2 class="section-title">Anomaly Alerts</h2>
+                <div id="anomalies-container"></div>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <p>Generated on 2026-04-04 17:12:40</p>
+    </footer>
+
+    <script>
+        // Data
+        const domainData = [{"domain": "gohotelly.com", "sessions": 22496.0, "clicks": 2121.0, "impressions": 227708.0, "position": 10.194532142857144, "bounce_rate": 57.501333333333335}];
+        const keywordsData = [{"query": "nau salgados dunas suites", "clicks": 100, "impressions": 1369, "ctr": 7.3, "position": 3.3747}, {"query": "ariyana reach hotel", "clicks": 65, "impressions": 2283, "ctr": 2.85, "position": 2.855}, {"query": "ariyana reach", "clicks": 58, "impressions": 2208, "ctr": 2.63, "position": 2.8936}, {"query": "motel urban", "clicks": 43, "impressions": 1311, "ctr": 3.2800000000000002, "position": 9.4416}, {"query": "ariyana reach hotel maharagama", "clicks": 37, "impressions": 617, "ctr": 6.0, "position": 2.4814}, {"query": "hotel luzino", "clicks": 37, "impressions": 1065, "ctr": 3.47, "position": 4.6075}, {"query": "the village resort & waterpark", "clicks": 36, "impressions": 666, "ctr": 5.41, "position": 6.4324}, {"query": "udayachal tourist lodge", "clicks": 30, "impressions": 929, "ctr": 3.2300000000000004, "position": 3.3617}, {"query": "matara rest house", "clicks": 29, "impressions": 2291, "ctr": 1.27, "position": 5.773}, {"query": "precios de motel urban villas & suites", "clicks": 28, "impressions": 572, "ctr": 4.9, "position": 7.785}, {"query": "volets resort", "clicks": 27, "impressions": 2784, "ctr": 0.97, "position": 5.6616}, {"query": "university of ghana guest centre prices", "clicks": 26, "impressions": 285, "ctr": 9.120000000000001, "position": 7.2246}, {"query": "salgados dunas suites", "clicks": 25, "impressions": 832, "ctr": 3.0, "position": 4.6022}, {"query": "motel urban villas & suites", "clicks": 22, "impressions": 926, "ctr": 2.3800000000000003, "position": 7.9276}, {"query": "mehran lodges", "clicks": 20, "impressions": 586, "ctr": 3.4099999999999997, "position": 2.3191}, {"query": "ranowell hotel", "clicks": 18, "impressions": 2307, "ctr": 0.7799999999999999, "position": 7.8522}, {"query": "h\u00f4tel magic iliade djerba", "clicks": 17, "impressions": 844, "ctr": 2.01, "position": 8.3815}, {"query": "mehran lodges murree", "clicks": 17, "impressions": 643, "ctr": 2.64, "position": 2.4883}, {"query": "ud\u00edrna jind\u0159ich\u016fv hradec", "clicks": 17, "impressions": 671, "ctr": 2.53, "position": 4.6438}, {"query": "tui suneo dunas", "clicks": 16, "impressions": 539, "ctr": 2.97, "position": 8.3692}];
+        const anomaliesData = [];
+        const chartDates = ["2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02"];
+        const sessionsDatasets = [{"label": "gohotelly.com", "data": [651, 666, 596, 654, 633, 621, 626, 692, 629, 672, 661, 756.0, 767.0, 691.0, 736.0, 924.0, 421.0, 794, 751, 741, 816, 999, 997, 1138.0, 791.0, 785.0, 806.0, 934.0, 828.0, 720.0], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 3}];
+        const clicksDatasets = [{"label": "gohotelly.com", "data": [64, 89, 67, 83, 57, 82, 74, 93, 90, 93, 65, 71.0, 75.0, 82.0, 95.0, 79, 77, 67, 61, 50, 70, 68, 68.0, 72.0, 73.0, 80.0, 83.0, 93.0], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 3}];
+        const impressionsDatasets = [{"label": "gohotelly.com", "data": [7063, 7200, 7126, 8057, 6839, 7323, 8345, 8140, 7737, 8556, 7776, 7189.0, 7174.0, 7587.0, 7772.0, 8083, 8521, 8589, 7815, 8600, 7990, 8345, 9086.0, 9480.0, 9514.0, 8989.0, 9455.0, 9357.0], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 3}];
+        const positionDatasets = [{"label": "gohotelly.com", "data": [10.5366, 10.0956, 10.2254, 10.1215, 10.2648, 9.9507, 11.4376, 9.7781, 9.6248, 9.6426, 9.7582, 10.1562, 10.048, 10.5045, 10.1414, 10.4078, 10.6205, 10.5455, 10.4631, 10.617, 9.3352, 9.6594, 9.9799, 10.4825, 11.2296, 9.9834, 9.9623, 9.8747], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 3}];
+
+        // Initialize tables
+        function initTables() {
+            populateWebsitesTable();
+            populateKeywordsTable();
+            populateAnomalies();
+            initCharts();
+            setupTOC();
+        }
+
+        function populateWebsitesTable() {
+            const tbody = document.querySelector('#websites-table tbody');
+            domainData.forEach(domain => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = domain.domain;
+                row.insertCell(1).textContent = domain.sessions.toLocaleString();
+                row.insertCell(2).textContent = domain.clicks.toLocaleString();
+                row.insertCell(3).textContent = domain.impressions.toLocaleString();
+                row.insertCell(4).textContent = domain.position.toFixed(2);
+                row.insertCell(5).textContent = domain.bounce_rate.toFixed(1) + '%';
+                row.className = 'data-row';
+                row.dataset.domain = domain.domain;
+            });
+        }
+
+        function populateKeywordsTable() {
+            const tbody = document.querySelector('#keywords-table tbody');
+            keywordsData.forEach(kw => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = kw.query;
+                row.insertCell(1).textContent = kw.clicks.toLocaleString();
+                row.insertCell(2).textContent = kw.impressions.toLocaleString();
+                row.insertCell(3).textContent = (kw.ctr.toFixed(2)) + '%';
+                row.insertCell(4).textContent = kw.position.toFixed(2);
+            });
+        }
+
+        function populateAnomalies() {
+            const container = document.getElementById('anomalies-container');
+            if (anomaliesData.length === 0) {
+                container.innerHTML = '<p>No anomalies detected</p>';
+                return;
+            }
+            anomaliesData.forEach(anomaly => {
+                const card = document.createElement('div');
+                card.className = 'anomaly-card';
+                if (anomaly.text.includes('spike')) card.classList.add('warning');
+                if (anomaly.text.includes('improved')) card.classList.add('success');
+                card.textContent = anomaly.text;
+                container.appendChild(card);
+            });
+        }
+
+        function filterTable() {
+            const domain = document.getElementById('domain-filter').value;
+            const rows = document.querySelectorAll('#websites-table tbody .data-row');
+            rows.forEach(row => {
+                if (domain === '' || row.dataset.domain === domain) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function sortTable(tableId, columnIndex) {
+            const table = document.getElementById(tableId);
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const isNumeric = rows.every(row => !isNaN(parseFloat(row.cells[columnIndex].textContent.replace(/[^0-9.-]/g, ''))));
+
+            rows.sort((a, b) => {
+                const aVal = a.cells[columnIndex].textContent.trim();
+                const bVal = b.cells[columnIndex].textContent.trim();
+
+                if (isNumeric) {
+                    return parseFloat(bVal.replace(/[^0-9.-]/g, '')) - parseFloat(aVal.replace(/[^0-9.-]/g, ''));
+                } else {
+                    return aVal.localeCompare(bVal);
+                }
+            });
+
+            rows.forEach(row => table.querySelector('tbody').appendChild(row));
+        }
+
+        function setupTOC() {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    const link = document.querySelector(`.toc-link[href="#${entry.target.id}"]`);
+                    if (link) {
+                        if (entry.isIntersecting) {
+                            document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
+                            link.classList.add('active');
+                        }
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            document.querySelectorAll('section').forEach(section => observer.observe(section));
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            document.body.classList.toggle('light-mode');
+        }
+
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: { legend: { labels: { color: '#f1f5f9' } } },
+                scales: {
+                    y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                    x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                }
+            };
+
+            // Sessions Chart
+            const sessionsCtx = document.getElementById('sessionsChart').getContext('2d');
+            new Chart(sessionsCtx, {
+                type: 'line',
+                data: { labels: chartDates, datasets: sessionsDatasets },
+                options: chartOptions
+            });
+
+            // Clicks Chart
+            const clicksCtx = document.getElementById('clicksChart').getContext('2d');
+            new Chart(clicksCtx, {
+                type: 'line',
+                data: { labels: chartDates, datasets: clicksDatasets },
+                options: chartOptions
+            });
+
+            // Impressions Chart
+            const impressionsCtx = document.getElementById('impressionsChart').getContext('2d');
+            new Chart(impressionsCtx, {
+                type: 'line',
+                data: { labels: chartDates, datasets: impressionsDatasets },
+                options: chartOptions
+            });
+
+            // Position Chart (reversed Y axis)
+            const positionCtx = document.getElementById('positionChart').getContext('2d');
+            const positionOptions = { ...chartOptions, scales: {
+                y: { ...chartOptions.scales.y, reverse: true },
+                x: chartOptions.scales.x
+            } };
+            new Chart(positionCtx, {
+                type: 'line',
+                data: { labels: chartDates, datasets: positionDatasets },
+                options: positionOptions
+            });
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', initTables);
+    </script>
+</body>
+</html>
