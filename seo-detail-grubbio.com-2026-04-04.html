@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Detail - grubbio.com</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #f1f5f9;
+        }
+
+        header {
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 30px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        h1 { font-size: 2em; margin-bottom: 5px; }
+        .domain-name { color: #94a3b8; font-size: 0.95em; }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            background: #334155;
+            color: #f1f5f9;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover { background: #475569; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .toc {
+            position: fixed;
+            left: 20px;
+            top: 150px;
+            width: 200px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+            z-index: 50;
+        }
+
+        .toc a {
+            display: block;
+            color: #94a3b8;
+            text-decoration: none;
+            margin: 10px 0;
+            padding: 8px 12px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .toc a:hover { color: #f1f5f9; }
+        .toc a.active { color: #3b82f6; border-left-color: #3b82f6; }
+
+        .content { margin-left: 240px; }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .kpi-label { color: #94a3b8; font-size: 0.85em; margin-bottom: 8px; }
+        .kpi-value { font-size: 1.8em; font-weight: 600; }
+        .kpi-change { font-size: 0.85em; margin-top: 5px; }
+        .kpi-change.positive { color: #22c55e; }
+        .kpi-change.negative { color: #ef4444; }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #334155;
+        }
+
+        .chart-container {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .chart-title { font-size: 1em; margin-bottom: 10px; color: #f1f5f9; }
+
+        canvas {
+            display: block !important;
+            max-height: 250px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        th {
+            background: #334155;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        th:hover { background: #475569; }
+
+        td {
+            padding: 12px;
+            border-top: 1px solid #334155;
+            font-size: 0.9em;
+        }
+
+        tr:hover { background: #334155; }
+
+        .anomaly-card {
+            background: #1e293b;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-top: 1px solid #334155;
+        }
+
+        @media (max-width: 1024px) {
+            .toc { display: none; }
+            .content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>SEO Detail Report</h1>
+            <p class="domain-name">grubbio.com</p>
+            <div class="nav-links"><a href="seo-detail-menu-world.com-2026-04-04.html">← menu-world.com</a><a href="seo-restaurants-2026-04-04.html">↑ Back to Restaurants</a><a href="seo-detail-menustic.com-2026-04-04.html">menustic.com →</a></div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="toc">
+            <a href="#kpis" class="toc-link">KPIs</a>
+            <a href="#ga4-trends" class="toc-link">GA4 Trends</a>
+            <a href="#gsc-trends" class="toc-link">GSC Trends</a>
+            <a href="#keywords" class="toc-link">Keywords</a>
+            <a href="#pages" class="toc-link">Pages</a>
+            <a href="#anomalies" class="toc-link">Anomalies</a>
+        </nav>
+
+        <div class="content">
+            <!-- KPIs -->
+            <section class="section" id="kpis">
+                <h2 class="section-title">Key Metrics (Last 30 Days)</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Sessions</div>
+                        <div class="kpi-value">136,074.0</div>
+                        <div class="kpi-change positive">+-15.4%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Users</div>
+                        <div class="kpi-value">3,464.0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Pageviews</div>
+                        <div class="kpi-value">192,746.0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">GSC Clicks</div>
+                        <div class="kpi-value">23,556.0</div>
+                        <div class="kpi-change positive">+-13.7%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Impressions</div>
+                        <div class="kpi-value">2,946,223.0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Bounce Rate</div>
+                        <div class="kpi-value">50.2%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Engagement</div>
+                        <div class="kpi-value">49.8%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Position</div>
+                        <div class="kpi-value">8.7</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GA4 Trends -->
+            <section class="section" id="ga4-trends">
+                <h2 class="section-title">GA4 Trends (60 Days)</h2>
+                <div class="chart-container">
+                    <div class="chart-title">Sessions</div>
+                    <canvas id="sessionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Clicks & Impressions</div>
+                    <canvas id="clicksChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Bounce & Engagement Rate</div>
+                    <canvas id="bounceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Page Views</div>
+                    <canvas id="pageviewsChart"></canvas>
+                </div>
+            </section>
+
+            <!-- GSC Trends -->
+            <section class="section" id="gsc-trends">
+                <h2 class="section-title">GSC Trends (60 Days)</h2>
+                <div class="chart-container">
+                    <div class="chart-title">CTR Trend</div>
+                    <canvas id="ctrChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Average Position (Lower is Better)</div>
+                    <canvas id="positionChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Keywords -->
+            <section class="section" id="keywords">
+                <h2 class="section-title">Top Keywords</h2>
+                <table id="keywords-table">
+                    <thead>
+                        <tr>
+                            <th>Query</th>
+                            <th>Clicks</th>
+                            <th>Impressions</th>
+                            <th>CTR</th>
+                            <th>Position</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+
+            <!-- Pages -->
+            <section class="section" id="pages">
+                <h2 class="section-title">Top Pages</h2>
+                <table id="pages-table">
+                    <thead>
+                        <tr>
+                            <th>Page URL</th>
+                            <th>Clicks</th>
+                            <th>Impressions</th>
+                            <th>CTR</th>
+                            <th>Position</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+
+            <!-- Anomalies -->
+            <section class="section" id="anomalies">
+                <h2 class="section-title">Detected Anomalies</h2>
+                <div id="anomalies-container"></div>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <p>Generated on 2026-04-04 17:12:40</p>
+    </footer>
+
+    <script>
+        const keywordsData = [{"query": "dockside boot key harbor", "clicks": 118, "impressions": 1490, "ctr": 7.920000000000001, "position": 3.553}, {"query": "brooklyn boys pizzeria & restaurant menu", "clicks": 116, "impressions": 614, "ctr": 18.89, "position": 2.798}, {"query": "dockside boot key harbor menu", "clicks": 91, "impressions": 639, "ctr": 14.24, "position": 2.1283}, {"query": "la madalena guadalajara menu", "clicks": 79, "impressions": 1271, "ctr": 6.22, "position": 3.0559}, {"query": "bodes", "clicks": 77, "impressions": 1522, "ctr": 5.06, "position": 3.726}, {"query": "hacker's grill menu", "clicks": 72, "impressions": 290, "ctr": 24.83, "position": 2.1966}, {"query": "los tules", "clicks": 69, "impressions": 1631, "ctr": 4.2299999999999995, "position": 5.0742}, {"query": "los tules menu", "clicks": 61, "impressions": 474, "ctr": 12.870000000000001, "position": 2.6013}, {"query": "the original henry's menu", "clicks": 61, "impressions": 919, "ctr": 6.64, "position": 3.3972}, {"query": "h & w drive in menu", "clicks": 55, "impressions": 688, "ctr": 7.99, "position": 2.8765}, {"query": "cafe peri", "clicks": 54, "impressions": 6813, "ctr": 0.79, "position": 5.5381}, {"query": "f street station", "clicks": 52, "impressions": 1554, "ctr": 3.35, "position": 4.4569}, {"query": "aroma essen", "clicks": 51, "impressions": 1648, "ctr": 3.09, "position": 5.2506}, {"query": "spain inn", "clicks": 51, "impressions": 1802, "ctr": 2.83, "position": 5.7397}];
+        const pagesData = [{"page": "https://dockside-boot-key-harbor.grubbio.com/", "clicks": 39.0, "impressions": 1610.0, "ctr": 2.42, "position": 9.2416}, {"page": "https://shea-schats-bakery.grubbio.com/", "clicks": 39.0, "impressions": 719.0, "ctr": 5.42, "position": 7.2712}, {"page": "https://cat-coras-taproom.grubbio.com/", "clicks": 35.0, "impressions": 637.0, "ctr": 5.489999999999999, "position": 10.4568}, {"page": "https://geriks-ole-czech-bakery-deli.grubbio.com/", "clicks": 34.0, "impressions": 533.0, "ctr": 6.38, "position": 8.2139}, {"page": "https://dockside-boot-key-harbor.grubbio.com/menu", "clicks": 32.0, "impressions": 686.0, "ctr": 4.66, "position": 5.6545}, {"page": "https://hackers-grill-apache-junction.grubbio.com/menu", "clicks": 31.0, "impressions": 380.0, "ctr": 8.16, "position": 3.5263}, {"page": "https://woojung.grubbio.com/", "clicks": 31.0, "impressions": 815.0, "ctr": 3.8, "position": 5.416}, {"page": "https://cross-grain-brewhouse.grubbio.com/", "clicks": 26.0, "impressions": 615.0, "ctr": 4.2299999999999995, "position": 6.5772}, {"page": "https://le-grenier-de-notre-dame.grubbio.com/", "clicks": 26.0, "impressions": 1649.0, "ctr": 1.58, "position": 4.7247}, {"page": "https://bayou-bar-grill.grubbio.com/", "clicks": 25.0, "impressions": 480.0, "ctr": 5.21, "position": 6.0229}, {"page": "https://la-madalena-guadalajara.grubbio.com/menu", "clicks": 23.0, "impressions": 1071.0, "ctr": 2.15, "position": 7.6228}, {"page": "https://rack-shack-bbq-wings.grubbio.com/", "clicks": 22.0, "impressions": 563.0, "ctr": 3.91, "position": 6.6252}, {"page": "https://rico-pan-bakery-store.grubbio.com/", "clicks": 22.0, "impressions": 512.0, "ctr": 4.3, "position": 7.4004}, {"page": "https://arandas-taqueria.grubbio.com/", "clicks": 20.0, "impressions": 1097.0, "ctr": 1.82, "position": 9.0365}, {"page": "https://benjies-jamaican-restaurant.grubbio.com/", "clicks": 20.0, "impressions": 753.0, "ctr": 2.6599999999999997, "position": 5.5339}, {"page": "https://cafe-peri.grubbio.com/", "clicks": 20.0, "impressions": 2451.0, "ctr": 0.8200000000000001, "position": 6.397}, {"page": "https://aroma-vietnamese-kitchen-sushi-bar.grubbio.com/", "clicks": 19.0, "impressions": 718.0, "ctr": 2.65, "position": 6.7604}, {"page": "https://h-w-drive-in.grubbio.com/menu", "clicks": 19.0, "impressions": 341.0, "ctr": 5.57, "position": 3.8563}, {"page": "https://parkside-grill-lounge.grubbio.com/", "clicks": 19.0, "impressions": 385.0, "ctr": 4.9399999999999995, "position": 7.1844}, {"page": "https://restaurante-moya-brunch.grubbio.com/", "clicks": 19.0, "impressions": 669.0, "ctr": 2.8400000000000003, "position": 5.6368}, {"page": "https://saigon-bar-vietnamese-japanese-cuisine.grubbio.com/", "clicks": 19.0, "impressions": 472.0, "ctr": 4.03, "position": 6.1716}, {"page": "https://shea-schats-bakery.grubbio.com/menu", "clicks": 19.0, "impressions": 429.0, "ctr": 4.43, "position": 5.1142}, {"page": "https://wooden-nickel-bar-grill.grubbio.com/", "clicks": 19.0, "impressions": 514.0, "ctr": 3.6999999999999997, "position": 6.393}, {"page": "https://cross-grain-brewhouse.grubbio.com/menu", "clicks": 18.0, "impressions": 374.0, "ctr": 4.81, "position": 3.7219}, {"page": "https://k-garden-qut.grubbio.com/", "clicks": 18.0, "impressions": 167.0, "ctr": 10.780000000000001, "position": 2.2635}, {"page": "https://kiremit-restaurant.grubbio.com/", "clicks": 18.0, "impressions": 207.0, "ctr": 8.7, "position": 3.2657}, {"page": "https://latrobe-top-shop.grubbio.com/menu", "clicks": 18.0, "impressions": 140.0, "ctr": 12.86, "position": 9.8286}, {"page": "https://the-original-henrys.grubbio.com/", "clicks": 18.0, "impressions": 1160.0, "ctr": 1.55, "position": 5.9121}, {"page": "https://brooklyn-boys-pizzeria-restaurant.grubbio.com/", "clicks": 17.0, "impressions": 306.0, "ctr": 5.56, "position": 5.9542}, {"page": "https://gusto-trattoria-toscana.grubbio.com/", "clicks": 17.0, "impressions": 238.0, "ctr": 7.140000000000001, "position": 2.7143}];
+        const anomaliesData = [];
+
+        const ga4Dates = ["2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02"];
+        const gscDates = ["2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01"];
+
+        const ga4SessionsDatasets = [{"label": "Sessions", "data": [3923, 3906, 4193, 4470, 4934, 5106, 5020, 4126, 3952, 3966, 4206, 4763, 5235, 4817, 4387, 4197, 5411, 4537, 5406, 5104, 5149, 3925, 8372, 22749, 5068, 5190, 5421, 4851, 4216, 4304, 4245, 4622, 4763, 4952, 10828, 4274, 4296, 4300, 4706, 4961, 5075, 4810.0, 4386.0, 4745.0, 4566.0, 4611.0, 2035.0, 4739, 4718, 3905, 3923, 4076, 3978, 4199.0, 4281.0, 4357.0, 3880.0, 4073.0, 4085.0, 3685.0], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+        const ga4UsersDatasets = [{"label": "Users", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#22c55e", "backgroundColor": "rgba(34, 197, 94, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+        const gscClicksDatasets = [{"label": "Clicks", "data": [634, 689, 751, 833, 946, 1066, 819, 756, 824, 829, 892, 986, 1202, 906, 822, 915, 913, 967, 1051, 1109, 941, 743, 923, 958, 1089, 1164, 1095, 909, 750, 803, 800, 873, 972, 1032, 907, 716, 731, 701, 789, 958, 954, 807.0, 785.0, 788.0, 813.0, 866, 883, 904, 815, 682, 746, 745, 952.0, 950.0, 880.0, 766.0, 849.0, 892.0], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+        const gscImpressionsDatasets = [{"label": "Impressions", "data": [78609, 85169, 90636, 103750, 117032, 125950, 109363, 99497, 100696, 103373, 108976, 131930, 140918, 110851, 102459, 102109, 102484, 105387, 118941, 126635, 110487, 96772, 102961, 107600, 116980, 133031, 129946, 113095, 89515, 95576, 95039, 101446, 116494, 124026, 109243, 87204, 91154, 95807, 99567, 115827, 122026, 108916.0, 90652.0, 96142.0, 98352.0, 106485, 117988, 123772, 112293, 92916, 93583, 95142, 115136.0, 124481.0, 109856.0, 93595.0, 101992.0, 107089.0], "borderColor": "#22c55e", "backgroundColor": "rgba(34, 197, 94, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+        const gscPositionDatasets = [{"label": "Position", "data": [8.7243, 8.1554, 8.1701, 8.344, 7.9643, 7.7437, 7.8321, 7.7167, 8.0146, 8.1598, 8.0238, 7.7383, 7.7968, 7.8635, 8.1046, 8.3788, 8.1749, 8.2475, 8.1681, 8.2157, 8.3002, 8.3742, 8.6578, 8.6239, 8.227, 8.1468, 7.9571, 8.272, 8.6862, 8.6749, 8.6375, 8.6448, 8.6683, 8.5967, 8.6205, 8.5055, 8.8728, 8.8985, 8.5495, 8.6169, 8.5696, 8.8515, 8.7858, 8.9206, 8.8988, 8.8255, 9.0241, 8.8498, 8.7953, 8.6575, 8.3136, 8.7325, 8.655, 8.6902, 8.5893, 8.7869, 8.6916, 8.5642], "borderColor": "#ef4444", "backgroundColor": "rgba(239, 68, 68, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+
+        const ga4BounceData = [{"label": "Bounce Rate", "data": [53.15, 51.33, 51.559999999999995, 51.9, 51.970000000000006, 48.16, 53.73, 49.3, 47.010000000000005, 44.48, 44.25, 46.08, 47.010000000000005, 49.39, 47.75, 45.89, 58.660000000000004, 48.230000000000004, 50.980000000000004, 47.02, 48.089999999999996, 44.940000000000005, 70.33, 88.28, 49.19, 47.589999999999996, 50.63999999999999, 50.28, 49.29, 51.370000000000005, 47.07, 49.13, 49.21, 47.52, 71.17999999999999, 54.0, 51.160000000000004, 50.529999999999994, 51.38, 50.529999999999994, 51.629999999999995, 52.52, 52.92, 52.410000000000004, 52.339999999999996, 50.55, 49.53, 50.33, 51.23, 49.94, 48.43, 47.839999999999996, 48.77, 45.39, 46.51, 48.52, 46.39, 46.6, 46.39, 45.35], "borderColor": "#ef4444", "backgroundColor": "rgba(239, 68, 68, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+        const ga4EngagementData = [{"label": "Engagement Rate", "data": [46.85, 48.67, 48.44, 48.1, 48.03, 51.839999999999996, 46.27, 50.7, 52.99, 55.52, 55.75, 53.92, 52.99, 50.61, 52.25, 54.11, 41.339999999999996, 51.77, 49.02, 52.980000000000004, 51.910000000000004, 55.059999999999995, 29.67, 11.72, 50.81, 52.410000000000004, 49.36, 49.72, 50.71, 48.63, 52.93, 50.870000000000005, 50.79, 52.480000000000004, 28.82, 46.0, 48.84, 49.47, 48.620000000000005, 49.47, 48.370000000000005, 47.48, 47.08, 47.589999999999996, 47.660000000000004, 49.45, 50.470000000000006, 49.669999999999995, 48.77, 50.06, 51.57000000000001, 52.16, 51.23, 54.61, 53.49, 51.480000000000004, 53.61, 53.400000000000006, 53.61, 54.65], "borderColor": "#22c55e", "backgroundColor": "rgba(34, 197, 94, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+        const ga4PageviewsData = [{"label": "Pageviews", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "type": "bar"}];
+        const gscCtrData = [{"label": "CTR %", "data": [0.8099999999999999, 0.8099999999999999, 0.83, 0.8, 0.8099999999999999, 0.8500000000000001, 0.75, 0.76, 0.8200000000000001, 0.8, 0.8200000000000001, 0.75, 0.8500000000000001, 0.8200000000000001, 0.8, 0.8999999999999999, 0.89, 0.9199999999999999, 0.88, 0.88, 0.8500000000000001, 0.77, 0.8999999999999999, 0.89, 0.9299999999999999, 0.8699999999999999, 0.84, 0.8, 0.84, 0.84, 0.84, 0.86, 0.83, 0.83, 0.83, 0.8200000000000001, 0.8, 0.73, 0.79, 0.83, 0.7799999999999999, 0.74, 0.8699999999999999, 0.8200000000000001, 0.83, 0.8099999999999999, 0.75, 0.73, 0.73, 0.73, 0.8, 0.7799999999999999, 0.83, 0.76, 0.8, 0.8200000000000001, 0.83, 0.83], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+
+        function initTables() {
+            populateKeywords();
+            populatePages();
+            populateAnomalies();
+            setupTOC();
+            initCharts();
+        }
+
+        function populateKeywords() {
+            const tbody = document.querySelector('#keywords-table tbody');
+            keywordsData.forEach(kw => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = kw.query;
+                row.insertCell(1).textContent = kw.clicks.toLocaleString();
+                row.insertCell(2).textContent = kw.impressions.toLocaleString();
+                row.insertCell(3).textContent = kw.ctr.toFixed(2) + '%';
+                row.insertCell(4).textContent = kw.position.toFixed(2);
+            });
+        }
+
+        function populatePages() {
+            const tbody = document.querySelector('#pages-table tbody');
+            pagesData.slice(0, 30).forEach(page => {
+                const row = tbody.insertRow();
+                const shortUrl = page.page.length > 60 ? page.page.substring(0, 60) + '...' : page.page;
+                row.insertCell(0).textContent = shortUrl;
+                row.insertCell(1).textContent = page.clicks.toLocaleString();
+                row.insertCell(2).textContent = page.impressions.toLocaleString();
+                row.insertCell(3).textContent = page.ctr.toFixed(2) + '%';
+                row.insertCell(4).textContent = page.position.toFixed(2);
+            });
+        }
+
+        function populateAnomalies() {
+            const container = document.getElementById('anomalies-container');
+            if (anomaliesData.length === 0) {
+                container.innerHTML = '<p>No anomalies detected</p>';
+                return;
+            }
+            anomaliesData.forEach(anomaly => {
+                const card = document.createElement('div');
+                card.className = 'anomaly-card';
+                card.textContent = anomaly.text;
+                container.appendChild(card);
+            });
+        }
+
+        function setupTOC() {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    const link = document.querySelector(`.toc-link[href="#${entry.target.id}"]`);
+                    if (link) {
+                        if (entry.isIntersecting) {
+                            document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
+                            link.classList.add('active');
+                        }
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            document.querySelectorAll('section').forEach(section => observer.observe(section));
+        }
+
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: { legend: { labels: { color: '#f1f5f9' } } },
+                scales: {
+                    y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                    x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                }
+            };
+
+            // Sessions Chart
+            new Chart(document.getElementById('sessionsChart').getContext('2d'), {
+                type: 'line',
+                data: { labels: ga4Dates, datasets: ga4SessionsDatasets },
+                options: chartOptions
+            });
+
+            // Clicks Chart
+            new Chart(document.getElementById('clicksChart').getContext('2d'), {
+                type: 'line',
+                data: { labels: gscDates, datasets: gscClicksDatasets },
+                options: chartOptions
+            });
+
+            // Bounce Chart
+            new Chart(document.getElementById('bounceChart').getContext('2d'), {
+                type: 'line',
+                data: { labels: ga4Dates, datasets: ga4BounceData },
+                options: chartOptions
+            });
+
+            // Pageviews Chart
+            new Chart(document.getElementById('pageviewsChart').getContext('2d'), {
+                type: 'bar',
+                data: { labels: ga4Dates, datasets: ga4PageviewsData },
+                options: chartOptions
+            });
+
+            // CTR Chart
+            new Chart(document.getElementById('ctrChart').getContext('2d'), {
+                type: 'line',
+                data: { labels: gscDates, datasets: gscCtrData },
+                options: chartOptions
+            });
+
+            // Position Chart (reversed Y axis)
+            const positionOptions = { ...chartOptions, scales: {
+                y: { ...chartOptions.scales.y, reverse: true },
+                x: chartOptions.scales.x
+            } };
+            new Chart(document.getElementById('positionChart').getContext('2d'), {
+                type: 'line',
+                data: { labels: gscDates, datasets: gscPositionDatasets },
+                options: positionOptions
+            });
+        }
+
+        window.addEventListener('load', initTables);
+    </script>
+</body>
+</html>
