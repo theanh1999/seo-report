@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Dashboard - Restaurants</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #f1f5f9;
+        }
+        .dark-mode { background: #0f172a; color: #f1f5f9; }
+        .light-mode { background: #ffffff; color: #1e293b; }
+        .light-mode .card { background: #f8fafc; border-color: #e2e8f0; }
+        .light-mode .header { background: #ffffff; border-bottom-color: #e2e8f0; }
+
+        header {
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 30px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 { font-size: 2em; margin-bottom: 10px; }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 0.95em;
+        }
+
+        button:hover { background: #2563eb; }
+
+        .cross-link {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .cross-link a {
+            background: #334155;
+            color: #f1f5f9;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .cross-link a:hover { background: #475569; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .toc {
+            position: fixed;
+            left: 20px;
+            top: 150px;
+            width: 200px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+            z-index: 50;
+        }
+
+        .toc a {
+            display: block;
+            color: #94a3b8;
+            text-decoration: none;
+            margin: 10px 0;
+            padding: 8px 12px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .toc a:hover { color: #f1f5f9; }
+        .toc a.active { color: #3b82f6; border-left-color: #3b82f6; }
+
+        .content { margin-left: 240px; }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .kpi-label { color: #94a3b8; font-size: 0.9em; margin-bottom: 10px; }
+        .kpi-value { font-size: 2.2em; font-weight: 600; margin-bottom: 8px; }
+        .kpi-change { font-size: 0.9em; }
+        .kpi-change.positive { color: #22c55e; }
+        .kpi-change.negative { color: #ef4444; }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #334155;
+        }
+
+        .chart-container {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .chart-title { font-size: 1.1em; margin-bottom: 15px; color: #f1f5f9; }
+
+        canvas {
+            display: block !important;
+            max-height: 300px;
+        }
+
+        .filter-container {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .filter-container label {
+            margin-right: 15px;
+            color: #94a3b8;
+        }
+
+        .filter-container select {
+            background: #334155;
+            color: #f1f5f9;
+            border: 1px solid #475569;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #334155;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover { background: #475569; }
+
+        td {
+            padding: 15px;
+            border-top: 1px solid #334155;
+        }
+
+        tr:hover { background: #334155; }
+
+        .anomaly-card {
+            background: #1e293b;
+            border-left: 4px solid #ef4444;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        .anomaly-card.warning { border-left-color: #eab308; }
+        .anomaly-card.success { border-left-color: #22c55e; }
+
+        .recommendation {
+            background: #1e293b;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid #334155;
+        }
+
+        @media (max-width: 1024px) {
+            .toc { display: none; }
+            .content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <header>
+        <div class="header-content">
+            <div>
+                <h1>SEO Dashboard</h1>
+                <p style="color: #94a3b8;">Restaurants Websites</p>
+            </div>
+            <div class="header-controls">
+                <button onclick="toggleTheme()">🌙 Theme</button>
+                <a href="index.html" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none;">📊 Index</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="cross-link">
+            <a href="seo-hotels-2026-04-04.html">↔️ View Hotels Report</a>
+            <a href="index.html">📋 Back to Index</a>
+        </div>
+
+        <nav class="toc">
+            <a href="#kpis" class="toc-link">KPIs</a>
+            <a href="#filter" class="toc-link">Filter</a>
+            <a href="#trends" class="toc-link">Trends</a>
+            <a href="#websites" class="toc-link">Websites</a>
+            <a href="#keywords" class="toc-link">Keywords</a>
+            <a href="#anomalies" class="toc-link">Anomalies</a>
+        </nav>
+
+        <div class="content">
+            <!-- KPIs Section -->
+            <section class="section" id="kpis">
+                <h2 class="section-title">Key Performance Indicators (30 days)</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Sessions</div>
+                        <div class="kpi-value">6,668,078.0</div>
+                        <div class="kpi-change positive">+0.0%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Users</div>
+                        <div class="kpi-value">180,250.0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Page Views</div>
+                        <div class="kpi-value">10,142,074.0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">GSC Clicks</div>
+                        <div class="kpi-value">2,475,806.0</div>
+                        <div class="kpi-change positive">+0.0%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Impressions</div>
+                        <div class="kpi-value">242,477,299.0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Bounce Rate</div>
+                        <div class="kpi-value">47.6%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Engagement Rate</div>
+                        <div class="kpi-value">52.4%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Position</div>
+                        <div class="kpi-value">8.4</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filter Section -->
+            <section class="section" id="filter">
+                <h2 class="section-title">Website Filter</h2>
+                <div class="filter-container">
+                    <label for="domain-filter">Select Website:</label>
+                    <select id="domain-filter" onchange="filterTable()">
+                        <option value="">All Websites</option>
+                        <option value="localoria.com">localoria.com</option>
+<option value="wherebly.com">wherebly.com</option>
+<option value="res-menu.net">res-menu.net</option>
+<option value="foodplacee.com">foodplacee.com</option>
+<option value="restaurants-world.net">restaurants-world.net</option>
+<option value="goto-where.com">goto-where.com</option>
+<option value="menu-world.com">menu-world.com</option>
+<option value="grubbio.com">grubbio.com</option>
+<option value="menustic.com">menustic.com</option>
+<option value="menufyy.com">menufyy.com</option>
+<option value="wherevi.com">wherevi.com</option>
+<option value="placejoys.com">placejoys.com</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Trends Section -->
+            <section class="section" id="trends">
+                <h2 class="section-title">30-Day Trend Analysis</h2>
+                <div class="chart-container">
+                    <div class="chart-title">Sessions Trend</div>
+                    <canvas id="sessionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">GSC Clicks Trend</div>
+                    <canvas id="clicksChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Impressions Trend</div>
+                    <canvas id="impressionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Average Position Trend</div>
+                    <canvas id="positionChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Website Comparison -->
+            <section class="section" id="websites">
+                <h2 class="section-title">Website Comparison</h2>
+                <table id="websites-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('websites-table', 0)">Domain 🔄</th>
+                            <th onclick="sortTable('websites-table', 1)">Sessions 🔄</th>
+                            <th onclick="sortTable('websites-table', 2)">Clicks 🔄</th>
+                            <th onclick="sortTable('websites-table', 3)">Impressions 🔄</th>
+                            <th onclick="sortTable('websites-table', 4)">Position 🔄</th>
+                            <th onclick="sortTable('websites-table', 5)">Bounce Rate 🔄</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Top Keywords -->
+            <section class="section" id="keywords">
+                <h2 class="section-title">Top Keywords</h2>
+                <table id="keywords-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('keywords-table', 0)">Query 🔄</th>
+                            <th onclick="sortTable('keywords-table', 1)">Clicks 🔄</th>
+                            <th onclick="sortTable('keywords-table', 2)">Impressions 🔄</th>
+                            <th onclick="sortTable('keywords-table', 3)">CTR 🔄</th>
+                            <th onclick="sortTable('keywords-table', 4)">Position 🔄</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Anomalies -->
+            <section class="section" id="anomalies">
+                <h2 class="section-title">Anomaly Alerts</h2>
+                <div id="anomalies-container"></div>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <p>Generated on 2026-04-04 17:12:40</p>
+    </footer>
+
+    <script>
+        // Data
+        const domainData = [{"domain": "localoria.com", "sessions": 160873.0, "clicks": 8719.0, "impressions": 1034718.0, "position": 9.089807142857143, "bounce_rate": 49.55433333333333}, {"domain": "wherebly.com", "sessions": 8952.0, "clicks": 601.0, "impressions": 36295.0, "position": 6.895471428571429, "bounce_rate": 50.23833333333333}, {"domain": "res-menu.net", "sessions": 1692655.0, "clicks": 767457.0, "impressions": 49142639.0, "position": 9.425814285714285, "bounce_rate": 43.164}, {"domain": "foodplacee.com", "sessions": 5533.0, "clicks": 439.0, "impressions": 36806.0, "position": 6.812745454545454, "bounce_rate": 45.79166666666667}, {"domain": "restaurants-world.net", "sessions": 637042.0, "clicks": 283841.0, "impressions": 29783961.0, "position": 9.549728571428572, "bounce_rate": 51.03766666666667}, {"domain": "goto-where.com", "sessions": 1031927.0, "clicks": 249735.0, "impressions": 55581726.0, "position": 8.511160714285714, "bounce_rate": 47.63466666666667}, {"domain": "menu-world.com", "sessions": 1471907.0, "clicks": 779879.0, "impressions": 68461692.0, "position": 8.617407142857143, "bounce_rate": 37.065333333333335}, {"domain": "grubbio.com", "sessions": 136074.0, "clicks": 23556.0, "impressions": 2946223.0, "position": 8.7076, "bounce_rate": 50.17666666666667}, {"domain": "menustic.com", "sessions": 193381.0, "clicks": 65886.0, "impressions": 8023511.0, "position": 7.333710714285714, "bounce_rate": 44.27833333333333}, {"domain": "menufyy.com", "sessions": 425885.0, "clicks": 149231.0, "impressions": 15777166.0, "position": 7.8291892857142855, "bounce_rate": 46.15566666666667}, {"domain": "wherevi.com", "sessions": 223271.0, "clicks": 25257.0, "impressions": 2172226.0, "position": 10.145471428571428, "bounce_rate": 60.72466666666667}, {"domain": "placejoys.com", "sessions": 680578.0, "clicks": 121205.0, "impressions": 9480336.0, "position": 7.9166, "bounce_rate": 44.82966666666667}];
+        const keywordsData = [{"query": "chez lucien", "clicks": 982, "impressions": 5193, "ctr": 18.91, "position": 2.8762}, {"query": "pjs oyster bar", "clicks": 923, "impressions": 2569, "ctr": 35.93, "position": 1.3351}, {"query": "los betos menu", "clicks": 816, "impressions": 2547, "ctr": 12.21, "position": 1.24815}, {"query": "kawa revolving sushi menu", "clicks": 727, "impressions": 1968, "ctr": 36.94, "position": 2.1474}, {"query": "sofia's pizza & roast beef menu", "clicks": 696, "impressions": 1626, "ctr": 42.8, "position": 2.4692}, {"query": "bistrot paul bert menu", "clicks": 659, "impressions": 2677, "ctr": 24.62, "position": 2.3975}, {"query": "panoramic 34 menu", "clicks": 600, "impressions": 1655, "ctr": 36.25, "position": 2.197}, {"query": "bell city diner menu", "clicks": 587, "impressions": 2210, "ctr": 26.56, "position": 2.0072}, {"query": "shukette menu", "clicks": 565, "impressions": 2766, "ctr": 20.43, "position": 1.9483}, {"query": "sushi kushi", "clicks": 560, "impressions": 4754, "ctr": 11.78, "position": 2.1414}, {"query": "johnny longboats menu", "clicks": 548, "impressions": 2266, "ctr": 24.18, "position": 2.0944}, {"query": "ok cafe menu", "clicks": 519, "impressions": 2412, "ctr": 21.52, "position": 2.8951}, {"query": "the hive waterfront restaurant & tiki menu", "clicks": 507, "impressions": 2868, "ctr": 17.68, "position": 2.0858}, {"query": "osteria santo spirito", "clicks": 503, "impressions": 5112, "ctr": 9.84, "position": 5.3284}, {"query": "josephine chamonix", "clicks": 491, "impressions": 5667, "ctr": 8.66, "position": 3.7335}, {"query": "meat me liverpool", "clicks": 488, "impressions": 3636, "ctr": 13.420000000000002, "position": 3.2189}, {"query": "cafe continental menu", "clicks": 469, "impressions": 3949, "ctr": 11.88, "position": 4.2831}, {"query": "lj shanghai menu", "clicks": 467, "impressions": 2113, "ctr": 22.1, "position": 2.0757}, {"query": "terra madre dublin", "clicks": 459, "impressions": 2277, "ctr": 20.16, "position": 2.9732}, {"query": "zest sushi", "clicks": 454, "impressions": 4063, "ctr": 11.17, "position": 3.9929}];
+        const anomaliesData = [{"text": "\ud83d\udcc8 localoria.com: Sessions spike on 2026-03-27 (15321.0 vs 4573 baseline)"}, {"text": "\ud83d\udd34 localoria.com: High bounce rate on 2026-04-02 (99.9%)"}, {"text": "\ud83d\udcc8 wherebly.com: Sessions spike on 2026-03-31 (677.0 vs 179 baseline)"}, {"text": "\ud83d\udcc8 wherebly.com: Sessions spike on 2026-04-01 (881.0 vs 179 baseline)"}, {"text": "\ud83d\udcc8 wherebly.com: Sessions spike on 2026-04-02 (1200.0 vs 179 baseline)"}, {"text": "\ud83d\udd34 wherebly.com: High bounce rate on 2026-04-02 (99.8%)"}, {"text": "\ud83d\udcc8 wherebly.com: Clicks spike on 2026-03-28 (33.0 vs 10 baseline)"}, {"text": "\ud83d\udcc8 wherebly.com: Clicks spike on 2026-04-01 (36.0 vs 10 baseline)"}, {"text": "\ud83d\udcc8 res-menu.net: Sessions spike on 2026-03-28 (163507.0 vs 48987 baseline)"}, {"text": "\ud83d\udd34 res-menu.net: High bounce rate on 2026-04-02 (99.6%)"}];
+        const chartDates = ["2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02"];
+        const sessionsDatasets = [{"label": "localoria.com", "data": [2812, 2955, 3483, 4193, 3468, 2867, 2826, 2975, 3019, 42753, 3699, 3455.0, 3596.0, 3778.0, 3731.0, 3811.0, 2282.0, 4503, 4594, 3518, 3758, 4032, 3891, 15321.0, 4914.0, 4627.0, 4284.0, 4052.0, 4132.0, 3544.0], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "wherebly.com", "data": [174, 202, 237, 221, 206, 147, 159, 212, 209, 237, 268, 267.0, 165.0, 195.0, 185.0, 181.0, 157.0, 266, 198, 150, 175, 187, 179, 225.0, 533.0, 465.0, 394.0, 677.0, 881.0, 1200.0], "borderColor": "#22c55e", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "res-menu.net", "data": [45005, 50003, 56832, 57952, 46474, 43423, 47451, 46853, 50898, 63313, 99269, 51793.0, 43592.0, 51054.0, 50854.0, 54088.0, 39442.0, 63780, 51125, 43830, 47827, 48897, 47704, 64226.0, 163507.0, 53381.0, 51697.0, 53087.0, 53084.0, 52214.0], "borderColor": "#ef4444", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "foodplacee.com", "data": [4, 96, 232, 211, 204, 167, 221, 191, 217, 245, 205, 157, 170, 145, 171, 236, 260, 219.0, 156.0, 174.0, 175.0, 138.0, 134.0, 261, 218, 200, 436, 451, 686, 67], "borderColor": "#eab308", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "restaurants-world.net", "data": [21133, 21784, 23749, 26535, 22145, 19197, 19935, 18331, 18285, 22355, 24789, 23655.0, 19130.0, 23463.0, 18201.0, 20037.0, 13758.0, 40359, 20308, 17500, 18399, 17864, 16594, 23009.0, 25278.0, 21449.0, 18443.0, 18714.0, 22059.0, 20584.0], "borderColor": "#a855f7", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "goto-where.com", "data": [27825, 27820, 31407, 32436, 154957, 133654, 31624, 25432, 23628, 29654, 31992, 29249.0, 25313.0, 25513.0, 24767.0, 25344.0, 10799.0, 28727, 26065, 22682, 23136, 23856, 24262, 27769.0, 29655.0, 26044.0, 26009.0, 26936.0, 30696.0, 24676.0], "borderColor": "#06b6d4", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menu-world.com", "data": [50163, 50348, 59621, 60016, 46611, 44795, 45604, 49507, 50230, 56591, 83349, 49257.0, 42716.0, 47224.0, 45095.0, 45726.0, 18101.0, 54466, 44286, 40882, 44242, 44303, 45525, 61127.0, 65609.0, 45247.0, 43263.0, 46854.0, 48253.0, 42896.0], "borderColor": "#f97316", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "grubbio.com", "data": [4245, 4622, 4763, 4952, 10828, 4274, 4296, 4300, 4706, 4961, 5075, 4810.0, 4386.0, 4745.0, 4566.0, 4611.0, 2035.0, 4739, 4718, 3905, 3923, 4076, 3978, 4199.0, 4281.0, 4357.0, 3880.0, 4073.0, 4085.0, 3685.0], "borderColor": "#ec4899", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menustic.com", "data": [6290, 6450, 6989, 7493, 6778, 6113, 6259, 6082, 6364, 6943, 7385, 6788.0, 6036.0, 6401.0, 6144.0, 6320.0, 3027.0, 7287, 6390, 5588, 5846, 5787, 6051, 6803.0, 7171.0, 6179.0, 6840.0, 7190.0, 7883.0, 6504.0], "borderColor": "#8b5cf6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menufyy.com", "data": [8452, 9075, 11350, 12001, 10907, 9818, 10234, 79260, 11336, 12699, 13943, 12465.0, 11261.0, 12278.0, 11799.0, 11969.0, 5785.0, 14003, 13128, 11261, 12030, 12222, 12277, 14333.0, 15735.0, 13907.0, 12453.0, 12897.0, 13899.0, 13108.0], "borderColor": "#14b8a6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "wherevi.com", "data": [5104, 5908, 6358, 6435, 5372, 4922, 20330, 5324, 5442, 5924, 6455, 5512.0, 4883.0, 5521.0, 5269.0, 5179.0, 3385.0, 5366, 5035, 4514, 60260, 4413, 4325, 5268.0, 4771.0, 4817.0, 4244.0, 4634.0, 4197.0, 4104.0], "borderColor": "#f43f5e", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "placejoys.com", "data": [19206, 53112, 22530, 25590, 20582, 17924, 18423, 18987, 21678, 24153, 26451, 22989.0, 20573.0, 21432.0, 21309.0, 22292.0, 16809.0, 27312, 24316, 19595, 21126, 20705, 20169, 24526.0, 25913.0, 23691.0, 19880.0, 20137.0, 19713.0, 19455.0], "borderColor": "#84cc16", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+        const clicksDatasets = [{"label": "localoria.com", "data": [244, 214, 238, 236, 179, 174, 188, 193, 198, 267, 246, 233.0, 239.0, 299.0, 270.0, 322, 398, 364, 359, 332, 376, 373, 444.0, 502.0, 468.0, 467.0, 463.0, 433.0], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "wherebly.com", "data": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 2, 0, 0, 0, 2, 8, 0, 3, 6, 16, 28, 17, 15, 8, 25, 28], "borderColor": "#22c55e", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "res-menu.net", "data": [21425, 23093, 29917, 31148, 22894, 18612, 20078, 22742, 26436, 34415, 35708, 26909.0, 22713.0, 26767.0, 26833.0, 28515, 35090, 35179, 27157, 21878, 23944, 25721, 35407.0, 37183.0, 28948.0, 24301.0, 26740.0, 27704.0], "borderColor": "#ef4444", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "foodplacee.com", "data": [5431, 6671, 7456, 8190, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], "borderColor": "#eab308", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "restaurants-world.net", "data": [10346, 10635, 12763, 13264, 9718, 7514, 8233, 8285, 9025, 11808, 12356, 9240.0, 8299.0, 9099.0, 9156.0, 9929, 11881, 11918, 9349, 8086, 8932, 8998, 12334.0, 13037.0, 10508.0, 8574.0, 9515.0, 11039.0], "borderColor": "#a855f7", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "goto-where.com", "data": [7835, 8558, 11011, 11158, 8931, 7891, 8326, 8472, 9249, 10877, 10672, 9074.0, 8510.0, 8519.0, 8548.0, 8944, 10128, 10098, 8631, 7672, 7937, 8513, 10429.0, 9759.0, 7976.0, 7022.0, 7234.0, 7761.0], "borderColor": "#06b6d4", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menu-world.com", "data": [27090, 28940, 36556, 35824, 26237, 23187, 24418, 25349, 28334, 34230, 33281, 26349.0, 23412.0, 25566.0, 25589.0, 27270, 32896, 31899, 25555, 22539, 24295, 25604, 34564.0, 32688.0, 25072.0, 22619.0, 24373.0, 26143.0], "borderColor": "#f97316", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "grubbio.com", "data": [800, 873, 972, 1032, 907, 716, 731, 701, 789, 958, 954, 807.0, 785.0, 788.0, 813.0, 866, 883, 904, 815, 682, 746, 745, 952.0, 950.0, 880.0, 766.0, 849.0, 892.0], "borderColor": "#ec4899", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menustic.com", "data": [2187, 2343, 2883, 2797, 2418, 2099, 2149, 2173, 2295, 2599, 2607, 2361.0, 2160.0, 2098.0, 2112.0, 2212, 2443, 2492, 2203, 1906, 2156, 2153, 2644.0, 2719.0, 2429.0, 2305.0, 2364.0, 2579.0], "borderColor": "#8b5cf6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menufyy.com", "data": [3313, 3573, 4797, 5126, 4640, 3939, 4122, 4323, 4858, 5636, 6162, 5365.0, 4621.0, 4877.0, 5040.0, 5267, 6054, 6421, 5689, 4766, 5155, 5498, 7169.0, 7532.0, 6519.0, 5629.0, 6262.0, 6878.0], "borderColor": "#14b8a6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "wherevi.com", "data": [1319, 1449, 1893, 1866, 1436, 1099, 1210, 1107, 1246, 1470, 1516, 1000.0, 899.0, 830.0, 801.0, 788, 990, 911, 716, 615, 570, 211, 264.0, 281.0, 214.0, 190.0, 165.0, 201.0], "borderColor": "#f43f5e", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "placejoys.com", "data": [3091, 3292, 3783, 4024, 3188, 2815, 3017, 3472, 4032, 4911, 4870, 4340.0, 3581.0, 4202.0, 4211.0, 4564, 5636, 5799, 4873, 4196, 4441, 4638, 5876.0, 6101.0, 5210.0, 4410.0, 4541.0, 4091.0], "borderColor": "#84cc16", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+        const impressionsDatasets = [{"label": "localoria.com", "data": [19080, 18116, 18945, 19423, 16855, 13928, 13762, 14655, 15724, 22003, 23719, 21339.0, 23733.0, 32858.0, 36498.0, 39979, 51362, 55569, 54085, 46173, 46442, 48271, 61550.0, 65616.0, 62930.0, 61033.0, 65412.0, 65658.0], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "wherebly.com", "data": [32, 30, 23, 27, 27, 26, 23, 17, 28, 40, 22, 36, 38, 16, 31, 32, 36, 36, 213, 258, 127, 386, 627, 1082, 1285, 1561, 1426, 1119, 1369, 1530], "borderColor": "#22c55e", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "res-menu.net", "data": [1179308, 1296930, 1618058, 1737808, 1417281, 1168081, 1258885, 1452296, 1607530, 2035676, 2144067, 1795835.0, 1502900.0, 1749217.0, 1812792.0, 1894266, 2307567, 2375670, 1968940, 1556607, 1622073, 1690854, 2227602.0, 2402894.0, 1996239.0, 1652572.0, 1812888.0, 1857803.0], "borderColor": "#ef4444", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "foodplacee.com", "data": [628652, 675952, 649504, 721280, 0, 0, 7, 12, 16, 12, 9, 3, 9, 5, 8, 4, 9, 8, 11, 14, 6, 6, 10, 6, 15, 5, 6, 6, 5, 10], "borderColor": "#eab308", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "restaurants-world.net", "data": [920621, 983153, 1194907, 1220058, 964421, 792100, 829056, 873211, 949987, 1178796, 1216973, 1023044.0, 892833.0, 977846.0, 1011099.0, 1063880, 1291670, 1310065, 1114022, 907059, 944297, 989752, 1303456.0, 1389842.0, 1173906.0, 985131.0, 1082514.0, 1200262.0], "borderColor": "#a855f7", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "goto-where.com", "data": [1603461, 1764721, 2203671, 2347689, 1944091, 1645215, 1743066, 1849489, 1961916, 2364553, 2439982, 2103379.0, 1797734.0, 1916441.0, 1929541.0, 2029705, 2375304, 2411395, 2081964, 1751451, 1785239, 1834401, 2322774.0, 2354623.0, 1916528.0, 1602019.0, 1709034.0, 1792340.0], "borderColor": "#06b6d4", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menu-world.com", "data": [2179719, 2337993, 2875640, 2989346, 2356093, 1982121, 2076535, 2233040, 2343762, 2869603, 2920476, 2453627.0, 2108450.0, 2315180.0, 2333606.0, 2447244, 2962688, 2997426, 2501787, 2085883, 2150593, 2229267, 2895762.0, 2952032.0, 2380798.0, 2006468.0, 2172053.0, 2304500.0], "borderColor": "#f97316", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "grubbio.com", "data": [95039, 101446, 116494, 124026, 109243, 87204, 91154, 95807, 99567, 115827, 122026, 108916.0, 90652.0, 96142.0, 98352.0, 106485, 117988, 123772, 112293, 92916, 93583, 95142, 115136.0, 124481.0, 109856.0, 93595.0, 101992.0, 107089.0], "borderColor": "#ec4899", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menustic.com", "data": [241720, 261139, 310446, 331112, 293128, 238187, 244061, 249975, 261926, 307478, 326834, 298186.0, 245925.0, 257824.0, 257600.0, 277988, 323887, 339891, 311453, 259234, 260887, 264226, 325987.0, 349244.0, 313578.0, 269659.0, 290188.0, 311748.0], "borderColor": "#8b5cf6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menufyy.com", "data": [336671, 365456, 454601, 514222, 469557, 387892, 412406, 439510, 480376, 575004, 630389, 591051.0, 475508.0, 507256.0, 539553.0, 576537, 673800, 718825, 656828, 543354, 566166, 581918, 743379.0, 804144.0, 716892.0, 620536.0, 669693.0, 725642.0], "borderColor": "#14b8a6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "wherevi.com", "data": [85730, 92588, 117187, 124900, 99045, 80988, 85830, 88332, 97283, 118304, 122667, 99910.0, 84354.0, 91681.0, 93620.0, 98313, 119471, 124235, 103676, 82594, 63607, 13350, 15773.0, 17412.0, 14039.0, 11735.0, 12709.0, 12893.0], "borderColor": "#f43f5e", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "placejoys.com", "data": [211243, 222875, 265775, 291409, 255557, 225257, 233016, 277674, 301846, 368239, 391583, 327050.0, 269907.0, 330576.0, 341172.0, 369324, 451840, 464806, 400732, 330852, 345478, 358834, 463915.0, 488616.0, 411845.0, 355252.0, 376088.0, 349575.0], "borderColor": "#84cc16", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+        const positionDatasets = [{"label": "localoria.com", "data": [7.6189, 8.3076, 8.4796, 8.6586, 8.4635, 8.3405, 9.0496, 9.6377, 8.9654, 9.4803, 9.2092, 9.5084, 9.8669, 10.2483, 9.9604, 9.8295, 9.5619, 9.113, 8.9609, 9.067, 8.6619, 9.4419, 9.2736, 9.4996, 9.1184, 8.9369, 8.6918, 8.5633], "borderColor": "#3b82f6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "wherebly.com", "data": [6.5938, 12.4, 8.2174, 11.5926, 6.3704, 7.6154, 6.3913, 11.7059, 8.0357, 8.55, 11.1364, 7.3056, 9.5526, 7.75, 6.6774, 6.9688, 5.8611, 10.3056, 5.277, 6.376, 6.7874, 6.6606, 8.2041, 6.6303, 6.8623, 6.991, 6.636, 7.3378, 8.1351, 7.332], "borderColor": "#22c55e", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "res-menu.net", "data": [9.8771, 9.9512, 9.5451, 9.4033, 9.6085, 9.6534, 10.0518, 10.0549, 9.5393, 9.2181, 8.8629, 9.1671, 9.4495, 9.466, 9.4778, 9.3204, 9.4809, 9.1331, 9.3361, 9.2975, 8.9338, 9.2382, 9.197, 9.2585, 9.1916, 9.566, 9.4043, 9.2394], "borderColor": "#ef4444", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "foodplacee.com", "data": [10.478, 10.1983, 9.9232, 9.4786, 0, 0, 7.4286, 5.8333, 7.1875, 6.3333, 5.5556, 5.3333, 8.3333, 5.6, 4.375, 6.75, 6.3333, 4, 6.3636, 4.0714, 3.3333, 5, 3.8, 7.8333, 5.6, 7, 5.6667, 2.1667, 4.2, 5.4], "borderColor": "#eab308", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "restaurants-world.net", "data": [9.3543, 9.4846, 9.205, 9.1353, 9.2377, 9.3817, 9.8656, 10.2052, 9.7375, 9.4445, 9.0517, 9.3876, 9.5878, 9.8448, 9.7877, 9.5199, 9.8066, 9.4667, 9.6479, 9.552, 9.1821, 9.5461, 9.5549, 9.6752, 9.52, 10.017, 9.8458, 9.3472], "borderColor": "#a855f7", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "goto-where.com", "data": [8.6704, 8.5997, 8.4143, 8.3187, 8.3357, 8.2459, 8.4602, 8.6151, 8.3818, 8.3663, 8.2647, 8.4065, 8.4316, 8.6081, 8.634, 8.5885, 8.69, 8.5372, 8.5941, 8.4553, 8.2382, 8.48, 8.4496, 8.6013, 8.6664, 8.8386, 8.7891, 8.6312], "borderColor": "#06b6d4", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menu-world.com", "data": [8.6486, 8.5983, 8.3151, 8.2371, 8.4448, 8.4136, 8.7714, 8.9361, 8.4674, 8.3721, 8.1566, 8.497, 8.6846, 8.8462, 8.8681, 8.7245, 8.8062, 8.5617, 8.7729, 8.6511, 8.2707, 8.6332, 8.508, 8.6766, 8.7444, 9.0611, 8.9345, 8.6855], "borderColor": "#f97316", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "grubbio.com", "data": [8.6375, 8.6448, 8.6683, 8.5967, 8.6205, 8.5055, 8.8728, 8.8985, 8.5495, 8.6169, 8.5696, 8.8515, 8.7858, 8.9206, 8.8988, 8.8255, 9.0241, 8.8498, 8.7953, 8.6575, 8.3136, 8.7325, 8.655, 8.6902, 8.5893, 8.7869, 8.6916, 8.5642], "borderColor": "#ec4899", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menustic.com", "data": [7.1735, 7.14, 7.1686, 7.1781, 7.1571, 7.0583, 7.234, 7.4057, 7.2474, 7.3253, 7.3348, 7.4635, 7.3488, 7.4878, 7.521, 7.4793, 7.5135, 7.4601, 7.4622, 7.3169, 7.1788, 7.3859, 7.3816, 7.446, 7.3981, 7.4488, 7.3449, 7.2839], "borderColor": "#8b5cf6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "menufyy.com", "data": [8.0537, 8.0325, 7.958, 7.8593, 7.8568, 7.6737, 7.9561, 7.9462, 7.6879, 7.7635, 7.7412, 7.7906, 7.8852, 7.9414, 7.8533, 7.9074, 7.9267, 7.8733, 7.8585, 7.7515, 7.5483, 7.7402, 7.6913, 7.7656, 7.7542, 7.8613, 7.8002, 7.7394], "borderColor": "#14b8a6", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "wherevi.com", "data": [9.0685, 9.0446, 8.5705, 8.3907, 8.4079, 8.5401, 8.8614, 9.2969, 8.9397, 8.6305, 8.2011, 8.3929, 8.593, 8.9453, 8.8088, 8.4458, 8.731, 8.5004, 8.5896, 8.494, 8.2789, 12.689, 14.0859, 15.0344, 13.8286, 16.3952, 15.8904, 14.4181], "borderColor": "#f43f5e", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}, {"label": "placejoys.com", "data": [8.0804, 8.2675, 8.3116, 8.0778, 8.0757, 7.9834, 8.3646, 8.2244, 7.8342, 7.8677, 7.6255, 7.6823, 8.0022, 7.9466, 7.812, 7.6807, 7.9067, 7.6418, 7.716, 7.5242, 7.3189, 7.7656, 7.7701, 7.9634, 7.8011, 8.1244, 8.0251, 8.2709], "borderColor": "#84cc16", "backgroundColor": "rgba(59, 130, 246, 0.05)", "tension": 0.4, "fill": false, "pointRadius": 0}];
+
+        // Initialize tables
+        function initTables() {
+            populateWebsitesTable();
+            populateKeywordsTable();
+            populateAnomalies();
+            initCharts();
+            setupTOC();
+        }
+
+        function populateWebsitesTable() {
+            const tbody = document.querySelector('#websites-table tbody');
+            domainData.forEach(domain => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = domain.domain;
+                row.insertCell(1).textContent = domain.sessions.toLocaleString();
+                row.insertCell(2).textContent = domain.clicks.toLocaleString();
+                row.insertCell(3).textContent = domain.impressions.toLocaleString();
+                row.insertCell(4).textContent = domain.position.toFixed(2);
+                row.insertCell(5).textContent = domain.bounce_rate.toFixed(1) + '%';
+                row.className = 'data-row';
+                row.dataset.domain = domain.domain;
+            });
+        }
+
+        function populateKeywordsTable() {
+            const tbody = document.querySelector('#keywords-table tbody');
+            keywordsData.forEach(kw => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = kw.query;
+                row.insertCell(1).textContent = kw.clicks.toLocaleString();
+                row.insertCell(2).textContent = kw.impressions.toLocaleString();
+                row.insertCell(3).textContent = (kw.ctr.toFixed(2)) + '%';
+                row.insertCell(4).textContent = kw.position.toFixed(2);
+            });
+        }
+
+        function populateAnomalies() {
+            const container = document.getElementById('anomalies-container');
+            if (anomaliesData.length === 0) {
+                container.innerHTML = '<p>No anomalies detected</p>';
+                return;
+            }
+            anomaliesData.forEach(anomaly => {
+                const card = document.createElement('div');
+                card.className = 'anomaly-card';
+                if (anomaly.text.includes('spike')) card.classList.add('warning');
+                if (anomaly.text.includes('improved')) card.classList.add('success');
+                card.textContent = anomaly.text;
+                container.appendChild(card);
+            });
+        }
+
+        function filterTable() {
+            const domain = document.getElementById('domain-filter').value;
+            const rows = document.querySelectorAll('#websites-table tbody .data-row');
+            rows.forEach(row => {
+                if (domain === '' || row.dataset.domain === domain) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function sortTable(tableId, columnIndex) {
+            const table = document.getElementById(tableId);
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const isNumeric = rows.every(row => !isNaN(parseFloat(row.cells[columnIndex].textContent.replace(/[^0-9.-]/g, ''))));
+
+            rows.sort((a, b) => {
+                const aVal = a.cells[columnIndex].textContent.trim();
+                const bVal = b.cells[columnIndex].textContent.trim();
+
+                if (isNumeric) {
+                    return parseFloat(bVal.replace(/[^0-9.-]/g, '')) - parseFloat(aVal.replace(/[^0-9.-]/g, ''));
+                } else {
+                    return aVal.localeCompare(bVal);
+                }
+            });
+
+            rows.forEach(row => table.querySelector('tbody').appendChild(row));
+        }
+
+        function setupTOC() {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    const link = document.querySelector(`.toc-link[href="#${entry.target.id}"]`);
+                    if (link) {
+                        if (entry.isIntersecting) {
+                            document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
+                            link.classList.add('active');
+                        }
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            document.querySelectorAll('section').forEach(section => observer.observe(section));
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            document.body.classList.toggle('light-mode');
+        }
+
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: { legend: { labels: { color: '#f1f5f9' } } },
+                scales: {
+                    y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                    x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                }
+            };
+
+            // Sessions Chart
+            const sessionsCtx = document.getElementById('sessionsChart').getContext('2d');
+            new Chart(sessionsCtx, {
+                type: 'line',
+                data: { labels: chartDates, datasets: sessionsDatasets },
+                options: chartOptions
+            });
+
+            // Clicks Chart
+            const clicksCtx = document.getElementById('clicksChart').getContext('2d');
+            new Chart(clicksCtx, {
+                type: 'line',
+                data: { labels: chartDates, datasets: clicksDatasets },
+                options: chartOptions
+            });
+
+            // Impressions Chart
+            const impressionsCtx = document.getElementById('impressionsChart').getContext('2d');
+            new Chart(impressionsCtx, {
+                type: 'line',
+                data: { labels: chartDates, datasets: impressionsDatasets },
+                options: chartOptions
+            });
+
+            // Position Chart (reversed Y axis)
+            const positionCtx = document.getElementById('positionChart').getContext('2d');
+            const positionOptions = { ...chartOptions, scales: {
+                y: { ...chartOptions.scales.y, reverse: true },
+                x: chartOptions.scales.x
+            } };
+            new Chart(positionCtx, {
+                type: 'line',
+                data: { labels: chartDates, datasets: positionDatasets },
+                options: positionOptions
+            });
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', initTables);
+    </script>
+</body>
+</html>
