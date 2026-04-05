@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân tích SEO chi tiết — foodplacee.com</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-gray-50: #f9fafb;
+            --color-gray-100: #f3f4f6;
+            --color-gray-200: #e5e7eb;
+            --color-gray-300: #d1d5db;
+            --color-gray-400: #9ca3af;
+            --color-gray-500: #6b7280;
+            --color-gray-600: #4b5563;
+            --color-gray-700: #374151;
+            --color-gray-800: #1f2937;
+            --color-gray-900: #111827;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        [data-theme="dark"] {
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --border-color: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-title {
+            flex: 1;
+        }
+
+        .header-title h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .header-nav a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            background-color: var(--bg-secondary);
+            transition: background-color 0.2s;
+        }
+
+        .header-nav a:hover {
+            background-color: var(--border-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .toc {
+            position: fixed;
+            right: 2rem;
+            top: 120px;
+            width: 200px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.875rem;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            z-index: 50;
+        }
+
+        .toc a {
+            display: block;
+            color: var(--color-primary);
+            text-decoration: none;
+            padding: 0.5rem 0;
+            border-left: 2px solid transparent;
+            padding-left: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .toc a:hover {
+            border-left-color: var(--color-primary);
+        }
+
+        .toc a.active {
+            color: var(--color-primary);
+            border-left-color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        main {
+            padding-right: 250px;
+        }
+
+        section {
+            margin-bottom: 3rem;
+            background-color: var(--bg-primary);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .kpi-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .kpi-value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .kpi-change.positive {
+            color: var(--color-success);
+        }
+
+        .kpi-change.negative {
+            color: var(--color-danger);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        th:hover {
+            background-color: var(--border-color);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .anomaly-card {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--color-danger);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+        }
+
+        .anomaly-card.medium {
+            border-left-color: var(--color-warning);
+        }
+
+        .anomaly-card.low {
+            border-left-color: var(--color-primary);
+        }
+
+        .recommendation {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--color-danger);
+        }
+
+        .recommendation.medium {
+            border-left-color: var(--color-warning);
+        }
+
+        .recommendation.low {
+            border-left-color: var(--color-primary);
+        }
+
+        .recommendation-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-action {
+            font-size: 0.875rem;
+            padding: 0.5rem;
+            background-color: var(--bg-secondary);
+            border-radius: 0.25rem;
+            border-left: 2px solid var(--color-primary);
+            padding-left: 0.75rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+        }
+
+        .comparison-table td {
+            text-align: right;
+        }
+
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .toc {
+                position: static;
+                width: auto;
+                max-height: none;
+                margin-bottom: 2rem;
+            }
+
+            main {
+                padding-right: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-nav {
+                flex-wrap: wrap;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-title">
+                <h1>Phân tích SEO chi tiết — foodplacee.com</h1>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Cập nhật: 2026-04-05</p>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html">Trang chủ</a>
+                <a href="seo-restaurants-2026-04-05.html">Tổng quan</a>
+                <a href="seo-detail-res-menu.net-2026-04-05.html">← Trước</a>
+                <a href="seo-detail-restaurants-world.net-2026-04-05.html">Tiếp →</a>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="toc" id="toc">
+            <strong>Nội dung</strong>
+            <a href="#kpi">KPI (30d)</a>
+            <a href="#trends">Xu hướng</a>
+            <a href="#daily">Dữ liệu hàng ngày</a>
+            <a href="#keywords">Top Keywords</a>
+            <a href="#pages">Top Pages</a>
+            <a href="#anomalies">Bất thường</a>
+            <a href="#comparison">So sánh</a>
+            <a href="#recommendations">Khuyến nghị</a>
+        </nav>
+
+        <main>
+            <!-- KPI Section -->
+            <section id="kpi">
+                <h2>📊 KPI (30 ngày gần nhất)</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Sessions</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Active Users</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Pageviews</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Bounce Rate</div>
+                        <div class="kpi-value">0%</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Engagement Rate</div>
+                        <div class="kpi-value">0%</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Duration (s)</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Clicks (GSC)</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Impressions (GSC)</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">CTR (GSC)</div>
+                        <div class="kpi-value">0%</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Position (GSC)</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trends Section -->
+            <section id="trends">
+                <h2>📈 Xu hướng (30 ngày gần nhất)</h2>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <canvas id="sessionsUsersChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="bounceEngagementChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="pageviewsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="durationChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="clicksImpressionsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="ctrPositionChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Daily Data -->
+            <section id="daily">
+                <h2>📅 Dữ liệu hàng ngày</h2>
+                <div class="table-scroll">
+                    <table id="dailyTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('dailyTable', 0)">Ngày</th>
+                                <th onclick="sortTable('dailyTable', 1)">Sessions</th>
+                                <th onclick="sortTable('dailyTable', 2)">Users</th>
+                                <th onclick="sortTable('dailyTable', 3)">Pageviews</th>
+                                <th onclick="sortTable('dailyTable', 4)">Bounce %</th>
+                                <th onclick="sortTable('dailyTable', 5)">Clicks</th>
+                                <th onclick="sortTable('dailyTable', 6)">Impressions</th>
+                                <th onclick="sortTable('dailyTable', 7)">CTR %</th>
+                                <th onclick="sortTable('dailyTable', 8)">Position</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailyTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Top Keywords -->
+            <section id="keywords">
+                <h2>🎯 Top 50 Keywords</h2>
+                <div class="table-scroll">
+                    <table id="keywordsTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('keywordsTable', 0)">Từ khóa</th>
+                                <th onclick="sortTable('keywordsTable', 1)">Clicks</th>
+                                <th onclick="sortTable('keywordsTable', 2)">Impressions</th>
+                                <th onclick="sortTable('keywordsTable', 3)">CTR %</th>
+                                <th onclick="sortTable('keywordsTable', 4)">Position</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keywordsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Top Pages -->
+            <section id="pages">
+                <h2>📄 Top 30 Pages</h2>
+                <div class="table-scroll">
+                    <table id="pagesTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('pagesTable', 0)">URL</th>
+                                <th onclick="sortTable('pagesTable', 1)">Clicks</th>
+                                <th onclick="sortTable('pagesTable', 2)">Impressions</th>
+                                <th onclick="sortTable('pagesTable', 3)">CTR %</th>
+                                <th onclick="sortTable('pagesTable', 4)">Position</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pagesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Anomalies -->
+            <section id="anomalies">
+                <h2>⚠️ Phát hiện bất thường</h2>
+                <div id="anomaliesContainer">
+                </div>
+            </section>
+
+            <!-- 30d vs Previous Comparison -->
+            <section id="comparison">
+                <h2>📊 So sánh 30 ngày</h2>
+                <div class="table-scroll">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Kỳ hiện tại</th>
+                                <th>Kỳ trước</th>
+                                <th>Thay đổi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Sessions</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Active Users</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Pageviews</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Bounce Rate</td>
+                                <td>0%</td>
+                                <td>0%</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Engagement Rate</td>
+                                <td>0%</td>
+                                <td>0%</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Clicks (GSC)</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Impressions (GSC)</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>CTR (GSC)</td>
+                                <td>0%</td>
+                                <td>0%</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Avg Position (GSC)</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Recommendations -->
+            <section id="recommendations">
+                <h2>💡 Khuyến nghị SEO</h2>
+                <div id="recommendationsContainer">
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const ga4Data = [];
+        const gscDailyData = [];
+        const topKeywords = [{"query": "factory creteil", "clicks": 24.0, "impressions": 1189.0, "ctr": 0.0202, "position": 5.1102}, {"query": "factorys", "clicks": 23.0, "impressions": 1122.0, "ctr": 0.0205, "position": 4.0143}, {"query": "sissis kaffeehaus", "clicks": 20.0, "impressions": 155.0, "ctr": 0.129, "position": 2.4645}, {"query": "fuji hillcrest", "clicks": 11.0, "impressions": 397.0, "ctr": 0.0277, "position": 2.7229}, {"query": "sissis kaffeehaus freising", "clicks": 11.0, "impressions": 100.0, "ctr": 0.11, "position": 3.17}, {"query": "fuji spartanburg sc", "clicks": 9.0, "impressions": 319.0, "ctr": 0.0282, "position": 3.7367}, {"query": "patron grill menu", "clicks": 9.0, "impressions": 295.0, "ctr": 0.0305, "position": 4.9966}, {"query": "factorys creteil", "clicks": 7.0, "impressions": 257.0, "ctr": 0.0272, "position": 4.1712}, {"query": "patrons livingston tx", "clicks": 6.0, "impressions": 253.0, "ctr": 0.0237, "position": 4.336}, {"query": "factory's creteil", "clicks": 4.0, "impressions": 152.0, "ctr": 0.0263, "position": 6.1316}, {"query": "fuji hillcrest menu", "clicks": 4.0, "impressions": 121.0, "ctr": 0.0331, "position": 3.9091}, {"query": "fuji spartanburg", "clicks": 4.0, "impressions": 260.0, "ctr": 0.0154, "position": 3.4538}, {"query": "sybil's bakery & restaurant", "clicks": 4.0, "impressions": 179.0, "ctr": 0.0223, "position": 4.2235}, {"query": "creteil factory", "clicks": 3.0, "impressions": 96.0, "ctr": 0.0312, "position": 4.7188}, {"query": "fuji", "clicks": 3.0, "impressions": 367.0, "ctr": 0.0082, "position": 5.2589}, {"query": "fuji menu", "clicks": 3.0, "impressions": 77.0, "ctr": 0.039, "position": 5.3506}, {"query": "jamaica way", "clicks": 3.0, "impressions": 469.0, "ctr": 0.0064, "position": 4.8998}, {"query": "factories creteil", "clicks": 2.0, "impressions": 3.0, "ctr": 0.6667, "position": 3.6667}, {"query": "fuji menu spartanburg sc", "clicks": 2.0, "impressions": 27.0, "ctr": 0.0741, "position": 5.5926}, {"query": "fuji spartanburg hillcrest", "clicks": 2.0, "impressions": 39.0, "ctr": 0.0513, "position": 3.5385}, {"query": "jamaica way menu", "clicks": 2.0, "impressions": 180.0, "ctr": 0.0111, "position": 6.1222}, {"query": "jamaican way", "clicks": 2.0, "impressions": 475.0, "ctr": 0.0042, "position": 3.7495}, {"query": "patron grill livingston tx", "clicks": 2.0, "impressions": 198.0, "ctr": 0.0101, "position": 5.8434}, {"query": "sissi's kaffeehaus speisekarte", "clicks": 2.0, "impressions": 9.0, "ctr": 0.2222, "position": 4.5556}, {"query": "sissis freising", "clicks": 2.0, "impressions": 4.0, "ctr": 0.5, "position": 3.0}, {"query": "super c gulfport ms", "clicks": 2.0, "impressions": 26.0, "ctr": 0.0769, "position": 3.5769}, {"query": "super c near me", "clicks": 2.0, "impressions": 150.0, "ctr": 0.0133, "position": 5.12}, {"query": "super c three dads cooking", "clicks": 2.0, "impressions": 18.0, "ctr": 0.1111, "position": 3.5556}, {"query": "sybils nyc", "clicks": 2.0, "impressions": 160.0, "ctr": 0.0125, "position": 4.3688}, {"query": "cafe sissi freising", "clicks": 1.0, "impressions": 7.0, "ctr": 0.1429, "position": 2.5714}, {"query": "crawfish gulfport ms", "clicks": 1.0, "impressions": 18.0, "ctr": 0.0556, "position": 9.1667}, {"query": "crawfish in gulfport", "clicks": 1.0, "impressions": 1.0, "ctr": 1.0, "position": 1.0}, {"query": "factory 94", "clicks": 1.0, "impressions": 6.0, "ctr": 0.1667, "position": 4.5}, {"query": "factory's cr\u00e9teil", "clicks": 1.0, "impressions": 11.0, "ctr": 0.0909, "position": 5.0}, {"query": "factroys", "clicks": 1.0, "impressions": 1.0, "ctr": 1.0, "position": 3.0}, {"query": "fuji east main", "clicks": 1.0, "impressions": 9.0, "ctr": 0.1111, "position": 2.0}, {"query": "fuji east main street spartanburg", "clicks": 1.0, "impressions": 5.0, "ctr": 0.2, "position": 6.4}, {"query": "fuji hillcrest spartanburg sc", "clicks": 1.0, "impressions": 20.0, "ctr": 0.05, "position": 3.3}, {"query": "fuji memu", "clicks": 1.0, "impressions": 1.0, "ctr": 1.0, "position": 2.0}, {"query": "fuji spartanburg, sc menu", "clicks": 1.0, "impressions": 7.0, "ctr": 0.1429, "position": 6.5714}, {"query": "jamaica way augusta ga", "clicks": 1.0, "impressions": 207.0, "ctr": 0.0048, "position": 3.8357}, {"query": "le factory creteil", "clicks": 1.0, "impressions": 21.0, "ctr": 0.0476, "position": 4.1429}, {"query": "patron grill", "clicks": 1.0, "impressions": 162.0, "ctr": 0.0062, "position": 5.8333}, {"query": "patron grill livingston, tx", "clicks": 1.0, "impressions": 2.0, "ctr": 0.5, "position": 6.0}, {"query": "patron grill menu livingston, tx", "clicks": 1.0, "impressions": 19.0, "ctr": 0.0526, "position": 3.3684}, {"query": "patron livingston", "clicks": 1.0, "impressions": 15.0, "ctr": 0.0667, "position": 5.9333}, {"query": "patron livingston tx", "clicks": 1.0, "impressions": 18.0, "ctr": 0.0556, "position": 4.8333}, {"query": "patron restaurant livingston tx", "clicks": 1.0, "impressions": 13.0, "ctr": 0.0769, "position": 4.4615}, {"query": "patrons livingston", "clicks": 1.0, "impressions": 55.0, "ctr": 0.0182, "position": 4.3091}, {"query": "patrons livingston tx menu", "clicks": 1.0, "impressions": 16.0, "ctr": 0.0625, "position": 3.6875}];
+        const topPages = [{"page": "https://factorys-creteil.foodplacee.com/", "clicks": 69.0, "impressions": 3690.0, "ctr": 0.0187, "position": 5.4659}, {"page": "https://sissis-kaffeehaus.foodplacee.com/", "clicks": 52.0, "impressions": 554.0, "ctr": 0.0939, "position": 5.5036}, {"page": "https://fuji-hillcrest.foodplacee.com/", "clicks": 39.0, "impressions": 2499.0, "ctr": 0.0156, "position": 4.9788}, {"page": "https://jamaica-way.foodplacee.com/", "clicks": 15.0, "impressions": 1653.0, "ctr": 0.0091, "position": 5.0127}, {"page": "https://patron-grill.foodplacee.com/", "clicks": 15.0, "impressions": 1476.0, "ctr": 0.0102, "position": 6.9553}, {"page": "https://patron-grill.foodplacee.com/menu", "clicks": 14.0, "impressions": 522.0, "ctr": 0.0268, "position": 8.6935}, {"page": "https://fuji-hillcrest.foodplacee.com/menu", "clicks": 13.0, "impressions": 461.0, "ctr": 0.0282, "position": 7.0933}, {"page": "https://super-c-three-dads-cooking.foodplacee.com/", "clicks": 11.0, "impressions": 1066.0, "ctr": 0.0103, "position": 7.7505}, {"page": "https://sybils-bakery-restaurant.foodplacee.com/", "clicks": 10.0, "impressions": 1268.0, "ctr": 0.0079, "position": 6.5584}, {"page": "https://pastelaria-vianeza-prato-do-dia.foodplacee.com/", "clicks": 5.0, "impressions": 255.0, "ctr": 0.0196, "position": 7.3333}, {"page": "https://foodplacee.com/", "clicks": 2.0, "impressions": 46.0, "ctr": 0.0435, "position": 1.6739}, {"page": "https://cafe-paragrapho.foodplacee.com/", "clicks": 1.0, "impressions": 99.0, "ctr": 0.0101, "position": 4.4242}, {"page": "https://jamaica-way.foodplacee.com/menu", "clicks": 1.0, "impressions": 205.0, "ctr": 0.0049, "position": 12.878}, {"page": "https://bagga-montelavar.foodplacee.com/", "clicks": 0.0, "impressions": 56.0, "ctr": 0.0, "position": 6.4464}, {"page": "https://bagga-montelavar.foodplacee.com/menu", "clicks": 0.0, "impressions": 26.0, "ctr": 0.0, "position": 9.3077}, {"page": "https://berlin-dner-haus.foodplacee.com/", "clicks": 0.0, "impressions": 1.0, "ctr": 0.0, "position": 11.0}, {"page": "https://creme-caffe.foodplacee.com/", "clicks": 0.0, "impressions": 87.0, "ctr": 0.0, "position": 3.046}, {"page": "https://creme-caffe.foodplacee.com/menu", "clicks": 0.0, "impressions": 18.0, "ctr": 0.0, "position": 18.0556}, {"page": "https://cru-coffee-roasters-cellars.foodplacee.com/", "clicks": 0.0, "impressions": 2.0, "ctr": 0.0, "position": 11.0}, {"page": "https://double-d-puchong-restaurant.foodplacee.com/", "clicks": 0.0, "impressions": 1.0, "ctr": 0.0, "position": 7.0}, {"page": "https://factorys-creteil.foodplacee.com/menu", "clicks": 0.0, "impressions": 46.0, "ctr": 0.0, "position": 11.4783}, {"page": "https://fuji-hillcrest.foodplacee.com/#Feel", "clicks": 0.0, "impressions": 100.0, "ctr": 0.0, "position": 5.41}, {"page": "https://fuji-hillcrest.foodplacee.com/#Why", "clicks": 0.0, "impressions": 107.0, "ctr": 0.0, "position": 5.5981}, {"page": "https://fuji-hillcrest.foodplacee.com/#experience", "clicks": 0.0, "impressions": 107.0, "ctr": 0.0, "position": 5.5981}, {"page": "https://fuji-hillcrest.foodplacee.com/#highlight", "clicks": 0.0, "impressions": 107.0, "ctr": 0.0, "position": 5.5981}, {"page": "https://fuji-hillcrest.foodplacee.com/#scrollspyAbout", "clicks": 0.0, "impressions": 107.0, "ctr": 0.0, "position": 5.5981}, {"page": "https://jamaica-way.foodplacee.com/#Feel", "clicks": 0.0, "impressions": 78.0, "ctr": 0.0, "position": 8.641}, {"page": "https://jamaica-way.foodplacee.com/#Why", "clicks": 0.0, "impressions": 85.0, "ctr": 0.0, "position": 8.7529}, {"page": "https://jamaica-way.foodplacee.com/#experience", "clicks": 0.0, "impressions": 85.0, "ctr": 0.0, "position": 8.7529}, {"page": "https://jamaica-way.foodplacee.com/#highlight", "clicks": 0.0, "impressions": 85.0, "ctr": 0.0, "position": 8.7529}];
+        const anomalies = [];
+        const recommendations = [{"priority": "high", "title": "C\u1ea3i thi\u1ec7n CTR cho keywords high-impression", "description": "C\u00f3 21 keywords v\u1edbi l\u01b0\u1ee3t hi\u1ec3n th\u1ecb cao nh\u01b0ng CTR th\u1ea5p (<2%)", "action": "T\u1ed1i \u01b0u ti\u00eau \u0111\u1ec1 v\u00e0 m\u00f4 t\u1ea3 (meta descriptions) cho c\u00e1c keywords n\u00e0y"}, {"priority": "medium", "title": "N\u00e2ng h\u1ea1ng t\u1eeb kh\u00f3a v\u1ecb tr\u00ed 5-20", "description": "C\u00f3 15 keywords c\u00f3 ti\u1ec1m n\u0103ng n\u00e2ng h\u1ea1ng", "action": "T\u1eadp trung v\u00e0o on-page SEO v\u00e0 backlink building"}];
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme') || 'light';
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Table sorting
+        function sortTable(tableId, colIdx) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                const aVal = a.cells[colIdx].textContent.trim();
+                const bVal = b.cells[colIdx].textContent.trim();
+                const aNum = parseFloat(aVal);
+                const bNum = parseFloat(bVal);
+
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return aNum - bNum;
+                }
+                return aVal.localeCompare(bVal);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Render daily data
+        function renderDailyData() {
+            const tbody = document.getElementById('dailyTableBody');
+            let html = '';
+
+            ga4Data.forEach(row => {
+                const gscRow = gscDailyData.find(g => g.date === row.date) || {};
+                html += `<tr>
+                    <td>${row.date}</td>
+                    <td>${row.sessions || 0}</td>
+                    <td>${row.active_users || 0}</td>
+                    <td>${row.screen_page_views || 0}</td>
+                    <td>${(row.bounce_rate || 0).toFixed(1)}</td>
+                    <td>${gscRow.clicks || 0}</td>
+                    <td>${gscRow.impressions || 0}</td>
+                    <td>${(gscRow.ctr || 0).toFixed(2)}</td>
+                    <td>${(gscRow.position || 0).toFixed(2)}</td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Render keywords
+        function renderKeywords() {
+            const tbody = document.getElementById('keywordsTableBody');
+            let html = '';
+
+            topKeywords.forEach(kw => {
+                html += `<tr>
+                    <td>${kw.query}</td>
+                    <td>${kw.clicks || 0}</td>
+                    <td>${kw.impressions || 0}</td>
+                    <td>${(kw.ctr || 0).toFixed(2)}</td>
+                    <td>${(kw.position || 0).toFixed(2)}</td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Render pages
+        function renderPages() {
+            const tbody = document.getElementById('pagesTableBody');
+            let html = '';
+
+            topPages.forEach(page => {
+                html += `<tr>
+                    <td><small>${page.page}</small></td>
+                    <td>${page.clicks || 0}</td>
+                    <td>${page.impressions || 0}</td>
+                    <td>${(page.ctr || 0).toFixed(2)}</td>
+                    <td>${(page.position || 0).toFixed(2)}</td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Render anomalies
+        function renderAnomalies() {
+            const container = document.getElementById('anomaliesContainer');
+            if (anomalies.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">Không có bất thường nào được phát hiện.</p>';
+                return;
+            }
+
+            let html = '';
+            anomalies.forEach(anom => {
+                html += `<div class="anomaly-card">
+                    <strong>${anom.date}</strong><br>
+                    Giá trị: ${anom.value.toFixed(2)} | Trung bình: ${anom.avg} | Z-score: ${anom.z_score}
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Render recommendations
+        function renderRecommendations() {
+            const container = document.getElementById('recommendationsContainer');
+            let html = '';
+
+            recommendations.forEach(rec => {
+                html += `<div class="recommendation ${rec.priority}">
+                    <div class="recommendation-title">${rec.title}</div>
+                    <div class="recommendation-desc">${rec.description}</div>
+                    <div class="recommendation-action">✓ ${rec.action}</div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Charts
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                        font: { size: 11 }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'), font: { size: 10 } },
+                    grid: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--border-color') }
+                },
+                y: {
+                    ticks: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'), font: { size: 10 } },
+                    grid: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--border-color') }
+                }
+            }
+        };
+
+        function initCharts() {
+            const dates = ga4Data.map(r => r.date);
+            const sessions = ga4Data.map(r => r.sessions || 0);
+            const users = ga4Data.map(r => r.active_users || 0);
+            const pageviews = ga4Data.map(r => r.screen_page_views || 0);
+            const bounce = ga4Data.map(r => r.bounce_rate || 0);
+            const engagement = ga4Data.map(r => r.engagement_rate || 0);
+            const duration = ga4Data.map(r => r.average_session_duration || 0);
+
+            const gscDates = gscDailyData.map(r => r.date);
+            const clicks = gscDailyData.map(r => r.clicks || 0);
+            const impressions = gscDailyData.map(r => r.impressions || 0);
+            const ctr = gscDailyData.map(r => r.ctr || 0);
+            const position = gscDailyData.map(r => r.position || 0);
+
+            // Sessions + Users
+            new Chart(document.getElementById('sessionsUsersChart'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        { label: 'Sessions', data: sessions, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', tension: 0.3 },
+                        { label: 'Active Users', data: users, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.3, yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y1: { position: 'right', ticks: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') } }
+                    }
+                }
+            });
+
+            // Bounce + Engagement
+            new Chart(document.getElementById('bounceEngagementChart'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        { label: 'Bounce Rate %', data: bounce, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', tension: 0.3 },
+                        { label: 'Engagement Rate %', data: engagement, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', tension: 0.3 }
+                    ]
+                },
+                options: chartOptions
+            });
+
+            // Pageviews
+            new Chart(document.getElementById('pageviewsChart'), {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{ label: 'Pageviews', data: pageviews, backgroundColor: '#2563eb' }]
+                },
+                options: chartOptions
+            });
+
+            // Duration
+            new Chart(document.getElementById('durationChart'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{ label: 'Avg Session Duration (s)', data: duration, borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', tension: 0.3 }]
+                },
+                options: chartOptions
+            });
+
+            // Clicks + Impressions
+            new Chart(document.getElementById('clicksImpressionsChart'), {
+                type: 'line',
+                data: {
+                    labels: gscDates,
+                    datasets: [
+                        { label: 'Clicks', data: clicks, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', tension: 0.3 },
+                        { label: 'Impressions', data: impressions, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.3, yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y1: { position: 'right', ticks: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') } }
+                    }
+                }
+            });
+
+            // CTR + Position
+            new Chart(document.getElementById('ctrPositionChart'), {
+                type: 'line',
+                data: {
+                    labels: gscDates,
+                    datasets: [
+                        { label: 'CTR %', data: ctr, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', tension: 0.3 },
+                        { label: 'Avg Position (reversed)', data: position.map(p => 100 - p), borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', tension: 0.3, yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y1: { position: 'right', ticks: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') } }
+                    }
+                }
+            });
+        }
+
+        // TOC with IntersectionObserver
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                const id = entry.target.id;
+                const link = document.querySelector(`.toc a[href="#${id}"]`);
+                if (link) {
+                    if (entry.isIntersecting) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('section').forEach(section => observer.observe(section));
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderDailyData();
+            renderKeywords();
+            renderPages();
+            renderAnomalies();
+            renderRecommendations();
+            initCharts();
+        });
+    </script>
+</body>
+</html>
