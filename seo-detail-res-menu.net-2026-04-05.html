@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân tích SEO chi tiết — res-menu.net</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-gray-50: #f9fafb;
+            --color-gray-100: #f3f4f6;
+            --color-gray-200: #e5e7eb;
+            --color-gray-300: #d1d5db;
+            --color-gray-400: #9ca3af;
+            --color-gray-500: #6b7280;
+            --color-gray-600: #4b5563;
+            --color-gray-700: #374151;
+            --color-gray-800: #1f2937;
+            --color-gray-900: #111827;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        [data-theme="dark"] {
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --border-color: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-title {
+            flex: 1;
+        }
+
+        .header-title h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .header-nav a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            background-color: var(--bg-secondary);
+            transition: background-color 0.2s;
+        }
+
+        .header-nav a:hover {
+            background-color: var(--border-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .toc {
+            position: fixed;
+            right: 2rem;
+            top: 120px;
+            width: 200px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.875rem;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            z-index: 50;
+        }
+
+        .toc a {
+            display: block;
+            color: var(--color-primary);
+            text-decoration: none;
+            padding: 0.5rem 0;
+            border-left: 2px solid transparent;
+            padding-left: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .toc a:hover {
+            border-left-color: var(--color-primary);
+        }
+
+        .toc a.active {
+            color: var(--color-primary);
+            border-left-color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        main {
+            padding-right: 250px;
+        }
+
+        section {
+            margin-bottom: 3rem;
+            background-color: var(--bg-primary);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .kpi-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .kpi-value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .kpi-change.positive {
+            color: var(--color-success);
+        }
+
+        .kpi-change.negative {
+            color: var(--color-danger);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        th:hover {
+            background-color: var(--border-color);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .anomaly-card {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--color-danger);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+        }
+
+        .anomaly-card.medium {
+            border-left-color: var(--color-warning);
+        }
+
+        .anomaly-card.low {
+            border-left-color: var(--color-primary);
+        }
+
+        .recommendation {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--color-danger);
+        }
+
+        .recommendation.medium {
+            border-left-color: var(--color-warning);
+        }
+
+        .recommendation.low {
+            border-left-color: var(--color-primary);
+        }
+
+        .recommendation-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-action {
+            font-size: 0.875rem;
+            padding: 0.5rem;
+            background-color: var(--bg-secondary);
+            border-radius: 0.25rem;
+            border-left: 2px solid var(--color-primary);
+            padding-left: 0.75rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+        }
+
+        .comparison-table td {
+            text-align: right;
+        }
+
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .toc {
+                position: static;
+                width: auto;
+                max-height: none;
+                margin-bottom: 2rem;
+            }
+
+            main {
+                padding-right: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-nav {
+                flex-wrap: wrap;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-title">
+                <h1>Phân tích SEO chi tiết — res-menu.net</h1>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Cập nhật: 2026-04-05</p>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html">Trang chủ</a>
+                <a href="seo-restaurants-2026-04-05.html">Tổng quan</a>
+                <a href="seo-detail-wherebly.com-2026-04-05.html">← Trước</a>
+                <a href="seo-detail-foodplacee.com-2026-04-05.html">Tiếp →</a>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="toc" id="toc">
+            <strong>Nội dung</strong>
+            <a href="#kpi">KPI (30d)</a>
+            <a href="#trends">Xu hướng</a>
+            <a href="#daily">Dữ liệu hàng ngày</a>
+            <a href="#keywords">Top Keywords</a>
+            <a href="#pages">Top Pages</a>
+            <a href="#anomalies">Bất thường</a>
+            <a href="#comparison">So sánh</a>
+            <a href="#recommendations">Khuyến nghị</a>
+        </nav>
+
+        <main>
+            <!-- KPI Section -->
+            <section id="kpi">
+                <h2>📊 KPI (30 ngày gần nhất)</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Sessions</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Active Users</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Pageviews</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Bounce Rate</div>
+                        <div class="kpi-value">0%</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Engagement Rate</div>
+                        <div class="kpi-value">0%</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Duration (s)</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Clicks (GSC)</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Impressions (GSC)</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">CTR (GSC)</div>
+                        <div class="kpi-value">0%</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Position (GSC)</div>
+                        <div class="kpi-value">0</div>
+                        <div class="kpi-change positive">
+                            ↑ 0.0%
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trends Section -->
+            <section id="trends">
+                <h2>📈 Xu hướng (30 ngày gần nhất)</h2>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <canvas id="sessionsUsersChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="bounceEngagementChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="pageviewsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="durationChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="clicksImpressionsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="ctrPositionChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Daily Data -->
+            <section id="daily">
+                <h2>📅 Dữ liệu hàng ngày</h2>
+                <div class="table-scroll">
+                    <table id="dailyTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('dailyTable', 0)">Ngày</th>
+                                <th onclick="sortTable('dailyTable', 1)">Sessions</th>
+                                <th onclick="sortTable('dailyTable', 2)">Users</th>
+                                <th onclick="sortTable('dailyTable', 3)">Pageviews</th>
+                                <th onclick="sortTable('dailyTable', 4)">Bounce %</th>
+                                <th onclick="sortTable('dailyTable', 5)">Clicks</th>
+                                <th onclick="sortTable('dailyTable', 6)">Impressions</th>
+                                <th onclick="sortTable('dailyTable', 7)">CTR %</th>
+                                <th onclick="sortTable('dailyTable', 8)">Position</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailyTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Top Keywords -->
+            <section id="keywords">
+                <h2>🎯 Top 50 Keywords</h2>
+                <div class="table-scroll">
+                    <table id="keywordsTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('keywordsTable', 0)">Từ khóa</th>
+                                <th onclick="sortTable('keywordsTable', 1)">Clicks</th>
+                                <th onclick="sortTable('keywordsTable', 2)">Impressions</th>
+                                <th onclick="sortTable('keywordsTable', 3)">CTR %</th>
+                                <th onclick="sortTable('keywordsTable', 4)">Position</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keywordsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Top Pages -->
+            <section id="pages">
+                <h2>📄 Top 30 Pages</h2>
+                <div class="table-scroll">
+                    <table id="pagesTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('pagesTable', 0)">URL</th>
+                                <th onclick="sortTable('pagesTable', 1)">Clicks</th>
+                                <th onclick="sortTable('pagesTable', 2)">Impressions</th>
+                                <th onclick="sortTable('pagesTable', 3)">CTR %</th>
+                                <th onclick="sortTable('pagesTable', 4)">Position</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pagesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Anomalies -->
+            <section id="anomalies">
+                <h2>⚠️ Phát hiện bất thường</h2>
+                <div id="anomaliesContainer">
+                </div>
+            </section>
+
+            <!-- 30d vs Previous Comparison -->
+            <section id="comparison">
+                <h2>📊 So sánh 30 ngày</h2>
+                <div class="table-scroll">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Kỳ hiện tại</th>
+                                <th>Kỳ trước</th>
+                                <th>Thay đổi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Sessions</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Active Users</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Pageviews</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Bounce Rate</td>
+                                <td>0%</td>
+                                <td>0%</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Engagement Rate</td>
+                                <td>0%</td>
+                                <td>0%</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Clicks (GSC)</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Impressions (GSC)</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>CTR (GSC)</td>
+                                <td>0%</td>
+                                <td>0%</td>
+                                <td>+0.0%</td>
+                            </tr>
+                            <tr>
+                                <td>Avg Position (GSC)</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>+0.0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Recommendations -->
+            <section id="recommendations">
+                <h2>💡 Khuyến nghị SEO</h2>
+                <div id="recommendationsContainer">
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const ga4Data = [];
+        const gscDailyData = [];
+        const topKeywords = [{"query": "kawa revolving sushi menu", "clicks": 727, "impressions": 1968, "ctr": 0.3694, "position": 2.1474}, {"query": "sofia's pizza & roast beef menu", "clicks": 696, "impressions": 1626, "ctr": 0.428, "position": 2.4692}, {"query": "bistrot paul bert menu", "clicks": 659, "impressions": 2677, "ctr": 0.2462, "position": 2.3975}, {"query": "panoramic 34 menu", "clicks": 600, "impressions": 1655, "ctr": 0.3625, "position": 2.197}, {"query": "bell city diner menu", "clicks": 587, "impressions": 2210, "ctr": 0.2656, "position": 2.0072}, {"query": "johnny longboats menu", "clicks": 548, "impressions": 2266, "ctr": 0.2418, "position": 2.0944}, {"query": "ok cafe menu", "clicks": 519, "impressions": 2412, "ctr": 0.2152, "position": 2.8951}, {"query": "the hive waterfront restaurant & tiki menu", "clicks": 507, "impressions": 2868, "ctr": 0.1768, "position": 2.0858}, {"query": "cafe continental menu", "clicks": 469, "impressions": 3949, "ctr": 0.1188, "position": 4.2831}, {"query": "lj shanghai menu", "clicks": 467, "impressions": 2113, "ctr": 0.221, "position": 2.0757}, {"query": "ltk crawfish menu", "clicks": 431, "impressions": 2891, "ctr": 0.1491, "position": 2.0937}, {"query": "donut hole menu", "clicks": 429, "impressions": 1890, "ctr": 0.227, "position": 3.346}, {"query": "katsu hama", "clicks": 404, "impressions": 2718, "ctr": 0.1486, "position": 3.0372}, {"query": "stasio's italian deli & market menu", "clicks": 384, "impressions": 2824, "ctr": 0.136, "position": 2.7716}, {"query": "alaska fish and chicken menu", "clicks": 378, "impressions": 1932, "ctr": 0.1957, "position": 3.3965}, {"query": "donut hole bakery cafe menu", "clicks": 373, "impressions": 2165, "ctr": 0.1723, "position": 3.1483}, {"query": "bimini twist menu", "clicks": 366, "impressions": 1838, "ctr": 0.1991, "position": 1.981}, {"query": "ingas bar menu", "clicks": 364, "impressions": 1400, "ctr": 0.26, "position": 2.0757}, {"query": "taberna dos mercadores", "clicks": 358, "impressions": 7863, "ctr": 0.0455, "position": 5.8405}, {"query": "deaverdura menu", "clicks": 357, "impressions": 1292, "ctr": 0.2763, "position": 2.3777}, {"query": "eric's family barbecue menu", "clicks": 342, "impressions": 1060, "ctr": 0.3226, "position": 2.084}, {"query": "bottega michelangelo menu", "clicks": 336, "impressions": 1632, "ctr": 0.2059, "position": 2.136}, {"query": "soup 'n fresh - rancho cucamonga menu", "clicks": 334, "impressions": 1334, "ctr": 0.2504, "position": 2.033}, {"query": "brass lantern menu", "clicks": 323, "impressions": 1777, "ctr": 0.1818, "position": 2.5374}, {"query": "viva south padre island menu", "clicks": 301, "impressions": 2463, "ctr": 0.1222, "position": 2.1332}, {"query": "country tavern menu", "clicks": 290, "impressions": 1499, "ctr": 0.1935, "position": 2.7432}, {"query": "gondola italian restaurant menu", "clicks": 289, "impressions": 593, "ctr": 0.4874, "position": 1.5717}, {"query": "strange design public house menu", "clicks": 288, "impressions": 519, "ctr": 0.5549, "position": 1.5241}, {"query": "papa paul's menu", "clicks": 285, "impressions": 2022, "ctr": 0.1409, "position": 2.1009}, {"query": "jade garden restaurant waipahu menu", "clicks": 282, "impressions": 616, "ctr": 0.4578, "position": 2.1461}, {"query": "rice box florence menu", "clicks": 278, "impressions": 1310, "ctr": 0.2122, "position": 1.9687}, {"query": "ironside fish and oyster menu", "clicks": 276, "impressions": 2035, "ctr": 0.1356, "position": 3.2624}, {"query": "samosa king", "clicks": 275, "impressions": 4970, "ctr": 0.0553, "position": 2.6851}, {"query": "scotties on the river menu", "clicks": 269, "impressions": 2751, "ctr": 0.0978, "position": 3.2025}, {"query": "why not hollywood menu", "clicks": 266, "impressions": 1226, "ctr": 0.217, "position": 1.9861}, {"query": "mike's kitchen cranston menu", "clicks": 254, "impressions": 937, "ctr": 0.2711, "position": 1.8527}, {"query": "murry & paul's restaurant menu", "clicks": 254, "impressions": 1543, "ctr": 0.1646, "position": 1.9948}, {"query": "ivy on the square menu", "clicks": 253, "impressions": 1619, "ctr": 0.1563, "position": 3.2193}, {"query": "house of pizza gloversville menu", "clicks": 252, "impressions": 1599, "ctr": 0.1576, "position": 2.1057}, {"query": "oug jade restaurant menu", "clicks": 251, "impressions": 865, "ctr": 0.2902, "position": 2.4925}, {"query": "savas pizza menu", "clicks": 248, "impressions": 598, "ctr": 0.4147, "position": 2.0535}, {"query": "johnny ray's smokehouse menu", "clicks": 244, "impressions": 1311, "ctr": 0.1861, "position": 2.1838}, {"query": "bistro caf\u00e9 san juan menu", "clicks": 243, "impressions": 1623, "ctr": 0.1497, "position": 2.1522}, {"query": "boston title and abstract menu", "clicks": 242, "impressions": 1150, "ctr": 0.2104, "position": 1.987}, {"query": "tnt pizza sycamore menu", "clicks": 236, "impressions": 444, "ctr": 0.5315, "position": 1.8041}, {"query": "flo's kitchen menu", "clicks": 234, "impressions": 1352, "ctr": 0.1731, "position": 2.1857}, {"query": "mariposa honolulu menu", "clicks": 227, "impressions": 1810, "ctr": 0.1254, "position": 3.5155}, {"query": "ramen house menu", "clicks": 227, "impressions": 1539, "ctr": 0.1475, "position": 2.3366}, {"query": "tea be honest menu", "clicks": 225, "impressions": 631, "ctr": 0.3566, "position": 2.3566}, {"query": "cajun critters menu", "clicks": 223, "impressions": 1309, "ctr": 0.1704, "position": 2.4049}];
+        const topPages = [{"page": "https://donut-hole-bakery-cafe.res-menu.net/menu", "clicks": 381, "impressions": 1765}, {"page": "https://bistrot-paul-bert.res-menu.net/menu", "clicks": 326, "impressions": 1538}, {"page": "https://cafe-continental.res-menu.net/menu", "clicks": 213, "impressions": 1192}, {"page": "https://le-plomb-du-cantal.res-menu.net/", "clicks": 185, "impressions": 3296}, {"page": "https://pell-22-hair-salon.res-menu.net/", "clicks": 174, "impressions": 1640}, {"page": "https://the-hive-waterfront.res-menu.net/menu", "clicks": 164, "impressions": 1387}, {"page": "https://panoramic-34.res-menu.net/menu", "clicks": 159, "impressions": 574}, {"page": "https://bistro-cafe.res-menu.net/", "clicks": 156, "impressions": 5122}, {"page": "https://sofias-pizza-roast-beef.res-menu.net/", "clicks": 155, "impressions": 1145}, {"page": "https://hawthorne-asylum.res-menu.net/", "clicks": 148, "impressions": 1548}, {"page": "https://stasios-italian-deli-market.res-menu.net/menu", "clicks": 136, "impressions": 738}, {"page": "https://ok-cafe.res-menu.net/menu", "clicks": 135, "impressions": 789}, {"page": "https://oiso-korean-traditional-cuisine-and-cafe.res-menu.net/", "clicks": 128, "impressions": 2199}, {"page": "https://kawa-revolving-sushi.res-menu.net/menu", "clicks": 127, "impressions": 597}, {"page": "https://old-luxemburg-inn.res-menu.net/menu", "clicks": 125, "impressions": 1984}, {"page": "https://katsu-hama.res-menu.net/", "clicks": 124, "impressions": 1390}, {"page": "https://cafe-metro.res-menu.net/", "clicks": 122, "impressions": 2029}, {"page": "https://el-sur.res-menu.net/", "clicks": 121, "impressions": 3560}, {"page": "https://sofias-pizza-roast-beef.res-menu.net/menu", "clicks": 110, "impressions": 668}, {"page": "https://opa-grill-tavern.res-menu.net/", "clicks": 109, "impressions": 1511}, {"page": "https://ken-sushi-workshop.res-menu.net/", "clicks": 107, "impressions": 1348}, {"page": "https://soup-n-fresh.res-menu.net/menu", "clicks": 107, "impressions": 513}, {"page": "https://johnny-longboats.res-menu.net/menu", "clicks": 107, "impressions": 585}, {"page": "https://bell-city-diner.res-menu.net/menu", "clicks": 102, "impressions": 383}, {"page": "https://mojis-pizzeria.res-menu.net/", "clicks": 99, "impressions": 647}, {"page": "https://johnnys-po-boys.res-menu.net/", "clicks": 96, "impressions": 1140}, {"page": "https://mariposa.res-menu.net/menu", "clicks": 93, "impressions": 773}, {"page": "https://nyonya.res-menu.net/", "clicks": 92, "impressions": 2401}, {"page": "https://rice-box.res-menu.net/menu", "clicks": 91, "impressions": 610}, {"page": "https://roundhouse-deli.res-menu.net/", "clicks": 90, "impressions": 1661}];
+        const anomalies = [];
+        const recommendations = [{"priority": "high", "title": "C\u1ea3i thi\u1ec7n CTR cho keywords high-impression", "description": "C\u00f3 50 keywords v\u1edbi l\u01b0\u1ee3t hi\u1ec3n th\u1ecb cao nh\u01b0ng CTR th\u1ea5p (<2%)", "action": "T\u1ed1i \u01b0u ti\u00eau \u0111\u1ec1 v\u00e0 m\u00f4 t\u1ea3 (meta descriptions) cho c\u00e1c keywords n\u00e0y"}, {"priority": "medium", "title": "N\u00e2ng h\u1ea1ng t\u1eeb kh\u00f3a v\u1ecb tr\u00ed 5-20", "description": "C\u00f3 1 keywords c\u00f3 ti\u1ec1m n\u0103ng n\u00e2ng h\u1ea1ng", "action": "T\u1eadp trung v\u00e0o on-page SEO v\u00e0 backlink building"}];
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme') || 'light';
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Table sorting
+        function sortTable(tableId, colIdx) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                const aVal = a.cells[colIdx].textContent.trim();
+                const bVal = b.cells[colIdx].textContent.trim();
+                const aNum = parseFloat(aVal);
+                const bNum = parseFloat(bVal);
+
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return aNum - bNum;
+                }
+                return aVal.localeCompare(bVal);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Render daily data
+        function renderDailyData() {
+            const tbody = document.getElementById('dailyTableBody');
+            let html = '';
+
+            ga4Data.forEach(row => {
+                const gscRow = gscDailyData.find(g => g.date === row.date) || {};
+                html += `<tr>
+                    <td>${row.date}</td>
+                    <td>${row.sessions || 0}</td>
+                    <td>${row.active_users || 0}</td>
+                    <td>${row.screen_page_views || 0}</td>
+                    <td>${(row.bounce_rate || 0).toFixed(1)}</td>
+                    <td>${gscRow.clicks || 0}</td>
+                    <td>${gscRow.impressions || 0}</td>
+                    <td>${(gscRow.ctr || 0).toFixed(2)}</td>
+                    <td>${(gscRow.position || 0).toFixed(2)}</td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Render keywords
+        function renderKeywords() {
+            const tbody = document.getElementById('keywordsTableBody');
+            let html = '';
+
+            topKeywords.forEach(kw => {
+                html += `<tr>
+                    <td>${kw.query}</td>
+                    <td>${kw.clicks || 0}</td>
+                    <td>${kw.impressions || 0}</td>
+                    <td>${(kw.ctr || 0).toFixed(2)}</td>
+                    <td>${(kw.position || 0).toFixed(2)}</td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Render pages
+        function renderPages() {
+            const tbody = document.getElementById('pagesTableBody');
+            let html = '';
+
+            topPages.forEach(page => {
+                html += `<tr>
+                    <td><small>${page.page}</small></td>
+                    <td>${page.clicks || 0}</td>
+                    <td>${page.impressions || 0}</td>
+                    <td>${(page.ctr || 0).toFixed(2)}</td>
+                    <td>${(page.position || 0).toFixed(2)}</td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Render anomalies
+        function renderAnomalies() {
+            const container = document.getElementById('anomaliesContainer');
+            if (anomalies.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">Không có bất thường nào được phát hiện.</p>';
+                return;
+            }
+
+            let html = '';
+            anomalies.forEach(anom => {
+                html += `<div class="anomaly-card">
+                    <strong>${anom.date}</strong><br>
+                    Giá trị: ${anom.value.toFixed(2)} | Trung bình: ${anom.avg} | Z-score: ${anom.z_score}
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Render recommendations
+        function renderRecommendations() {
+            const container = document.getElementById('recommendationsContainer');
+            let html = '';
+
+            recommendations.forEach(rec => {
+                html += `<div class="recommendation ${rec.priority}">
+                    <div class="recommendation-title">${rec.title}</div>
+                    <div class="recommendation-desc">${rec.description}</div>
+                    <div class="recommendation-action">✓ ${rec.action}</div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Charts
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                        font: { size: 11 }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'), font: { size: 10 } },
+                    grid: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--border-color') }
+                },
+                y: {
+                    ticks: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'), font: { size: 10 } },
+                    grid: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--border-color') }
+                }
+            }
+        };
+
+        function initCharts() {
+            const dates = ga4Data.map(r => r.date);
+            const sessions = ga4Data.map(r => r.sessions || 0);
+            const users = ga4Data.map(r => r.active_users || 0);
+            const pageviews = ga4Data.map(r => r.screen_page_views || 0);
+            const bounce = ga4Data.map(r => r.bounce_rate || 0);
+            const engagement = ga4Data.map(r => r.engagement_rate || 0);
+            const duration = ga4Data.map(r => r.average_session_duration || 0);
+
+            const gscDates = gscDailyData.map(r => r.date);
+            const clicks = gscDailyData.map(r => r.clicks || 0);
+            const impressions = gscDailyData.map(r => r.impressions || 0);
+            const ctr = gscDailyData.map(r => r.ctr || 0);
+            const position = gscDailyData.map(r => r.position || 0);
+
+            // Sessions + Users
+            new Chart(document.getElementById('sessionsUsersChart'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        { label: 'Sessions', data: sessions, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', tension: 0.3 },
+                        { label: 'Active Users', data: users, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.3, yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y1: { position: 'right', ticks: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') } }
+                    }
+                }
+            });
+
+            // Bounce + Engagement
+            new Chart(document.getElementById('bounceEngagementChart'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        { label: 'Bounce Rate %', data: bounce, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', tension: 0.3 },
+                        { label: 'Engagement Rate %', data: engagement, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', tension: 0.3 }
+                    ]
+                },
+                options: chartOptions
+            });
+
+            // Pageviews
+            new Chart(document.getElementById('pageviewsChart'), {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{ label: 'Pageviews', data: pageviews, backgroundColor: '#2563eb' }]
+                },
+                options: chartOptions
+            });
+
+            // Duration
+            new Chart(document.getElementById('durationChart'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{ label: 'Avg Session Duration (s)', data: duration, borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', tension: 0.3 }]
+                },
+                options: chartOptions
+            });
+
+            // Clicks + Impressions
+            new Chart(document.getElementById('clicksImpressionsChart'), {
+                type: 'line',
+                data: {
+                    labels: gscDates,
+                    datasets: [
+                        { label: 'Clicks', data: clicks, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', tension: 0.3 },
+                        { label: 'Impressions', data: impressions, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.3, yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y1: { position: 'right', ticks: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') } }
+                    }
+                }
+            });
+
+            // CTR + Position
+            new Chart(document.getElementById('ctrPositionChart'), {
+                type: 'line',
+                data: {
+                    labels: gscDates,
+                    datasets: [
+                        { label: 'CTR %', data: ctr, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', tension: 0.3 },
+                        { label: 'Avg Position (reversed)', data: position.map(p => 100 - p), borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', tension: 0.3, yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y1: { position: 'right', ticks: { color: window.getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') } }
+                    }
+                }
+            });
+        }
+
+        // TOC with IntersectionObserver
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                const id = entry.target.id;
+                const link = document.querySelector(`.toc a[href="#${id}"]`);
+                if (link) {
+                    if (entry.isIntersecting) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('section').forEach(section => observer.observe(section));
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderDailyData();
+            renderKeywords();
+            renderPages();
+            renderAnomalies();
+            renderRecommendations();
+            initCharts();
+        });
+    </script>
+</body>
+</html>
