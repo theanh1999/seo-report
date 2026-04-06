@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân tích SEO chi tiết — placejoys.com</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #eeeeee;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            --border-color: #dddddd;
+            --accent-primary: #0066cc;
+            --accent-danger: #cc0000;
+            --accent-warning: #ff9900;
+            --accent-success: #00aa00;
+        }
+
+        html.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --border-color: #444444;
+            --accent-primary: #4da6ff;
+            --accent-danger: #ff6666;
+            --accent-warning: #ffbb33;
+            --accent-success: #66dd66;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            padding: 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .date-range {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .dark-mode-toggle {
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .dark-mode-toggle:hover {
+            opacity: 0.9;
+        }
+
+        .nav-breadcrumbs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-breadcrumbs a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            padding: 0.4rem 0.8rem;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .nav-breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        .nav-arrows {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-arrows a {
+            color: white;
+            background-color: var(--accent-primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .nav-arrows a:hover {
+            opacity: 0.9;
+        }
+
+        .nav-arrows a.disabled {
+            background-color: var(--border-color);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 1.5rem;
+            margin: 0 2rem 2rem;
+            position: sticky;
+            top: 120px;
+            z-index: 50;
+        }
+
+        .toc h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+        }
+
+        .toc a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .toc li.active a {
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 3rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .kpi-card {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .kpi-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .kpi-change.positive {
+            color: var(--accent-success);
+        }
+
+        .kpi-change.negative {
+            color: var(--accent-danger);
+        }
+
+        .kpi-change.neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-bottom: 2rem;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        table thead {
+            background-color: var(--bg-tertiary);
+        }
+
+        table th {
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        table th:hover {
+            background-color: var(--border-color);
+        }
+
+        table th.sortable::after {
+            content: " ↕";
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        table th.sorted-asc::after {
+            content: " ↑";
+            opacity: 1;
+            color: var(--accent-primary);
+        }
+
+        table th.sorted-desc::after {
+            content: " ↓";
+            opacity: 1;
+            color: var(--accent-primary);
+        }
+
+        table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        table tbody tr:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        table tbody tr.anomaly-row {
+            background-color: rgba(255, 100, 100, 0.1);
+        }
+
+        table tbody tr.summary-row {
+            font-weight: bold;
+            background-color: var(--bg-tertiary);
+            border-top: 2px solid var(--accent-primary);
+        }
+
+        /* Anomalies */
+        .anomaly-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .anomaly-card {
+            background-color: var(--bg-primary);
+            border-left: 4px solid var(--accent-danger);
+            padding: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .anomaly-card.warning {
+            border-left-color: var(--accent-warning);
+        }
+
+        .anomaly-card.info {
+            border-left-color: var(--accent-primary);
+        }
+
+        .anomaly-date {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .anomaly-type {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .anomaly-details {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .anomaly-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin: 0.5rem 0;
+        }
+
+        /* Recommendation Cards */
+        .recommendation-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .recommendation-card {
+            background-color: var(--bg-primary);
+            border-left: 4px solid var(--accent-danger);
+            padding: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .recommendation-card.medium {
+            border-left-color: var(--accent-warning);
+        }
+
+        .recommendation-card.low {
+            border-left-color: var(--accent-success);
+        }
+
+        .recommendation-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+        }
+
+        .recommendation-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
+
+            section {
+                padding: 1rem;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            table td, table th {
+                padding: 0.5rem;
+            }
+
+            .header-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .toc {
+                position: static;
+                margin: 0 1rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Phân tích SEO chi tiết — placejoys.com</h1>
+        <div class="header-meta">
+            <div class="date-range">Khoảng thời gian: 2026-01-15 đến 2026-04-05</div>
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙 Chế độ tối</button>
+        </div>
+        <div class="nav-breadcrumbs">
+            <a href="index.html">📊 Tổng quan</a>
+            <a href="index.html#restaurants">🍽️ Nhà hàng</a>
+        </div>
+        <div class="nav-arrows">
+            <a href="seo-detail-wherevi.com-2026-04-06.html">← wherevi.com</a>
+            <a class="disabled">Sau →</a>
+        </div>
+    </header>
+
+    <nav class="toc">
+        <h3>📑 Mục lục</h3>
+        <ul>
+            <li><a href="#kpis">KPI Chính</a></li>
+            <li><a href="#ga4-trends">Xu hướng GA4</a></li>
+            <li><a href="#gsc-trends">Xu hướng GSC</a></li>
+            <li><a href="#daily-breakdown">Chi tiết hàng ngày</a></li>
+            <li><a href="#top-keywords">Top Từ khóa</a></li>
+            <li><a href="#top-pages">Top Trang</a></li>
+            <li><a href="#anomalies">Bất thường</a></li>
+            <li><a href="#30day-comparison">So sánh 30 ngày</a></li>
+            <li><a href="#recommendations">Khuyến nghị</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Section 1: KPI Cards -->
+        <section id="kpis">
+            <h2>📊 KPI Chính (30 ngày gần nhất)</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Phiên làm việc</div>
+                    <div class="kpi-value">864,821</div>
+                    <div class="kpi-change positive">
+                        1950.0% ↑
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Người dùng hoạt động</div>
+                    <div class="kpi-value">750,557</div>
+                    <div class="kpi-change positive">
+                        1640.0% ↑
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lượt xem trang</div>
+                    <div class="kpi-value">1,456,677</div>
+                    <div class="kpi-change positive">
+                        2320.0% ↑
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ lệ thoát</div>
+                    <div class="kpi-value">43.5%</div>
+                    <div class="kpi-change positive">
+                        -3.40%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ lệ tương tác</div>
+                    <div class="kpi-value">56.5%</div>
+                    <div class="kpi-change positive">
+                        3.40%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Thời gian trung bình</div>
+                    <div class="kpi-value">97.2s</div>
+                    <div class="kpi-change positive">
+                        4.5s
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Người dùng mới</div>
+                    <div class="kpi-value">711,819</div>
+                    <div class="kpi-change positive">
+                        86,047
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lần nhấp (GSC)</div>
+                    <div class="kpi-value">151,192</div>
+                    <div class="kpi-change positive">
+                        23530.0% ↑
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lần hiển thị (GSC)</div>
+                    <div class="kpi-value">11,574,025</div>
+                    <div class="kpi-change positive">
+                        25470.0% ↑
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">CTR (GSC)</div>
+                    <div class="kpi-value">1.33%</div>
+                    <div class="kpi-change positive">
+                        0.12%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Vị trí trung bình</div>
+                    <div class="kpi-value">7.9</div>
+                    <div class="kpi-change positive">
+                        0.9 ↑
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: GA4 Trend Charts -->
+        <section id="ga4-trends">
+            <h2>📈 Xu hướng GA4</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="sessionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="bounceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="pageviewChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="durationChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: GSC Trend Charts -->
+        <section id="gsc-trends">
+            <h2>🔍 Xu hướng GSC</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="clicksChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ctrChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="positionChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Daily Breakdown Table -->
+        <section id="daily-breakdown">
+            <h2>📅 Chi tiết hàng ngày</h2>
+            <div class="table-container">
+                <table id="dailyTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable">Ngày</th>
+                            <th class="sortable">Phiên</th>
+                            <th class="sortable">Người dùng</th>
+                            <th class="sortable">Lượt xem</th>
+                            <th class="sortable">Tỷ lệ thoát</th>
+                            <th class="sortable">Lần nhấp</th>
+                            <th class="sortable">Lần hiển thị</th>
+                            <th class="sortable">CTR</th>
+                            <th class="sortable">Vị trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 5: Top Keywords -->
+        <section id="top-keywords">
+            <h2>🎯 Top 50 Từ khóa</h2>
+            <div class="table-container">
+                <table id="keywordsTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable">Từ khóa</th>
+                            <th class="sortable">Lần nhấp</th>
+                            <th class="sortable">Lần hiển thị</th>
+                            <th class="sortable">CTR</th>
+                            <th class="sortable">Vị trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 6: Top Pages -->
+        <section id="top-pages">
+            <h2>📄 Top 30 Trang</h2>
+            <div class="table-container">
+                <table id="pagesTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable">Trang</th>
+                            <th class="sortable">Lần nhấp</th>
+                            <th class="sortable">Lần hiển thị</th>
+                            <th class="sortable">CTR</th>
+                            <th class="sortable">Vị trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 7: Anomalies -->
+        <section id="anomalies">
+            <h2>⚠️ Bất thường phát hiện</h2>
+            <div class="anomaly-cards" id="anomalyCards">
+            </div>
+        </section>
+
+        <!-- Section 8: 30-day Comparison -->
+        <section id="30day-comparison">
+            <h2>📊 So sánh 30 ngày</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Chỉ số</th>
+                            <th>30 ngày gần nhất</th>
+                            <th>30 ngày trước</th>
+                            <th>Thay đổi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Phiên</strong></td>
+                            <td>864,821</td>
+                            <td>723,828</td>
+                            <td class="positive">1950.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Người dùng hoạt động</strong></td>
+                            <td>750,557</td>
+                            <td>645,021</td>
+                            <td class="positive">1640.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lượt xem trang</strong></td>
+                            <td>1,456,677</td>
+                            <td>1,182,594</td>
+                            <td class="positive">2320.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tỷ lệ thoát</strong></td>
+                            <td>43.5%</td>
+                            <td>46.9%</td>
+                            <td class="positive">-3.4%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tỷ lệ tương tác</strong></td>
+                            <td>56.5%</td>
+                            <td>53.1%</td>
+                            <td class="negative">3.4%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lần nhấp (GSC)</strong></td>
+                            <td>151,192</td>
+                            <td>45,087</td>
+                            <td class="positive">23530.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lần hiển thị (GSC)</strong></td>
+                            <td>11,574,025</td>
+                            <td>3,262,919</td>
+                            <td class="positive">25470.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CTR (GSC)</strong></td>
+                            <td>1.33%</td>
+                            <td>1.20%</td>
+                            <td class="positive">0.1%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vị trí trung bình</strong></td>
+                            <td>7.9</td>
+                            <td>8.8</td>
+                            <td class="positive">90.7%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 9: Recommendations -->
+        <section id="recommendations">
+            <h2>💡 Khuyến nghị & Phân tích</h2>
+            <div class="recommendation-cards" id="recommendationCards">
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const DATA = {
+            domain: 'placejoys.com',
+            ga4_rows: [{"date": "2026-01-15", "active_users": 1928, "sessions": 1992, "screen_page_views": 2791, "bounce_rate": 0.5959, "engagement_rate": 0.4041, "average_session_duration": 73.1139, "newusers": 1938, "totalusers": 1928}, {"date": "2026-01-16", "active_users": 2333, "sessions": 2454, "screen_page_views": 3539, "bounce_rate": 0.5754, "engagement_rate": 0.4246, "average_session_duration": 68.3052, "newusers": 2318, "totalusers": 2346}, {"date": "2026-01-17", "active_users": 2157, "sessions": 2276, "screen_page_views": 3329, "bounce_rate": 0.5734, "engagement_rate": 0.4266, "average_session_duration": 73.0447, "newusers": 2142, "totalusers": 2188}, {"date": "2026-01-18", "active_users": 4258, "sessions": 4611, "screen_page_views": 7360, "bounce_rate": 0.4979, "engagement_rate": 0.5021, "average_session_duration": 86.1084, "newusers": 4229, "totalusers": 4298}, {"date": "2026-01-19", "active_users": 4156, "sessions": 4467, "screen_page_views": 7030, "bounce_rate": 0.4994, "engagement_rate": 0.5006, "average_session_duration": 89.7335, "newusers": 4107, "totalusers": 4250}, {"date": "2026-01-20", "active_users": 3552, "sessions": 3812, "screen_page_views": 5797, "bounce_rate": 0.5254, "engagement_rate": 0.4746, "average_session_duration": 78.1552, "newusers": 3500, "totalusers": 3637}, {"date": "2026-01-21", "active_users": 3822, "sessions": 4214, "screen_page_views": 6344, "bounce_rate": 0.5093, "engagement_rate": 0.4907, "average_session_duration": 83.4195, "newusers": 3750, "totalusers": 3907}, {"date": "2026-01-22", "active_users": 9030, "sessions": 9749, "screen_page_views": 16403, "bounce_rate": 0.4375, "engagement_rate": 0.5625, "average_session_duration": 107.1025, "newusers": 8917, "totalusers": 9127}, {"date": "2026-01-23", "active_users": 9971, "sessions": 11026, "screen_page_views": 18925, "bounce_rate": 0.4367, "engagement_rate": 0.5633, "average_session_duration": 109.5389, "newusers": 9950, "totalusers": 10238}, {"date": "2026-01-24", "active_users": 10570, "sessions": 11860, "screen_page_views": 20030, "bounce_rate": 0.4535, "engagement_rate": 0.5465, "average_session_duration": 100.8133, "newusers": 10322, "totalusers": 10876}, {"date": "2026-01-25", "active_users": 10258, "sessions": 11786, "screen_page_views": 19163, "bounce_rate": 0.4693, "engagement_rate": 0.5307, "average_session_duration": 101.7455, "newusers": 10094, "totalusers": 10629}, {"date": "2026-01-26", "active_users": 9681, "sessions": 10956, "screen_page_views": 17790, "bounce_rate": 0.4604, "engagement_rate": 0.5396, "average_session_duration": 101.0676, "newusers": 9459, "totalusers": 10061}, {"date": "2026-01-27", "active_users": 11745, "sessions": 13321, "screen_page_views": 21976, "bounce_rate": 0.44, "engagement_rate": 0.56, "average_session_duration": 103.0609, "newusers": 11562, "totalusers": 12123}, {"date": "2026-01-28", "active_users": 12341, "sessions": 13958, "screen_page_views": 23571, "bounce_rate": 0.4231, "engagement_rate": 0.5769, "average_session_duration": 105.7877, "newusers": 12209, "totalusers": 12761}, {"date": "2026-01-29", "active_users": 14818, "sessions": 16764, "screen_page_views": 28591, "bounce_rate": 0.4208, "engagement_rate": 0.5792, "average_session_duration": 112.3701, "newusers": 14567, "totalusers": 15317}, {"date": "2026-01-30", "active_users": 17842, "sessions": 20724, "screen_page_views": 35466, "bounce_rate": 0.4252, "engagement_rate": 0.5748, "average_session_duration": 114.6546, "newusers": 17546, "totalusers": 18468}, {"date": "2026-01-31", "active_users": 18942, "sessions": 21582, "screen_page_views": 36986, "bounce_rate": 0.4255, "engagement_rate": 0.5745, "average_session_duration": 110.095, "newusers": 18514, "totalusers": 19778}, {"date": "2026-02-01", "active_users": 18530, "sessions": 21085, "screen_page_views": 35899, "bounce_rate": 0.4447, "engagement_rate": 0.5553, "average_session_duration": 103.7825, "newusers": 18084, "totalusers": 19311}, {"date": "2026-02-02", "active_users": 15586, "sessions": 17465, "screen_page_views": 29153, "bounce_rate": 0.4401, "engagement_rate": 0.5599, "average_session_duration": 100.7414, "newusers": 14917, "totalusers": 16437}, {"date": "2026-02-03", "active_users": 16291, "sessions": 18432, "screen_page_views": 30719, "bounce_rate": 0.4492, "engagement_rate": 0.5508, "average_session_duration": 101.9432, "newusers": 15572, "totalusers": 17053}, {"date": "2026-02-04", "active_users": 16110, "sessions": 18566, "screen_page_views": 31273, "bounce_rate": 0.4375, "engagement_rate": 0.5625, "average_session_duration": 105.4333, "newusers": 15742, "totalusers": 16870}, {"date": "2026-02-05", "active_users": 26189, "sessions": 28393, "screen_page_views": 42475, "bounce_rate": 0.6118, "engagement_rate": 0.3882, "average_session_duration": 73.6673, "newusers": 25660, "totalusers": 27035}, {"date": "2026-02-06", "active_users": 30381, "sessions": 32912, "screen_page_views": 48765, "bounce_rate": 0.6095, "engagement_rate": 0.3905, "average_session_duration": 74.6344, "newusers": 29299, "totalusers": 31236}, {"date": "2026-02-07", "active_users": 38717, "sessions": 41244, "screen_page_views": 59192, "bounce_rate": 0.6653, "engagement_rate": 0.3347, "average_session_duration": 62.1527, "newusers": 37618, "totalusers": 39737}, {"date": "2026-02-08", "active_users": 33255, "sessions": 36650, "screen_page_views": 48913, "bounce_rate": 0.7189, "engagement_rate": 0.2811, "average_session_duration": 52.6896, "newusers": 32801, "totalusers": 34392}, {"date": "2026-02-09", "active_users": 30734, "sessions": 33070, "screen_page_views": 43863, "bounce_rate": 0.7135, "engagement_rate": 0.2865, "average_session_duration": 51.5437, "newusers": 29982, "totalusers": 31631}, {"date": "2026-02-10", "active_users": 22024, "sessions": 24273, "screen_page_views": 36618, "bounce_rate": 0.5856, "engagement_rate": 0.4144, "average_session_duration": 77.378, "newusers": 21462, "totalusers": 22910}, {"date": "2026-02-11", "active_users": 15642, "sessions": 18420, "screen_page_views": 31486, "bounce_rate": 0.3861, "engagement_rate": 0.6139, "average_session_duration": 104.1402, "newusers": 15066, "totalusers": 16640}, {"date": "2026-02-12", "active_users": 16445, "sessions": 18733, "screen_page_views": 32659, "bounce_rate": 0.3747, "engagement_rate": 0.6253, "average_session_duration": 104.9723, "newusers": 15620, "totalusers": 17367}, {"date": "2026-02-13", "active_users": 20701, "sessions": 23674, "screen_page_views": 42117, "bounce_rate": 0.3607, "engagement_rate": 0.6393, "average_session_duration": 110.5689, "newusers": 19902, "totalusers": 21720}, {"date": "2026-02-14", "active_users": 23878, "sessions": 27483, "screen_page_views": 48801, "bounce_rate": 0.3769, "engagement_rate": 0.6231, "average_session_duration": 104.8148, "newusers": 23194, "totalusers": 25091}, {"date": "2026-02-15", "active_users": 19729, "sessions": 22873, "screen_page_views": 40026, "bounce_rate": 0.3878, "engagement_rate": 0.6122, "average_session_duration": 103.2616, "newusers": 18936, "totalusers": 21044}, {"date": "2026-02-16", "active_users": 16869, "sessions": 19841, "screen_page_views": 34360, "bounce_rate": 0.3896, "engagement_rate": 0.6104, "average_session_duration": 98.7614, "newusers": 16123, "totalusers": 18153}, {"date": "2026-02-17", "active_users": 15981, "sessions": 17787, "screen_page_views": 32084, "bounce_rate": 0.3807, "engagement_rate": 0.6193, "average_session_duration": 102.1131, "newusers": 15134, "totalusers": 17172}, {"date": "2026-02-18", "active_users": 18151, "sessions": 20810, "screen_page_views": 34552, "bounce_rate": 0.4383, "engagement_rate": 0.5617, "average_session_duration": 96.2123, "newusers": 17447, "totalusers": 19229}, {"date": "2026-02-19", "active_users": 38980, "sessions": 41910, "screen_page_views": 78240, "bounce_rate": 0.1939, "engagement_rate": 0.8061, "average_session_duration": 70.3708, "newusers": 37838, "totalusers": 40046}, {"date": "2026-02-20", "active_users": 21737, "sessions": 25626, "screen_page_views": 42966, "bounce_rate": 0.3865, "engagement_rate": 0.6135, "average_session_duration": 99.6567, "newusers": 20614, "totalusers": 22968}, {"date": "2026-02-21", "active_users": 21869, "sessions": 25885, "screen_page_views": 44656, "bounce_rate": 0.3753, "engagement_rate": 0.6247, "average_session_duration": 102.1707, "newusers": 20980, "totalusers": 23211}, {"date": "2026-02-22", "active_users": 19818, "sessions": 23144, "screen_page_views": 38686, "bounce_rate": 0.4078, "engagement_rate": 0.5922, "average_session_duration": 96.1237, "newusers": 18657, "totalusers": 21233}, {"date": "2026-02-23", "active_users": 15567, "sessions": 18408, "screen_page_views": 30766, "bounce_rate": 0.4111, "engagement_rate": 0.5889, "average_session_duration": 96.787, "newusers": 14674, "totalusers": 16844}, {"date": "2026-02-24", "active_users": 15696, "sessions": 18456, "screen_page_views": 31696, "bounce_rate": 0.3772, "engagement_rate": 0.6228, "average_session_duration": 100.0826, "newusers": 14942, "totalusers": 16820}, {"date": "2026-02-25", "active_users": 16473, "sessions": 19256, "screen_page_views": 32357, "bounce_rate": 0.4177, "engagement_rate": 0.5823, "average_session_duration": 97.1164, "newusers": 15612, "totalusers": 17599}, {"date": "2026-02-26", "active_users": 17415, "sessions": 20496, "screen_page_views": 34857, "bounce_rate": 0.3808, "engagement_rate": 0.6192, "average_session_duration": 101.0398, "newusers": 16608, "totalusers": 18507}, {"date": "2026-02-27", "active_users": 21144, "sessions": 25006, "screen_page_views": 42517, "bounce_rate": 0.3626, "engagement_rate": 0.6374, "average_session_duration": 98.2678, "newusers": 20232, "totalusers": 22291}, {"date": "2026-02-28", "active_users": 22036, "sessions": 24145, "screen_page_views": 44047, "bounce_rate": 0.3591, "engagement_rate": 0.6409, "average_session_duration": 106.9271, "newusers": 20953, "totalusers": 23396}, {"date": "2026-03-01", "active_users": 19204, "sessions": 23104, "screen_page_views": 37281, "bounce_rate": 0.4136, "engagement_rate": 0.5864, "average_session_duration": 92.3858, "newusers": 18295, "totalusers": 20560}, {"date": "2026-03-02", "active_users": 15051, "sessions": 17889, "screen_page_views": 29754, "bounce_rate": 0.4139, "engagement_rate": 0.5861, "average_session_duration": 95.7236, "newusers": 14256, "totalusers": 16235}, {"date": "2026-03-03", "active_users": 15351, "sessions": 17483, "screen_page_views": 30047, "bounce_rate": 0.3905, "engagement_rate": 0.6095, "average_session_duration": 102.1035, "newusers": 14394, "totalusers": 16564}, {"date": "2026-03-04", "active_users": 16700, "sessions": 19206, "screen_page_views": 33092, "bounce_rate": 0.3632, "engagement_rate": 0.6368, "average_session_duration": 94.3849, "newusers": 15746, "totalusers": 17869}, {"date": "2026-03-05", "active_users": 50645, "sessions": 53112, "screen_page_views": 97719, "bounce_rate": 0.1447, "engagement_rate": 0.8553, "average_session_duration": 60.6368, "newusers": 49636, "totalusers": 51944}, {"date": "2026-03-06", "active_users": 19628, "sessions": 22530, "screen_page_views": 39443, "bounce_rate": 0.3748, "engagement_rate": 0.6252, "average_session_duration": 101.7282, "newusers": 18557, "totalusers": 20852}, {"date": "2026-03-07", "active_users": 21725, "sessions": 25590, "screen_page_views": 42782, "bounce_rate": 0.3825, "engagement_rate": 0.6175, "average_session_duration": 97.449, "newusers": 20402, "totalusers": 22982}, {"date": "2026-03-08", "active_users": 17739, "sessions": 20582, "screen_page_views": 35400, "bounce_rate": 0.4105, "engagement_rate": 0.5895, "average_session_duration": 96.7628, "newusers": 16899, "totalusers": 19153}, {"date": "2026-03-09", "active_users": 15178, "sessions": 17924, "screen_page_views": 29637, "bounce_rate": 0.3919, "engagement_rate": 0.6081, "average_session_duration": 104.3999, "newusers": 14455, "totalusers": 16419}, {"date": "2026-03-10", "active_users": 16024, "sessions": 18423, "screen_page_views": 31200, "bounce_rate": 0.3967, "engagement_rate": 0.6033, "average_session_duration": 99.593, "newusers": 15233, "totalusers": 17282}, {"date": "2026-03-11", "active_users": 16378, "sessions": 18987, "screen_page_views": 31555, "bounce_rate": 0.3869, "engagement_rate": 0.6131, "average_session_duration": 95.703, "newusers": 15539, "totalusers": 17584}, {"date": "2026-03-12", "active_users": 17950, "sessions": 21678, "screen_page_views": 34882, "bounce_rate": 0.404, "engagement_rate": 0.596, "average_session_duration": 96.1351, "newusers": 17024, "totalusers": 19263}, {"date": "2026-03-13", "active_users": 21060, "sessions": 24153, "screen_page_views": 41349, "bounce_rate": 0.3844, "engagement_rate": 0.6156, "average_session_duration": 102.3581, "newusers": 19980, "totalusers": 22483}, {"date": "2026-03-14", "active_users": 22976, "sessions": 26451, "screen_page_views": 44809, "bounce_rate": 0.3942, "engagement_rate": 0.6058, "average_session_duration": 101.5037, "newusers": 21863, "totalusers": 24387}, {"date": "2026-03-15", "active_users": 20424.0, "sessions": 22989.0, "screen_page_views": 39760.0, "bounce_rate": 0.3937, "engagement_rate": 0.6063, "average_session_duration": 98.6122, "newusers": 19434.0, "totalusers": 22030.0}, {"date": "2026-03-16", "active_users": 17635.0, "sessions": 20573.0, "screen_page_views": 33302.0, "bounce_rate": 0.4194, "engagement_rate": 0.5806, "average_session_duration": 90.5313, "newusers": 16763.0, "totalusers": 18926.0}, {"date": "2026-03-17", "active_users": 19306.0, "sessions": 21432.0, "screen_page_views": 35984.0, "bounce_rate": 0.4325, "engagement_rate": 0.5675, "average_session_duration": 93.3812, "newusers": 18329.0, "totalusers": 20681.0}, {"date": "2026-03-18", "active_users": 18723.0, "sessions": 21309.0, "screen_page_views": 36171.0, "bounce_rate": 0.385, "engagement_rate": 0.615, "average_session_duration": 95.4097, "newusers": 17825.0, "totalusers": 20059.0}, {"date": "2026-03-19", "active_users": 19265.0, "sessions": 22292.0, "screen_page_views": 37065.0, "bounce_rate": 0.3995, "engagement_rate": 0.6005, "average_session_duration": 98.8825, "newusers": 18296.0, "totalusers": 20664.0}, {"date": "2026-03-20", "active_users": 14901.0, "sessions": 16809.0, "screen_page_views": 27391.0, "bounce_rate": 0.9922, "engagement_rate": 0.0078, "average_session_duration": 124.0464, "newusers": 13315.0, "totalusers": 15942.0}, {"date": "2026-03-21", "active_users": 23217, "sessions": 27312, "screen_page_views": 45318, "bounce_rate": 0.4042, "engagement_rate": 0.5958, "average_session_duration": 93.3081, "newusers": 22155, "totalusers": 24832}, {"date": "2026-03-22", "active_users": 20285, "sessions": 24316, "screen_page_views": 39060, "bounce_rate": 0.4275, "engagement_rate": 0.5725, "average_session_duration": 89.6051, "newusers": 19314, "totalusers": 21840}, {"date": "2026-03-23", "active_users": 16801, "sessions": 19595, "screen_page_views": 31909, "bounce_rate": 0.4061, "engagement_rate": 0.5939, "average_session_duration": 95.3619, "newusers": 15831, "totalusers": 18196}, {"date": "2026-03-24", "active_users": 18375, "sessions": 21126, "screen_page_views": 35086, "bounce_rate": 0.3983, "engagement_rate": 0.6017, "average_session_duration": 94.5751, "newusers": 17415, "totalusers": 19647}, {"date": "2026-03-25", "active_users": 17602, "sessions": 20705, "screen_page_views": 33990, "bounce_rate": 0.4178, "engagement_rate": 0.5822, "average_session_duration": 91.4711, "newusers": 16718, "totalusers": 18986}, {"date": "2026-03-26", "active_users": 17623, "sessions": 20169, "screen_page_views": 31839, "bounce_rate": 0.9898, "engagement_rate": 0.0102, "average_session_duration": 102.8879, "newusers": 15948, "totalusers": 18884}, {"date": "2026-03-27", "active_users": 21325.0, "sessions": 24526.0, "screen_page_views": 41272.0, "bounce_rate": 0.3768, "engagement_rate": 0.6232, "average_session_duration": 98.838, "newusers": 20323.0, "totalusers": 22694.0}, {"date": "2026-03-28", "active_users": 22445.0, "sessions": 25913.0, "screen_page_views": 45126.0, "bounce_rate": 0.38, "engagement_rate": 0.62, "average_session_duration": 94.9998, "newusers": 21575.0, "totalusers": 23984.0}, {"date": "2026-03-29", "active_users": 19947.0, "sessions": 23691.0, "screen_page_views": 38561.0, "bounce_rate": 0.4004, "engagement_rate": 0.5996, "average_session_duration": 91.7752, "newusers": 19066.0, "totalusers": 21423.0}, {"date": "2026-03-30", "active_users": 17336.0, "sessions": 19880.0, "screen_page_views": 32401.0, "bounce_rate": 0.4079, "engagement_rate": 0.5921, "average_session_duration": 92.2297, "newusers": 16305.0, "totalusers": 18767.0}, {"date": "2026-03-31", "active_users": 17103.0, "sessions": 20137.0, "screen_page_views": 33009.0, "bounce_rate": 0.405, "engagement_rate": 0.595, "average_session_duration": 91.5928, "newusers": 16196.0, "totalusers": 18527.0}, {"date": "2026-04-01", "active_users": 17130.0, "sessions": 19713.0, "screen_page_views": 32961.0, "bounce_rate": 0.3905, "engagement_rate": 0.6095, "average_session_duration": 102.5808, "newusers": 16186.0, "totalusers": 18393.0}, {"date": "2026-04-02", "active_users": 17174.0, "sessions": 19455.0, "screen_page_views": 31282.0, "bounce_rate": 0.9885, "engagement_rate": 0.0115, "average_session_duration": 110.6776, "newusers": 15525.0, "totalusers": 18337.0}],
+            gsc_daily_rows: [{"date": "2026-01-15", "clicks": 62, "impressions": 11576, "ctr": 0.0054, "position": 9.3819}, {"date": "2026-01-16", "clicks": 181, "impressions": 26733, "ctr": 0.0068, "position": 9.9126}, {"date": "2026-01-17", "clicks": 209, "impressions": 32581, "ctr": 0.0064, "position": 9.2005}, {"date": "2026-01-18", "clicks": 213, "impressions": 36283, "ctr": 0.0059, "position": 10.0922}, {"date": "2026-01-19", "clicks": 233, "impressions": 34562, "ctr": 0.0067, "position": 10.6687}, {"date": "2026-01-20", "clicks": 201, "impressions": 31466, "ctr": 0.0064, "position": 10.6456}, {"date": "2026-01-21", "clicks": 187, "impressions": 30853, "ctr": 0.0061, "position": 10.5777}, {"date": "2026-01-22", "clicks": 253, "impressions": 33150, "ctr": 0.0076, "position": 10.1715}, {"date": "2026-01-23", "clicks": 345, "impressions": 43492, "ctr": 0.0079, "position": 9.2231}, {"date": "2026-01-24", "clicks": 319, "impressions": 46966, "ctr": 0.0068, "position": 8.9118}, {"date": "2026-01-25", "clicks": 286, "impressions": 41468, "ctr": 0.0069, "position": 9.6135}, {"date": "2026-01-26", "clicks": 349, "impressions": 44391, "ctr": 0.0079, "position": 9.5563}, {"date": "2026-01-27", "clicks": 461, "impressions": 49854, "ctr": 0.0092, "position": 9.3498}, {"date": "2026-01-28", "clicks": 621, "impressions": 56076, "ctr": 0.0111, "position": 8.7779}, {"date": "2026-01-29", "clicks": 812, "impressions": 68149, "ctr": 0.0119, "position": 8.2289}, {"date": "2026-01-30", "clicks": 626, "impressions": 42100, "ctr": 0.0149, "position": 8.5886}, {"date": "2026-01-31", "clicks": 710, "impressions": 43479, "ctr": 0.0163, "position": 8.2456}, {"date": "2026-02-01", "clicks": 475, "impressions": 40707, "ctr": 0.0117, "position": 9.1386}, {"date": "2026-02-02", "clicks": 533, "impressions": 37358, "ctr": 0.0143, "position": 9.9404}, {"date": "2026-02-03", "clicks": 600, "impressions": 43650, "ctr": 0.0137, "position": 9.6528}, {"date": "2026-02-04", "clicks": 673, "impressions": 47463, "ctr": 0.0142, "position": 9.0581}, {"date": "2026-02-05", "clicks": 817, "impressions": 55726, "ctr": 0.0147, "position": 8.681}, {"date": "2026-02-06", "clicks": 1292, "impressions": 81884, "ctr": 0.0158, "position": 8.0239}, {"date": "2026-02-07", "clicks": 1460, "impressions": 102678, "ctr": 0.0142, "position": 7.8738}, {"date": "2026-02-08", "clicks": 1190, "impressions": 90693, "ctr": 0.0131, "position": 7.9082}, {"date": "2026-02-09", "clicks": 1302, "impressions": 86211, "ctr": 0.0151, "position": 8.1532}, {"date": "2026-02-10", "clicks": 1583, "impressions": 97182, "ctr": 0.0163, "position": 8.0299}, {"date": "2026-02-11", "clicks": 1907, "impressions": 113396, "ctr": 0.0168, "position": 8.1058}, {"date": "2026-02-12", "clicks": 2286, "impressions": 127696, "ctr": 0.0179, "position": 7.9887}, {"date": "2026-02-13", "clicks": 2855, "impressions": 166704, "ctr": 0.0171, "position": 7.489}, {"date": "2026-02-14", "clicks": 3186, "impressions": 209075, "ctr": 0.0152, "position": 7.5507}, {"date": "2026-02-15", "clicks": 2426, "impressions": 162190, "ctr": 0.015, "position": 7.5196}, {"date": "2026-02-16", "clicks": 2162, "impressions": 158163, "ctr": 0.0137, "position": 8.1816}, {"date": "2026-02-17", "clicks": 2083, "impressions": 142598, "ctr": 0.0146, "position": 8.4497}, {"date": "2026-02-18", "clicks": 2313, "impressions": 158579, "ctr": 0.0146, "position": 8.2117}, {"date": "2026-02-19", "clicks": 2616, "impressions": 183657, "ctr": 0.0142, "position": 8.2612}, {"date": "2026-02-20", "clicks": 3571, "impressions": 234321, "ctr": 0.0152, "position": 7.7573}, {"date": "2026-02-21", "clicks": 3689, "impressions": 249809, "ctr": 0.0148, "position": 7.6351}, {"date": "2026-02-22", "clicks": 3039, "impressions": 218142, "ctr": 0.0139, "position": 7.7251}, {"date": "2026-02-23", "clicks": 2509, "impressions": 185148, "ctr": 0.0136, "position": 8.0967}, {"date": "2026-02-24", "clicks": 2788, "impressions": 194559, "ctr": 0.0143, "position": 8.4373}, {"date": "2026-02-25", "clicks": 2799, "impressions": 194715, "ctr": 0.0144, "position": 8.0693}, {"date": "2026-02-26", "clicks": 3077, "impressions": 205414, "ctr": 0.015, "position": 7.9376}, {"date": "2026-02-27", "clicks": 3631, "impressions": 247326, "ctr": 0.0147, "position": 7.6732}, {"date": "2026-02-28", "clicks": 3618, "impressions": 247812, "ctr": 0.0146, "position": 7.219}, {"date": "2026-03-01", "clicks": 3180, "impressions": 215976, "ctr": 0.0147, "position": 7.6483}, {"date": "2026-03-02", "clicks": 2594, "impressions": 183657, "ctr": 0.0141, "position": 7.8504}, {"date": "2026-03-03", "clicks": 2752, "impressions": 200940, "ctr": 0.0137, "position": 7.9667}, {"date": "2026-03-04", "clicks": 3091, "impressions": 211243, "ctr": 0.0146, "position": 8.0804}, {"date": "2026-03-05", "clicks": 3292, "impressions": 222875, "ctr": 0.0148, "position": 8.2675}, {"date": "2026-03-06", "clicks": 3783, "impressions": 265775, "ctr": 0.0142, "position": 8.3116}, {"date": "2026-03-07", "clicks": 4024, "impressions": 291409, "ctr": 0.0138, "position": 8.0778}, {"date": "2026-03-08", "clicks": 3188, "impressions": 255557, "ctr": 0.0125, "position": 8.0757}, {"date": "2026-03-09", "clicks": 2815, "impressions": 225257, "ctr": 0.0125, "position": 7.9834}, {"date": "2026-03-10", "clicks": 3017, "impressions": 233016, "ctr": 0.0129, "position": 8.3646}, {"date": "2026-03-11", "clicks": 3472, "impressions": 277674, "ctr": 0.0125, "position": 8.2244}, {"date": "2026-03-12", "clicks": 4032, "impressions": 301846, "ctr": 0.0134, "position": 7.8342}, {"date": "2026-03-13", "clicks": 4911, "impressions": 368239, "ctr": 0.0133, "position": 7.8677}, {"date": "2026-03-14", "clicks": 4870, "impressions": 391583, "ctr": 0.0124, "position": 7.6255}, {"date": "2026-03-15", "clicks": 4340.0, "impressions": 327050.0, "ctr": 0.0133, "position": 7.6823}, {"date": "2026-03-16", "clicks": 3581.0, "impressions": 269907.0, "ctr": 0.0133, "position": 8.0022}, {"date": "2026-03-17", "clicks": 4202.0, "impressions": 330576.0, "ctr": 0.0127, "position": 7.9466}, {"date": "2026-03-18", "clicks": 4211.0, "impressions": 341172.0, "ctr": 0.0123, "position": 7.812}, {"date": "2026-03-19", "clicks": 4564, "impressions": 369324, "ctr": 0.0124, "position": 7.6807}, {"date": "2026-03-20", "clicks": 5636, "impressions": 451840, "ctr": 0.0125, "position": 7.9067}, {"date": "2026-03-21", "clicks": 5799, "impressions": 464806, "ctr": 0.0125, "position": 7.6418}, {"date": "2026-03-22", "clicks": 4873, "impressions": 400732, "ctr": 0.0122, "position": 7.716}, {"date": "2026-03-23", "clicks": 4196, "impressions": 330852, "ctr": 0.0127, "position": 7.5242}, {"date": "2026-03-24", "clicks": 4441, "impressions": 345478, "ctr": 0.0129, "position": 7.3189}, {"date": "2026-03-25", "clicks": 4638, "impressions": 358834, "ctr": 0.0129, "position": 7.7656}, {"date": "2026-03-27", "clicks": 5876.0, "impressions": 463915.0, "ctr": 0.0127, "position": 7.7701}, {"date": "2026-03-28", "clicks": 6101.0, "impressions": 488616.0, "ctr": 0.0125, "position": 7.9634}, {"date": "2026-03-29", "clicks": 5210.0, "impressions": 411845.0, "ctr": 0.0127, "position": 7.8011}, {"date": "2026-03-30", "clicks": 4410.0, "impressions": 355252.0, "ctr": 0.0124, "position": 8.1244}, {"date": "2026-03-31", "clicks": 4541.0, "impressions": 376088.0, "ctr": 0.0121, "position": 8.0251}, {"date": "2026-04-01", "clicks": 4091.0, "impressions": 349575.0, "ctr": 0.0117, "position": 8.2709}],
+            keywords: [{"query": "deaverdura", "clicks": 358}, {"query": "skippers cove", "clicks": 358}, {"query": "harborcove seafood bar & grill menu", "clicks": 329}, {"query": "mais arepas", "clicks": 229}, {"query": "panes bread cafe", "clicks": 224}, {"query": "tacos and beer", "clicks": 223}, {"query": "osteria al squero", "clicks": 217}, {"query": "casa adela", "clicks": 214}, {"query": "puerto sagua", "clicks": 212}, {"query": "paradise buffet", "clicks": 191}, {"query": "lucky dynasty", "clicks": 186}, {"query": "rudy's chicken menu", "clicks": 179}, {"query": "stacks pancake house", "clicks": 178}, {"query": "wormhole coffee", "clicks": 167}, {"query": "plum blossom menu", "clicks": 163}, {"query": "ferris shawarma", "clicks": 162}, {"query": "el bucanero menu", "clicks": 159}, {"query": "skippers cove fort pierce", "clicks": 154}, {"query": "ritaj restaurant", "clicks": 148}, {"query": "rimsky-korsakoffee house", "clicks": 147}, {"query": "rudys chicken", "clicks": 141}, {"query": "cafeter\u00eda mallorca menu", "clicks": 140}, {"query": "plum blossom troy ny", "clicks": 122}, {"query": "cafe nouveau", "clicks": 116}, {"query": "granny d's", "clicks": 114}, {"query": "bamboo terrace", "clicks": 113}, {"query": "the bamboo terrace menu", "clicks": 110}, {"query": "granny d's menu", "clicks": 103}, {"query": "panes", "clicks": 102}, {"query": "brothers taco house", "clicks": 101}, {"query": "gross burgers", "clicks": 98}, {"query": "bowl of pho", "clicks": 97}, {"query": "woodbine inn menu", "clicks": 97}, {"query": "plum blossom troy", "clicks": 96}, {"query": "wong kei", "clicks": 95}, {"query": "michael's steak and lobster house menu", "clicks": 94}, {"query": "neptune diner bayside", "clicks": 92}, {"query": "woodbine inn", "clicks": 92}, {"query": "ye olde ale house", "clicks": 92}, {"query": "money pit san marcos", "clicks": 89}, {"query": "deaverdura menu", "clicks": 88}, {"query": "table 9 morgantown", "clicks": 87}, {"query": "kamehameha bakery", "clicks": 85}, {"query": "that little restaurant", "clicks": 83}, {"query": "gen hoe geneva", "clicks": 82}, {"query": "pannes", "clicks": 82}, {"query": "tacos and beer new orleans menu", "clicks": 82}, {"query": "deaverdura san juan", "clicks": 81}, {"query": "el bucanero", "clicks": 81}, {"query": "fireside deli", "clicks": 81}],
+            pages: [{"page": "https://deaverdura.placejoys.com/", "clicks": 220, "impressions": 3747}, {"page": "https://el-arepazo-doral.placejoys.com/", "clicks": 70, "impressions": 7154}, {"page": "https://skippers-cove-bar-grill.placejoys.com/menu", "clicks": 152, "impressions": 1733}, {"page": "https://skippers-cove-bar-grill.placejoys.com/", "clicks": 129, "impressions": 2489}, {"page": "https://ritaj-restaurant.placejoys.com/", "clicks": 57, "impressions": 2515}, {"page": "https://mas-arepas.placejoys.com/", "clicks": 90, "impressions": 903}, {"page": "https://rimsky-korsakoffee-house.placejoys.com/", "clicks": 79, "impressions": 1501}, {"page": "https://tacos-beer.placejoys.com/", "clicks": 78, "impressions": 1612}, {"page": "https://puerto-sagua-restaurant.placejoys.com/", "clicks": 56, "impressions": 1376}, {"page": "https://ristorante-la-campana.placejoys.com/", "clicks": 66, "impressions": 1064}, {"page": "https://osteria-al-squero.placejoys.com/", "clicks": 65, "impressions": 2107}, {"page": "https://the-wormhole-coffee.placejoys.com/", "clicks": 64, "impressions": 1317}, {"page": "https://casa-adela.placejoys.com/", "clicks": 64, "impressions": 2198}, {"page": "https://clover-on-court-formerly-harp-and-clover.placejoys.com/", "clicks": 53, "impressions": 1077}, {"page": "https://el-bucanero-embassy.placejoys.com/menu", "clicks": 72, "impressions": 1052}, {"page": "https://el-bucanero-embassy.placejoys.com/", "clicks": 44, "impressions": 1342}, {"page": "https://panes-bread-cafe.placejoys.com/", "clicks": 61, "impressions": 725}, {"page": "https://granny-ds.placejoys.com/menu", "clicks": 33, "impressions": 764}, {"page": "https://granny-ds.placejoys.com/", "clicks": 30, "impressions": 866}, {"page": "https://pannes.placejoys.com/", "clicks": 38, "impressions": 1025}, {"page": "https://nick-elenas-pizzeria.placejoys.com/", "clicks": 33, "impressions": 632}, {"page": "https://johnnies-beef.placejoys.com/", "clicks": 26, "impressions": 1333}, {"page": "https://original-timmys.placejoys.com/", "clicks": 11, "impressions": 1043}, {"page": "https://raouls.placejoys.com/menu", "clicks": 13, "impressions": 1846}, {"page": "https://no6-restaurant.placejoys.com/", "clicks": 11, "impressions": 486}, {"page": "https://brothers-taco-house.placejoys.com/", "clicks": 22, "impressions": 1280}, {"page": "https://sea-biscuit-cafe.placejoys.com/", "clicks": 34, "impressions": 502}, {"page": "https://ye-olde-ale-house.placejoys.com/", "clicks": 30, "impressions": 619}, {"page": "https://ferris-shawarma.placejoys.com/", "clicks": 31, "impressions": 612}, {"page": "https://grub-hub.placejoys.com/", "clicks": 36, "impressions": 348}],
+            kpi: {"sessions_recent": 864821.0, "sessions_prev": 723828.0, "users_recent": 750557.0, "users_prev": 645021.0, "pageviews_recent": 1456677.0, "pageviews_prev": 1182594.0, "bounce_rate_recent": 0.4352666666666666, "bounce_rate_prev": 0.46931025641025653, "engagement_rate_recent": 0.5647333333333335, "engagement_rate_prev": 0.5306897435897435, "avg_duration_recent": 97.2270384615385, "avg_duration_prev": 92.6986948717949, "newusers_recent": 711819.0, "newusers_prev": 625772.0, "clicks_recent": 151192.0, "clicks_prev": 45087.0, "impressions_recent": 11574025.0, "impressions_prev": 3262919.0, "ctr_recent": 0.013255263157894737, "ctr_prev": 0.012010526315789471, "position_recent": 7.902326315789474, "position_prev": 8.809381578947367, "sessions_change": 19.5, "users_change": 16.4, "pageviews_change": 23.2, "clicks_change": 235.3, "impressions_change": 254.7},
+            anomalies: [{"type": "high_bounce", "level": "warning", "date": "2026-04-02", "value": 98.9, "desc": "Bounce rate 98.9%"}],
+            ga4_dates: ["2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02"],
+            ga4_sessions: [19206, 53112, 22530, 25590, 20582, 17924, 18423, 18987, 21678, 24153, 26451, 22989.0, 20573.0, 21432.0, 21309.0, 22292.0, 16809.0, 27312, 24316, 19595, 21126, 20705, 20169, 24526.0, 25913.0, 23691.0, 19880.0, 20137.0, 19713.0, 19455.0],
+            ga4_users: [16700, 50645, 19628, 21725, 17739, 15178, 16024, 16378, 17950, 21060, 22976, 20424.0, 17635.0, 19306.0, 18723.0, 19265.0, 14901.0, 23217, 20285, 16801, 18375, 17602, 17623, 21325.0, 22445.0, 19947.0, 17336.0, 17103.0, 17130.0, 17174.0],
+            ga4_pageviews: [33092, 97719, 39443, 42782, 35400, 29637, 31200, 31555, 34882, 41349, 44809, 39760.0, 33302.0, 35984.0, 36171.0, 37065.0, 27391.0, 45318, 39060, 31909, 35086, 33990, 31839, 41272.0, 45126.0, 38561.0, 32401.0, 33009.0, 32961.0, 31282.0],
+            ga4_bounce: [36.32, 14.469999999999999, 37.480000000000004, 38.25, 41.05, 39.190000000000005, 39.67, 38.690000000000005, 40.400000000000006, 38.440000000000005, 39.42, 39.37, 41.94, 43.25, 38.5, 39.95, 99.22, 40.42, 42.75, 40.61, 39.83, 41.78, 98.98, 37.68, 38.0, 40.04, 40.79, 40.5, 39.050000000000004, 98.85000000000001],
+            ga4_engagement: [63.68000000000001, 85.53, 62.519999999999996, 61.75000000000001, 58.95, 60.809999999999995, 60.33, 61.309999999999995, 59.599999999999994, 61.56, 60.58, 60.629999999999995, 58.06, 56.75, 61.5, 60.050000000000004, 0.7799999999999999, 59.58, 57.25, 59.39, 60.17, 58.220000000000006, 1.02, 62.32, 62.0, 59.96, 59.209999999999994, 59.5, 60.95, 1.15],
+            ga4_duration: [94.3849, 60.6368, 101.7282, 97.449, 96.7628, 104.3999, 99.593, 95.703, 96.1351, 102.3581, 101.5037, 98.6122, 90.5313, 93.3812, 95.4097, 98.8825, 124.0464, 93.3081, 89.6051, 95.3619, 94.5751, 91.4711, 102.8879, 98.838, 94.9998, 91.7752, 92.2297, 91.5928, 102.5808, 110.6776],
+            gsc_clicks: [2594, 2752, 3091, 3292, 3783, 4024, 3188, 2815, 3017, 3472, 4032, 4911, 4870, 4340.0, 3581.0, 4202.0, 4211.0, 4564, 5636, 5799, 4873, 4196, 4441, 4638, 5876.0, 6101.0, 5210.0, 4410.0, 4541.0, 4091.0],
+            gsc_impressions: [183657, 200940, 211243, 222875, 265775, 291409, 255557, 225257, 233016, 277674, 301846, 368239, 391583, 327050.0, 269907.0, 330576.0, 341172.0, 369324, 451840, 464806, 400732, 330852, 345478, 358834, 463915.0, 488616.0, 411845.0, 355252.0, 376088.0, 349575.0],
+            gsc_ctr: [1.41, 1.37, 1.46, 1.48, 1.4200000000000002, 1.38, 1.25, 1.25, 1.29, 1.25, 1.34, 1.3299999999999998, 1.24, 1.3299999999999998, 1.3299999999999998, 1.27, 1.23, 1.24, 1.25, 1.25, 1.22, 1.27, 1.29, 1.29, 1.27, 1.25, 1.27, 1.24, 1.21, 1.17],
+            gsc_position: [7.8504, 7.9667, 8.0804, 8.2675, 8.3116, 8.0778, 8.0757, 7.9834, 8.3646, 8.2244, 7.8342, 7.8677, 7.6255, 7.6823, 8.0022, 7.9466, 7.812, 7.6807, 7.9067, 7.6418, 7.716, 7.5242, 7.3189, 7.7656, 7.7701, 7.9634, 7.8011, 8.1244, 8.0251, 8.2709]
+        };
+
+        // Dark mode toggle
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark-mode'));
+        }
+
+        // Initialize dark mode from localStorage
+        window.addEventListener('load', function() {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        });
+
+        // Table of Contents with IntersectionObserver
+        const tocLinks = document.querySelectorAll('.toc a');
+        const sections = document.querySelectorAll('section');
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                tocLinks.forEach(link => {
+                    link.parentElement.classList.remove('active');
+                    if (link.getAttribute('href').slice(1) === entry.target.id && entry.isIntersecting) {
+                        link.parentElement.classList.add('active');
+                    }
+                });
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => observer.observe(section));
+
+        // Smooth scrolling
+        tocLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Initialize tables and charts
+        window.addEventListener('load', function() {
+            initializeDailyTable();
+            initializeKeywordsTable();
+            initializePagesTable();
+            initializeAnomalies();
+            initializeRecommendations();
+            initializeCharts();
+        });
+
+        // Table sorting
+        function makeTableSortable(tableId) {
+            const table = document.getElementById(tableId);
+            const headers = table.querySelectorAll('th.sortable');
+
+            headers.forEach((header, index) => {
+                header.addEventListener('click', function() {
+                    let ascending = !this.classList.contains('sorted-asc');
+
+                    // Remove all sorted classes
+                    headers.forEach(h => {
+                        h.classList.remove('sorted-asc', 'sorted-desc');
+                    });
+
+                    this.classList.add(ascending ? 'sorted-asc' : 'sorted-desc');
+
+                    // Sort rows
+                    const rows = Array.from(table.querySelectorAll('tbody tr')).filter(row => !row.classList.contains('summary-row'));
+
+                    rows.sort((a, b) => {
+                        let aVal = a.cells[index].textContent.trim();
+                        let bVal = b.cells[index].textContent.trim();
+
+                        // Try to convert to number
+                        const aNum = parseFloat(aVal.replace(/,/g, '').replace('%', ''));
+                        const bNum = parseFloat(bVal.replace(/,/g, '').replace('%', ''));
+
+                        if (!isNaN(aNum) && !isNaN(bNum)) {
+                            return ascending ? aNum - bNum : bNum - aNum;
+                        }
+
+                        return ascending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                    });
+
+                    const tbody = table.querySelector('tbody');
+                    rows.forEach(row => tbody.appendChild(row));
+                });
+            });
+        }
+
+        function initializeDailyTable() {
+            const table = document.getElementById('dailyTable');
+            const tbody = table.querySelector('tbody');
+            const anomalyDates = new Set(DATA.anomalies.map(a => a.date));
+
+            let totalSessions = 0, totalUsers = 0, totalPageviews = 0;
+            let totalClicks = 0, totalImpressions = 0;
+
+            DATA.ga4_rows.forEach((row, idx) => {
+                const gscRow = DATA.gsc_daily_rows[idx] || {};
+                const tr = document.createElement('tr');
+
+                if (anomalyDates.has(row.date)) {
+                    tr.classList.add('anomaly-row');
+                }
+
+                tr.innerHTML = `
+                    <td>${row.date}</td>
+                    <td>${row.sessions.toLocaleString()}</td>
+                    <td>${row.active_users.toLocaleString()}</td>
+                    <td>${row.screen_page_views.toLocaleString()}</td>
+                    <td>${(row.bounce_rate * 100).toFixed(1)}%</td>
+                    <td>${gscRow.clicks ? gscRow.clicks.toLocaleString() : '-'}</td>
+                    <td>${gscRow.impressions ? gscRow.impressions.toLocaleString() : '-'}</td>
+                    <td>${gscRow.ctr ? (gscRow.ctr * 100).toFixed(2) : '-'}%</td>
+                    <td>${gscRow.position ? gscRow.position.toFixed(1) : '-'}</td>
+                `;
+                tbody.appendChild(tr);
+
+                totalSessions += row.sessions;
+                totalUsers += row.active_users;
+                totalPageviews += row.screen_page_views;
+                totalClicks += gscRow.clicks || 0;
+                totalImpressions += gscRow.impressions || 0;
+            });
+
+            // Summary row
+            const summaryRow = document.createElement('tr');
+            summaryRow.classList.add('summary-row');
+            summaryRow.innerHTML = `
+                <td>TỔNG</td>
+                <td>${totalSessions.toLocaleString()}</td>
+                <td>${totalUsers.toLocaleString()}</td>
+                <td>${totalPageviews.toLocaleString()}</td>
+                <td>-</td>
+                <td>${totalClicks.toLocaleString()}</td>
+                <td>${totalImpressions.toLocaleString()}</td>
+                <td>${totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(2) : '-'}%</td>
+                <td>-</td>
+            `;
+            tbody.appendChild(summaryRow);
+
+            makeTableSortable('dailyTable');
+        }
+
+        function initializeKeywordsTable() {
+            const table = document.getElementById('keywordsTable');
+            const tbody = table.querySelector('tbody');
+
+            DATA.keywords.forEach(kw => {
+                const tr = document.createElement('tr');
+                const isOpportunity = kw.impressions > 100 && kw.ctr < 0.02 && kw.position >= 5 && kw.position <= 20;
+                if (isOpportunity) {
+                    tr.style.backgroundColor = 'rgba(255, 200, 100, 0.1)';
+                }
+
+                tr.innerHTML = `
+                    <td>${kw.query}</td>
+                    <td>${kw.clicks.toLocaleString()}</td>
+                    <td>${kw.impressions.toLocaleString()}</td>
+                    <td>${(kw.ctr * 100).toFixed(2)}%</td>
+                    <td>${kw.position.toFixed(1)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            makeTableSortable('keywordsTable');
+        }
+
+        function initializePagesTable() {
+            const table = document.getElementById('pagesTable');
+            const tbody = table.querySelector('tbody');
+
+            DATA.pages.forEach(page => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><a href="${page.page}" target="_blank" style="color: var(--accent-primary); text-decoration: none;">${page.page.split('/').pop() || '/'}</a></td>
+                    <td>${page.clicks.toLocaleString()}</td>
+                    <td>${page.impressions.toLocaleString()}</td>
+                    <td>${(page.ctr * 100).toFixed(2)}%</td>
+                    <td>${page.position.toFixed(1)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            makeTableSortable('pagesTable');
+        }
+
+        function initializeAnomalies() {
+            const container = document.getElementById('anomalyCards');
+
+            DATA.anomalies.forEach(anomaly => {
+                const card = document.createElement('div');
+                card.className = 'anomaly-card';
+
+                if (anomaly.level === 'critical') {
+                    card.classList.add('');
+                } else if (anomaly.level === 'warning') {
+                    card.classList.add('warning');
+                } else {
+                    card.classList.add('info');
+                }
+
+                const typeLabel = {
+                    'spike_sessions': 'Spike Phiên',
+                    'drop_sessions': 'Giảm Phiên',
+                    'spike_clicks': 'Spike Lần nhấp',
+                    'drop_clicks': 'Giảm Lần nhấp',
+                    'position_change': 'Thay đổi Vị trí'
+                }[anomaly.type] || anomaly.type;
+
+                card.innerHTML = `
+                    <div class="anomaly-date">${anomaly.date}</div>
+                    <div class="anomaly-type">${typeLabel}</div>
+                    <div class="anomaly-value">${anomaly.value.toLocaleString()}</div>
+                    <div class="anomaly-details">
+                        <strong>Trung bình:</strong> ${anomaly.avg.toLocaleString()}<br>
+                        <strong>Tỷ lệ:</strong> ${anomaly.ratio.toFixed(1)}x<br>
+                        <strong>Chi tiết:</strong> ${anomaly.desc}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            if (DATA.anomalies.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1 / -1;">Không phát hiện bất thường.</p>';
+            }
+        }
+
+        function initializeRecommendations() {
+            const container = document.getElementById('recommendationCards');
+            const recommendations = generateRecommendations();
+
+            recommendations.forEach(rec => {
+                const card = document.createElement('div');
+                card.className = 'recommendation-card ' + rec.severity.toLowerCase();
+                card.innerHTML = `
+                    <div class="recommendation-title">${rec.emoji} ${rec.title}</div>
+                    <div class="recommendation-text">${rec.text}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function generateRecommendations() {
+            const recs = [];
+            const kpi = DATA.kpi;
+
+            // High priority
+            if (kpi.bounce_rate_recent > 0.6) {
+                recs.push({
+                    severity: 'High',
+                    emoji: '🔴',
+                    title: 'Tỷ lệ thoát quá cao',
+                    text: 'Tỷ lệ thoát hiện tại là ' + (kpi.bounce_rate_recent * 100).toFixed(1) + '%. Tối ưu hóa nội dung, cải thiện UX và tốc độ tải trang.'
+                });
+            }
+
+            if (kpi.position_recent > 20) {
+                recs.push({
+                    severity: 'High',
+                    emoji: '🔴',
+                    title: 'Vị trí xếp hạng thấp',
+                    text: 'Vị trí trung bình là ' + kpi.position_recent.toFixed(1) + '. Tăng cường chiến lược liên kết ngoài và tối ưu hóa từ khóa.'
+                });
+            }
+
+            if (kpi.ctr_recent < 0.02) {
+                recs.push({
+                    severity: 'High',
+                    emoji: '🔴',
+                    title: 'CTR thấp',
+                    text: 'CTR là ' + (kpi.ctr_recent * 100).toFixed(2) + '%. Cải thiện meta descriptions và titles.'
+                });
+            }
+
+            // Medium priority
+            if (kpi.sessions_change < -0.1) {
+                recs.push({
+                    severity: 'Medium',
+                    emoji: '🟡',
+                    title: 'Giảm phiên làm việc',
+                    text: 'Phiên giảm ' + (Math.abs(kpi.sessions_change) * 100).toFixed(1) + '% so với kỳ trước. Điều tra nguyên nhân và tối ưu hóa traffic sources.'
+                });
+            }
+
+            if (kpi.engagement_rate_recent < 0.4) {
+                recs.push({
+                    severity: 'Medium',
+                    emoji: '🟡',
+                    title: 'Tỷ lệ tương tác thấp',
+                    text: 'Tỷ lệ tương tác là ' + (kpi.engagement_rate_recent * 100).toFixed(1) + '%. Tăng cường nội dung hấp dẫn và CTA.'
+                });
+            }
+
+            // Low priority
+            if (kpi.clicks_change >= 0.05) {
+                recs.push({
+                    severity: 'Low',
+                    emoji: '🟢',
+                    title: 'Tăng trưởng tốt',
+                    text: 'Lần nhấp tăng ' + (kpi.clicks_change * 100).toFixed(1) + '%. Tiếp tục duy trì chiến lược hiện tại.'
+                });
+            }
+
+            if (recs.length === 0) {
+                recs.push({
+                    severity: 'Low',
+                    emoji: '🟢',
+                    title: 'Hiệu suất tốt',
+                    text: 'Các chỉ số chính đang hoạt động tốt. Tiếp tục giám sát và tối ưu hóa.'
+                });
+            }
+
+            return recs;
+        }
+
+        function initializeCharts() {
+            const chartConfig = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                            usePointStyle: true
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary')
+                        },
+                        grid: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--border-color')
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary')
+                        },
+                        grid: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--border-color')
+                        }
+                    }
+                }
+            };
+
+            // Sessions chart
+            new Chart(document.getElementById('sessionChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Phiên',
+                            data: DATA.ga4_sessions,
+                            borderColor: '#0066cc',
+                            backgroundColor: 'rgba(0, 102, 204, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Người dùng',
+                            data: DATA.ga4_users,
+                            borderColor: '#ff9900',
+                            backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    ...chartConfig,
+                    scales: {
+                        x: chartConfig.scales.x,
+                        y: {...chartConfig.scales.y, title: {display: true, text: 'Phiên'}},
+                        y1: {...chartConfig.scales.y, position: 'right', title: {display: true, text: 'Người dùng'}}
+                    }
+                }
+            });
+
+            // Bounce/Engagement chart
+            new Chart(document.getElementById('bounceChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Tỷ lệ thoát (%)',
+                            data: DATA.ga4_bounce,
+                            borderColor: '#cc0000',
+                            backgroundColor: 'rgba(204, 0, 0, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Tỷ lệ tương tác (%)',
+                            data: DATA.ga4_engagement,
+                            borderColor: '#00aa00',
+                            backgroundColor: 'rgba(0, 170, 0, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Pageviews bar chart
+            new Chart(document.getElementById('pageviewChart'), {
+                type: 'bar',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Lượt xem trang',
+                            data: DATA.ga4_pageviews,
+                            backgroundColor: 'rgba(0, 102, 204, 0.6)',
+                            borderColor: '#0066cc',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Duration chart
+            new Chart(document.getElementById('durationChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Thời gian (giây)',
+                            data: DATA.ga4_duration,
+                            borderColor: '#ff9900',
+                            backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Clicks/Impressions chart
+            new Chart(document.getElementById('clicksChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Lần nhấp',
+                            data: DATA.gsc_clicks,
+                            borderColor: '#0066cc',
+                            backgroundColor: 'rgba(0, 102, 204, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Lần hiển thị',
+                            data: DATA.gsc_impressions,
+                            borderColor: '#ff9900',
+                            backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    ...chartConfig,
+                    scales: {
+                        x: chartConfig.scales.x,
+                        y: {...chartConfig.scales.y, title: {display: true, text: 'Lần nhấp'}},
+                        y1: {...chartConfig.scales.y, position: 'right', title: {display: true, text: 'Lần hiển thị'}}
+                    }
+                }
+            });
+
+            // CTR chart
+            new Chart(document.getElementById('ctrChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'CTR (%)',
+                            data: DATA.gsc_ctr,
+                            borderColor: '#00aa00',
+                            backgroundColor: 'rgba(0, 170, 0, 0.1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Position chart (Y reversed)
+            new Chart(document.getElementById('positionChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Vị trí trung bình',
+                            data: DATA.gsc_position,
+                            borderColor: '#ff9900',
+                            backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    ...chartConfig,
+                    scales: {
+                        ...chartConfig.scales,
+                        y: {
+                            ...chartConfig.scales.y,
+                            reverse: true,
+                            title: {display: true, text: 'Vị trí (1 tốt nhất)'}
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
