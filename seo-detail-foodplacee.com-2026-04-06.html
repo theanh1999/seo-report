@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân tích SEO chi tiết — foodplacee.com</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #eeeeee;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            --border-color: #dddddd;
+            --accent-primary: #0066cc;
+            --accent-danger: #cc0000;
+            --accent-warning: #ff9900;
+            --accent-success: #00aa00;
+        }
+
+        html.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --border-color: #444444;
+            --accent-primary: #4da6ff;
+            --accent-danger: #ff6666;
+            --accent-warning: #ffbb33;
+            --accent-success: #66dd66;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            padding: 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .date-range {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .dark-mode-toggle {
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .dark-mode-toggle:hover {
+            opacity: 0.9;
+        }
+
+        .nav-breadcrumbs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-breadcrumbs a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            padding: 0.4rem 0.8rem;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .nav-breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        .nav-arrows {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-arrows a {
+            color: white;
+            background-color: var(--accent-primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .nav-arrows a:hover {
+            opacity: 0.9;
+        }
+
+        .nav-arrows a.disabled {
+            background-color: var(--border-color);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 1.5rem;
+            margin: 0 2rem 2rem;
+            position: sticky;
+            top: 120px;
+            z-index: 50;
+        }
+
+        .toc h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+        }
+
+        .toc a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .toc li.active a {
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 3rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .kpi-card {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .kpi-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .kpi-change.positive {
+            color: var(--accent-success);
+        }
+
+        .kpi-change.negative {
+            color: var(--accent-danger);
+        }
+
+        .kpi-change.neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-bottom: 2rem;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        table thead {
+            background-color: var(--bg-tertiary);
+        }
+
+        table th {
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        table th:hover {
+            background-color: var(--border-color);
+        }
+
+        table th.sortable::after {
+            content: " ↕";
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        table th.sorted-asc::after {
+            content: " ↑";
+            opacity: 1;
+            color: var(--accent-primary);
+        }
+
+        table th.sorted-desc::after {
+            content: " ↓";
+            opacity: 1;
+            color: var(--accent-primary);
+        }
+
+        table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        table tbody tr:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        table tbody tr.anomaly-row {
+            background-color: rgba(255, 100, 100, 0.1);
+        }
+
+        table tbody tr.summary-row {
+            font-weight: bold;
+            background-color: var(--bg-tertiary);
+            border-top: 2px solid var(--accent-primary);
+        }
+
+        /* Anomalies */
+        .anomaly-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .anomaly-card {
+            background-color: var(--bg-primary);
+            border-left: 4px solid var(--accent-danger);
+            padding: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .anomaly-card.warning {
+            border-left-color: var(--accent-warning);
+        }
+
+        .anomaly-card.info {
+            border-left-color: var(--accent-primary);
+        }
+
+        .anomaly-date {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .anomaly-type {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .anomaly-details {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .anomaly-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin: 0.5rem 0;
+        }
+
+        /* Recommendation Cards */
+        .recommendation-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .recommendation-card {
+            background-color: var(--bg-primary);
+            border-left: 4px solid var(--accent-danger);
+            padding: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .recommendation-card.medium {
+            border-left-color: var(--accent-warning);
+        }
+
+        .recommendation-card.low {
+            border-left-color: var(--accent-success);
+        }
+
+        .recommendation-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+        }
+
+        .recommendation-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
+
+            section {
+                padding: 1rem;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            table td, table th {
+                padding: 0.5rem;
+            }
+
+            .header-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .toc {
+                position: static;
+                margin: 0 1rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Phân tích SEO chi tiết — foodplacee.com</h1>
+        <div class="header-meta">
+            <div class="date-range">Khoảng thời gian: 2026-01-15 đến 2026-04-05</div>
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙 Chế độ tối</button>
+        </div>
+        <div class="nav-breadcrumbs">
+            <a href="index.html">📊 Tổng quan</a>
+            <a href="index.html#restaurants">🍽️ Nhà hàng</a>
+        </div>
+        <div class="nav-arrows">
+            <a href="seo-detail-res-menu.net-2026-04-06.html">← res-menu.net</a>
+            <a href="seo-detail-restaurants-world.net-2026-04-06.html">restaurants-world.net →</a>
+        </div>
+    </header>
+
+    <nav class="toc">
+        <h3>📑 Mục lục</h3>
+        <ul>
+            <li><a href="#kpis">KPI Chính</a></li>
+            <li><a href="#ga4-trends">Xu hướng GA4</a></li>
+            <li><a href="#gsc-trends">Xu hướng GSC</a></li>
+            <li><a href="#daily-breakdown">Chi tiết hàng ngày</a></li>
+            <li><a href="#top-keywords">Top Từ khóa</a></li>
+            <li><a href="#top-pages">Top Trang</a></li>
+            <li><a href="#anomalies">Bất thường</a></li>
+            <li><a href="#30day-comparison">So sánh 30 ngày</a></li>
+            <li><a href="#recommendations">Khuyến nghị</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Section 1: KPI Cards -->
+        <section id="kpis">
+            <h2>📊 KPI Chính (30 ngày gần nhất)</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Phiên làm việc</div>
+                    <div class="kpi-value">4,904</div>
+                    <div class="kpi-change positive">
+                        21040.0% ↑
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Người dùng hoạt động</div>
+                    <div class="kpi-value">4,297</div>
+                    <div class="kpi-change positive">
+                        20710.0% ↑
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lượt xem trang</div>
+                    <div class="kpi-value">9,100</div>
+                    <div class="kpi-change positive">
+                        20210.0% ↑
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ lệ thoát</div>
+                    <div class="kpi-value">45.8%</div>
+                    <div class="kpi-change positive">
+                        -2.11%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ lệ tương tác</div>
+                    <div class="kpi-value">54.2%</div>
+                    <div class="kpi-change positive">
+                        2.11%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Thời gian trung bình</div>
+                    <div class="kpi-value">99.7s</div>
+                    <div class="kpi-change negative">
+                        -82.4s
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Người dùng mới</div>
+                    <div class="kpi-value">4,046</div>
+                    <div class="kpi-change positive">
+                        2,674
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lần nhấp (GSC)</div>
+                    <div class="kpi-value">447</div>
+                    <div class="kpi-change negative">
+                        -9960.0% ↓
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lần hiển thị (GSC)</div>
+                    <div class="kpi-value">37,907</div>
+                    <div class="kpi-change negative">
+                        -9960.0% ↓
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">CTR (GSC)</div>
+                    <div class="kpi-value">1.78%</div>
+                    <div class="kpi-change positive">
+                        0.32%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Vị trí trung bình</div>
+                    <div class="kpi-value">6.4</div>
+                    <div class="kpi-change positive">
+                        0.9 ↑
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: GA4 Trend Charts -->
+        <section id="ga4-trends">
+            <h2>📈 Xu hướng GA4</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="sessionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="bounceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="pageviewChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="durationChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: GSC Trend Charts -->
+        <section id="gsc-trends">
+            <h2>🔍 Xu hướng GSC</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="clicksChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ctrChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="positionChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Daily Breakdown Table -->
+        <section id="daily-breakdown">
+            <h2>📅 Chi tiết hàng ngày</h2>
+            <div class="table-container">
+                <table id="dailyTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable">Ngày</th>
+                            <th class="sortable">Phiên</th>
+                            <th class="sortable">Người dùng</th>
+                            <th class="sortable">Lượt xem</th>
+                            <th class="sortable">Tỷ lệ thoát</th>
+                            <th class="sortable">Lần nhấp</th>
+                            <th class="sortable">Lần hiển thị</th>
+                            <th class="sortable">CTR</th>
+                            <th class="sortable">Vị trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 5: Top Keywords -->
+        <section id="top-keywords">
+            <h2>🎯 Top 50 Từ khóa</h2>
+            <div class="table-container">
+                <table id="keywordsTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable">Từ khóa</th>
+                            <th class="sortable">Lần nhấp</th>
+                            <th class="sortable">Lần hiển thị</th>
+                            <th class="sortable">CTR</th>
+                            <th class="sortable">Vị trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 6: Top Pages -->
+        <section id="top-pages">
+            <h2>📄 Top 30 Trang</h2>
+            <div class="table-container">
+                <table id="pagesTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable">Trang</th>
+                            <th class="sortable">Lần nhấp</th>
+                            <th class="sortable">Lần hiển thị</th>
+                            <th class="sortable">CTR</th>
+                            <th class="sortable">Vị trí</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 7: Anomalies -->
+        <section id="anomalies">
+            <h2>⚠️ Bất thường phát hiện</h2>
+            <div class="anomaly-cards" id="anomalyCards">
+            </div>
+        </section>
+
+        <!-- Section 8: 30-day Comparison -->
+        <section id="30day-comparison">
+            <h2>📊 So sánh 30 ngày</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Chỉ số</th>
+                            <th>30 ngày gần nhất</th>
+                            <th>30 ngày trước</th>
+                            <th>Thay đổi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Phiên</strong></td>
+                            <td>4,904</td>
+                            <td>1,580</td>
+                            <td class="positive">21040.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Người dùng hoạt động</strong></td>
+                            <td>4,297</td>
+                            <td>1,399</td>
+                            <td class="positive">20710.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lượt xem trang</strong></td>
+                            <td>9,100</td>
+                            <td>3,012</td>
+                            <td class="positive">20210.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tỷ lệ thoát</strong></td>
+                            <td>45.8%</td>
+                            <td>47.9%</td>
+                            <td class="positive">-2.1%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tỷ lệ tương tác</strong></td>
+                            <td>54.2%</td>
+                            <td>52.1%</td>
+                            <td class="negative">2.1%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lần nhấp (GSC)</strong></td>
+                            <td>447</td>
+                            <td>115,961</td>
+                            <td class="negative">-9960.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lần hiển thị (GSC)</strong></td>
+                            <td>37,907</td>
+                            <td>10,305,865</td>
+                            <td class="negative">-9960.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CTR (GSC)</strong></td>
+                            <td>1.78%</td>
+                            <td>1.46%</td>
+                            <td class="positive">0.3%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vị trí trung bình</strong></td>
+                            <td>6.4</td>
+                            <td>7.4</td>
+                            <td class="positive">94.4%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 9: Recommendations -->
+        <section id="recommendations">
+            <h2>💡 Khuyến nghị & Phân tích</h2>
+            <div class="recommendation-cards" id="recommendationCards">
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const DATA = {
+            domain: 'foodplacee.com',
+            ga4_rows: [{"date": "2026-01-31", "active_users": 2, "sessions": 2, "screen_page_views": 2, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 2, "totalusers": 2}, {"date": "2026-02-01", "active_users": 2, "sessions": 2, "screen_page_views": 6, "bounce_rate": 0.5, "engagement_rate": 0.5, "average_session_duration": 77.2255, "newusers": 2, "totalusers": 2}, {"date": "2026-02-04", "active_users": 18, "sessions": 18, "screen_page_views": 18, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 4.2931, "newusers": 18, "totalusers": 18}, {"date": "2026-02-05", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 83.5692, "newusers": 1, "totalusers": 1}, {"date": "2026-02-09", "active_users": 1, "sessions": 1, "screen_page_views": 3, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 1743.7556, "newusers": 1, "totalusers": 1}, {"date": "2026-02-13", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 10.0832, "newusers": 1, "totalusers": 1}, {"date": "2026-02-19", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 1, "totalusers": 1}, {"date": "2026-02-22", "active_users": 1, "sessions": 1, "screen_page_views": 1, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 1, "totalusers": 1}, {"date": "2026-02-23", "active_users": 3, "sessions": 3, "screen_page_views": 3, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 0, "newusers": 3, "totalusers": 3}, {"date": "2026-02-24", "active_users": 1, "sessions": 1, "screen_page_views": 2, "bounce_rate": 0, "engagement_rate": 1, "average_session_duration": 8.7118, "newusers": 1, "totalusers": 1}, {"date": "2026-02-25", "active_users": 5, "sessions": 6, "screen_page_views": 19, "bounce_rate": 0.3333, "engagement_rate": 0.6667, "average_session_duration": 443.746, "newusers": 3, "totalusers": 6}, {"date": "2026-02-26", "active_users": 3, "sessions": 4, "screen_page_views": 15, "bounce_rate": 0.5, "engagement_rate": 0.5, "average_session_duration": 392.4435, "newusers": 2, "totalusers": 3}, {"date": "2026-02-27", "active_users": 88, "sessions": 96, "screen_page_views": 177, "bounce_rate": 0.4375, "engagement_rate": 0.5625, "average_session_duration": 80.4874, "newusers": 87, "totalusers": 88}, {"date": "2026-02-28", "active_users": 212, "sessions": 232, "screen_page_views": 482, "bounce_rate": 0.3405, "engagement_rate": 0.6595, "average_session_duration": 166.4694, "newusers": 209, "totalusers": 213}, {"date": "2026-03-01", "active_users": 185, "sessions": 211, "screen_page_views": 421, "bounce_rate": 0.3318, "engagement_rate": 0.6682, "average_session_duration": 78.2001, "newusers": 184, "totalusers": 193}, {"date": "2026-03-02", "active_users": 180, "sessions": 204, "screen_page_views": 403, "bounce_rate": 0.3922, "engagement_rate": 0.6078, "average_session_duration": 154.7687, "newusers": 173, "totalusers": 184}, {"date": "2026-03-03", "active_users": 153, "sessions": 167, "screen_page_views": 306, "bounce_rate": 0.3892, "engagement_rate": 0.6108, "average_session_duration": 106.3207, "newusers": 150, "totalusers": 156}, {"date": "2026-03-04", "active_users": 190, "sessions": 221, "screen_page_views": 393, "bounce_rate": 0.5068, "engagement_rate": 0.4932, "average_session_duration": 94.0069, "newusers": 187, "totalusers": 201}, {"date": "2026-03-05", "active_users": 171, "sessions": 191, "screen_page_views": 359, "bounce_rate": 0.4293, "engagement_rate": 0.5707, "average_session_duration": 115.0853, "newusers": 167, "totalusers": 180}, {"date": "2026-03-06", "active_users": 181, "sessions": 217, "screen_page_views": 399, "bounce_rate": 0.4286, "engagement_rate": 0.5714, "average_session_duration": 83.7944, "newusers": 179, "totalusers": 192}, {"date": "2026-03-07", "active_users": 196, "sessions": 245, "screen_page_views": 437, "bounce_rate": 0.4163, "engagement_rate": 0.5837, "average_session_duration": 208.2518, "newusers": 185, "totalusers": 210}, {"date": "2026-03-08", "active_users": 177, "sessions": 205, "screen_page_views": 397, "bounce_rate": 0.3512, "engagement_rate": 0.6488, "average_session_duration": 112.4893, "newusers": 173, "totalusers": 188}, {"date": "2026-03-09", "active_users": 141, "sessions": 157, "screen_page_views": 336, "bounce_rate": 0.3376, "engagement_rate": 0.6624, "average_session_duration": 119.4668, "newusers": 138, "totalusers": 146}, {"date": "2026-03-10", "active_users": 150, "sessions": 170, "screen_page_views": 339, "bounce_rate": 0.3471, "engagement_rate": 0.6529, "average_session_duration": 65.1579, "newusers": 149, "totalusers": 160}, {"date": "2026-03-11", "active_users": 127, "sessions": 145, "screen_page_views": 262, "bounce_rate": 0.3586, "engagement_rate": 0.6414, "average_session_duration": 120.191, "newusers": 123, "totalusers": 135}, {"date": "2026-03-12", "active_users": 153, "sessions": 171, "screen_page_views": 344, "bounce_rate": 0.3333, "engagement_rate": 0.6667, "average_session_duration": 100.2027, "newusers": 144, "totalusers": 159}, {"date": "2026-03-13", "active_users": 203, "sessions": 236, "screen_page_views": 462, "bounce_rate": 0.3559, "engagement_rate": 0.6441, "average_session_duration": 80.3733, "newusers": 192, "totalusers": 211}, {"date": "2026-03-14", "active_users": 221, "sessions": 260, "screen_page_views": 499, "bounce_rate": 0.3615, "engagement_rate": 0.6385, "average_session_duration": 92.6844, "newusers": 214, "totalusers": 231}, {"date": "2026-03-15", "active_users": 179.0, "sessions": 219.0, "screen_page_views": 432.0, "bounce_rate": 0.411, "engagement_rate": 0.589, "average_session_duration": 113.0406, "newusers": 172.0, "totalusers": 194.0}, {"date": "2026-03-16", "active_users": 133.0, "sessions": 156.0, "screen_page_views": 277.0, "bounce_rate": 0.3654, "engagement_rate": 0.6346, "average_session_duration": 72.446, "newusers": 126.0, "totalusers": 142.0}, {"date": "2026-03-17", "active_users": 150.0, "sessions": 174.0, "screen_page_views": 363.0, "bounce_rate": 0.3218, "engagement_rate": 0.6782, "average_session_duration": 99.9522, "newusers": 144.0, "totalusers": 159.0}, {"date": "2026-03-18", "active_users": 151.0, "sessions": 175.0, "screen_page_views": 358.0, "bounce_rate": 0.3371, "engagement_rate": 0.6629, "average_session_duration": 107.4109, "newusers": 139.0, "totalusers": 157.0}, {"date": "2026-03-19", "active_users": 123.0, "sessions": 138.0, "screen_page_views": 305.0, "bounce_rate": 0.2971, "engagement_rate": 0.7029, "average_session_duration": 103.7314, "newusers": 115.0, "totalusers": 129.0}, {"date": "2026-03-20", "active_users": 118.0, "sessions": 134.0, "screen_page_views": 227.0, "bounce_rate": 1.0, "engagement_rate": 0.0, "average_session_duration": 79.4764, "newusers": 94.0, "totalusers": 126.0}, {"date": "2026-03-21", "active_users": 218, "sessions": 261, "screen_page_views": 501, "bounce_rate": 0.3716, "engagement_rate": 0.6284, "average_session_duration": 102.5093, "newusers": 207, "totalusers": 233}, {"date": "2026-03-22", "active_users": 191, "sessions": 218, "screen_page_views": 454, "bounce_rate": 0.3578, "engagement_rate": 0.6422, "average_session_duration": 98.8262, "newusers": 179, "totalusers": 205}, {"date": "2026-03-23", "active_users": 160, "sessions": 200, "screen_page_views": 569, "bounce_rate": 0.39, "engagement_rate": 0.61, "average_session_duration": 115.2616, "newusers": 147, "totalusers": 175}, {"date": "2026-03-24", "active_users": 406, "sessions": 436, "screen_page_views": 731, "bounce_rate": 0.4656, "engagement_rate": 0.5344, "average_session_duration": 78.3326, "newusers": 397, "totalusers": 410}, {"date": "2026-03-25", "active_users": 409, "sessions": 451, "screen_page_views": 748, "bounce_rate": 0.4479, "engagement_rate": 0.5521, "average_session_duration": 79.3795, "newusers": 395, "totalusers": 418}, {"date": "2026-03-26", "active_users": 629, "sessions": 686, "screen_page_views": 985, "bounce_rate": 0.9985, "engagement_rate": 0.0015, "average_session_duration": 93.4336, "newusers": 561, "totalusers": 646}, {"date": "2026-03-27", "active_users": 62, "sessions": 67, "screen_page_views": 74, "bounce_rate": 1, "engagement_rate": 0, "average_session_duration": 51.429, "newusers": 52, "totalusers": 67}],
+            gsc_daily_rows: [{"date": "2026-01-15", "clicks": 8019, "impressions": 645804, "ctr": 0.0124, "position": 9.5722}, {"date": "2026-01-16", "clicks": 10511, "impressions": 776047, "ctr": 0.0135, "position": 9.5359}, {"date": "2026-01-17", "clicks": 10775, "impressions": 771574, "ctr": 0.014, "position": 8.797}, {"date": "2026-01-18", "clicks": 8662, "impressions": 701622, "ctr": 0.0123, "position": 10.1651}, {"date": "2026-01-19", "clicks": 7051, "impressions": 654714, "ctr": 0.0108, "position": 11.2007}, {"date": "2026-01-20", "clicks": 6769, "impressions": 612432, "ctr": 0.0111, "position": 11.5061}, {"date": "2026-01-21", "clicks": 7238, "impressions": 637815, "ctr": 0.0113, "position": 11.5656}, {"date": "2026-01-22", "clicks": 7060, "impressions": 670780, "ctr": 0.0105, "position": 11.4091}, {"date": "2026-01-23", "clicks": 8546, "impressions": 770724, "ctr": 0.0111, "position": 10.009}, {"date": "2026-01-24", "clicks": 8279, "impressions": 766271, "ctr": 0.0108, "position": 9.6328}, {"date": "2026-01-25", "clicks": 5300, "impressions": 622539, "ctr": 0.0085, "position": 10.8869}, {"date": "2026-01-26", "clicks": 5431, "impressions": 628652, "ctr": 0.0086, "position": 10.478}, {"date": "2026-01-27", "clicks": 6671, "impressions": 675952, "ctr": 0.0099, "position": 10.1983}, {"date": "2026-01-28", "clicks": 7456, "impressions": 649504, "ctr": 0.0115, "position": 9.9232}, {"date": "2026-01-29", "clicks": 8190, "impressions": 721280, "ctr": 0.0114, "position": 9.4786}, {"date": "2026-01-30", "clicks": 0, "impressions": 0, "ctr": null, "position": 0}, {"date": "2026-01-31", "clicks": 0, "impressions": 0, "ctr": null, "position": 0}, {"date": "2026-02-01", "clicks": 1, "impressions": 7, "ctr": 0.1429, "position": 7.4286}, {"date": "2026-02-02", "clicks": 0, "impressions": 12, "ctr": 0, "position": 5.8333}, {"date": "2026-02-03", "clicks": 0, "impressions": 16, "ctr": 0, "position": 7.1875}, {"date": "2026-02-04", "clicks": 0, "impressions": 12, "ctr": 0, "position": 6.3333}, {"date": "2026-02-05", "clicks": 1, "impressions": 9, "ctr": 0.1111, "position": 5.5556}, {"date": "2026-02-06", "clicks": 0, "impressions": 3, "ctr": 0, "position": 5.3333}, {"date": "2026-02-07", "clicks": 0, "impressions": 9, "ctr": 0, "position": 8.3333}, {"date": "2026-02-08", "clicks": 0, "impressions": 5, "ctr": 0, "position": 5.6}, {"date": "2026-02-09", "clicks": 0, "impressions": 8, "ctr": 0, "position": 4.375}, {"date": "2026-02-10", "clicks": 0, "impressions": 4, "ctr": 0, "position": 6.75}, {"date": "2026-02-11", "clicks": 0, "impressions": 9, "ctr": 0, "position": 6.3333}, {"date": "2026-02-12", "clicks": 0, "impressions": 8, "ctr": 0, "position": 4}, {"date": "2026-02-13", "clicks": 1, "impressions": 11, "ctr": 0.0909, "position": 6.3636}, {"date": "2026-02-14", "clicks": 0, "impressions": 14, "ctr": 0, "position": 4.0714}, {"date": "2026-02-15", "clicks": 0, "impressions": 6, "ctr": 0, "position": 3.3333}, {"date": "2026-02-16", "clicks": 0, "impressions": 6, "ctr": 0, "position": 5}, {"date": "2026-02-17", "clicks": 0, "impressions": 10, "ctr": 0, "position": 3.8}, {"date": "2026-02-18", "clicks": 0, "impressions": 6, "ctr": 0, "position": 7.8333}, {"date": "2026-02-19", "clicks": 0, "impressions": 15, "ctr": 0, "position": 5.6}, {"date": "2026-02-20", "clicks": 0, "impressions": 5, "ctr": 0, "position": 7}, {"date": "2026-02-21", "clicks": 0, "impressions": 6, "ctr": 0, "position": 5.6667}, {"date": "2026-02-22", "clicks": 0, "impressions": 6, "ctr": 0, "position": 2.1667}, {"date": "2026-02-23", "clicks": 0, "impressions": 5, "ctr": 0, "position": 4.2}, {"date": "2026-02-24", "clicks": 1, "impressions": 10, "ctr": 0.1, "position": 5.4}, {"date": "2026-02-25", "clicks": 2, "impressions": 13, "ctr": 0.1538, "position": 5.1538}, {"date": "2026-02-26", "clicks": 0, "impressions": 13, "ctr": 0, "position": 7.0769}, {"date": "2026-02-27", "clicks": 0, "impressions": 21, "ctr": 0, "position": 5.381}, {"date": "2026-02-28", "clicks": 1, "impressions": 161, "ctr": 0.0062, "position": 6.3727}, {"date": "2026-03-01", "clicks": 3, "impressions": 405, "ctr": 0.0074, "position": 5.1333}, {"date": "2026-03-02", "clicks": 1, "impressions": 283, "ctr": 0.0035, "position": 6.7703}, {"date": "2026-03-03", "clicks": 0, "impressions": 158, "ctr": 0, "position": 8.981}, {"date": "2026-03-04", "clicks": 3, "impressions": 393, "ctr": 0.0076, "position": 6.5674}, {"date": "2026-03-05", "clicks": 12, "impressions": 554, "ctr": 0.0217, "position": 5.7347}, {"date": "2026-03-06", "clicks": 14, "impressions": 1058, "ctr": 0.0132, "position": 6.4972}, {"date": "2026-03-07", "clicks": 17, "impressions": 1178, "ctr": 0.0144, "position": 5.9745}, {"date": "2026-03-08", "clicks": 25, "impressions": 1085, "ctr": 0.023, "position": 6.1806}, {"date": "2026-03-09", "clicks": 25, "impressions": 815, "ctr": 0.0307, "position": 5.589}, {"date": "2026-03-10", "clicks": 16, "impressions": 790, "ctr": 0.0203, "position": 5.9519}, {"date": "2026-03-11", "clicks": 14, "impressions": 716, "ctr": 0.0196, "position": 6.0559}, {"date": "2026-03-12", "clicks": 21, "impressions": 834, "ctr": 0.0252, "position": 4.7374}, {"date": "2026-03-13", "clicks": 33, "impressions": 1126, "ctr": 0.0293, "position": 4.5595}, {"date": "2026-03-14", "clicks": 22, "impressions": 1176, "ctr": 0.0187, "position": 5.6088}, {"date": "2026-03-15", "clicks": 6.0, "impressions": 627.0, "ctr": 0.0096, "position": 7.134}, {"date": "2026-03-16", "clicks": 7.0, "impressions": 375.0, "ctr": 0.0187, "position": 6.9307}, {"date": "2026-03-17", "clicks": 7.0, "impressions": 418.0, "ctr": 0.0167, "position": 8.4904}, {"date": "2026-03-18", "clicks": 13.0, "impressions": 764.0, "ctr": 0.017, "position": 6.3678}, {"date": "2026-03-19", "clicks": 19, "impressions": 957, "ctr": 0.0199, "position": 6.5298}, {"date": "2026-03-20", "clicks": 20, "impressions": 2245, "ctr": 0.0089, "position": 7.3385}, {"date": "2026-03-21", "clicks": 34, "impressions": 3768, "ctr": 0.009, "position": 8.1388}, {"date": "2026-03-22", "clicks": 38, "impressions": 4557, "ctr": 0.0083, "position": 8.582}, {"date": "2026-03-23", "clicks": 26, "impressions": 4296, "ctr": 0.0061, "position": 8.9169}, {"date": "2026-03-24", "clicks": 29, "impressions": 4205, "ctr": 0.0069, "position": 8.7239}, {"date": "2026-03-25", "clicks": 38, "impressions": 4869, "ctr": 0.0078, "position": 9.2707}],
+            keywords: [{"query": "factory creteil", "clicks": 24.0, "impressions": 1189.0, "ctr": 0.0202, "position": 5.1102}, {"query": "factorys", "clicks": 23.0, "impressions": 1122.0, "ctr": 0.0205, "position": 4.0143}, {"query": "sissis kaffeehaus", "clicks": 20.0, "impressions": 155.0, "ctr": 0.129, "position": 2.4645}, {"query": "fuji hillcrest", "clicks": 11.0, "impressions": 397.0, "ctr": 0.0277, "position": 2.7229}, {"query": "sissis kaffeehaus freising", "clicks": 11.0, "impressions": 100.0, "ctr": 0.11, "position": 3.17}, {"query": "fuji spartanburg sc", "clicks": 9.0, "impressions": 319.0, "ctr": 0.0282, "position": 3.7367}, {"query": "patron grill menu", "clicks": 9.0, "impressions": 295.0, "ctr": 0.0305, "position": 4.9966}, {"query": "factorys creteil", "clicks": 7.0, "impressions": 257.0, "ctr": 0.0272, "position": 4.1712}, {"query": "patrons livingston tx", "clicks": 6.0, "impressions": 253.0, "ctr": 0.0237, "position": 4.336}, {"query": "factory's creteil", "clicks": 4.0, "impressions": 152.0, "ctr": 0.0263, "position": 6.1316}, {"query": "fuji hillcrest menu", "clicks": 4.0, "impressions": 121.0, "ctr": 0.0331, "position": 3.9091}, {"query": "fuji spartanburg", "clicks": 4.0, "impressions": 260.0, "ctr": 0.0154, "position": 3.4538}, {"query": "sybil's bakery & restaurant", "clicks": 4.0, "impressions": 179.0, "ctr": 0.0223, "position": 4.2235}, {"query": "creteil factory", "clicks": 3.0, "impressions": 96.0, "ctr": 0.0312, "position": 4.7188}, {"query": "fuji", "clicks": 3.0, "impressions": 367.0, "ctr": 0.0082, "position": 5.2589}, {"query": "fuji menu", "clicks": 3.0, "impressions": 77.0, "ctr": 0.039, "position": 5.3506}, {"query": "jamaica way", "clicks": 3.0, "impressions": 469.0, "ctr": 0.0064, "position": 4.8998}, {"query": "factories creteil", "clicks": 2.0, "impressions": 3.0, "ctr": 0.6667, "position": 3.6667}, {"query": "fuji menu spartanburg sc", "clicks": 2.0, "impressions": 27.0, "ctr": 0.0741, "position": 5.5926}, {"query": "fuji spartanburg hillcrest", "clicks": 2.0, "impressions": 39.0, "ctr": 0.0513, "position": 3.5385}, {"query": "jamaica way menu", "clicks": 2.0, "impressions": 180.0, "ctr": 0.0111, "position": 6.1222}, {"query": "jamaican way", "clicks": 2.0, "impressions": 475.0, "ctr": 0.0042, "position": 3.7495}, {"query": "patron grill livingston tx", "clicks": 2.0, "impressions": 198.0, "ctr": 0.0101, "position": 5.8434}, {"query": "sissi's kaffeehaus speisekarte", "clicks": 2.0, "impressions": 9.0, "ctr": 0.2222, "position": 4.5556}, {"query": "sissis freising", "clicks": 2.0, "impressions": 4.0, "ctr": 0.5, "position": 3.0}, {"query": "super c gulfport ms", "clicks": 2.0, "impressions": 26.0, "ctr": 0.0769, "position": 3.5769}, {"query": "super c near me", "clicks": 2.0, "impressions": 150.0, "ctr": 0.0133, "position": 5.12}, {"query": "super c three dads cooking", "clicks": 2.0, "impressions": 18.0, "ctr": 0.1111, "position": 3.5556}, {"query": "sybils nyc", "clicks": 2.0, "impressions": 160.0, "ctr": 0.0125, "position": 4.3688}, {"query": "cafe sissi freising", "clicks": 1.0, "impressions": 7.0, "ctr": 0.1429, "position": 2.5714}, {"query": "crawfish gulfport ms", "clicks": 1.0, "impressions": 18.0, "ctr": 0.0556, "position": 9.1667}, {"query": "crawfish in gulfport", "clicks": 1.0, "impressions": 1.0, "ctr": 1.0, "position": 1.0}, {"query": "factory 94", "clicks": 1.0, "impressions": 6.0, "ctr": 0.1667, "position": 4.5}, {"query": "factory's cr\u00e9teil", "clicks": 1.0, "impressions": 11.0, "ctr": 0.0909, "position": 5.0}, {"query": "factroys", "clicks": 1.0, "impressions": 1.0, "ctr": 1.0, "position": 3.0}, {"query": "fuji east main", "clicks": 1.0, "impressions": 9.0, "ctr": 0.1111, "position": 2.0}, {"query": "fuji east main street spartanburg", "clicks": 1.0, "impressions": 5.0, "ctr": 0.2, "position": 6.4}, {"query": "fuji hillcrest spartanburg sc", "clicks": 1.0, "impressions": 20.0, "ctr": 0.05, "position": 3.3}, {"query": "fuji memu", "clicks": 1.0, "impressions": 1.0, "ctr": 1.0, "position": 2.0}, {"query": "fuji spartanburg, sc menu", "clicks": 1.0, "impressions": 7.0, "ctr": 0.1429, "position": 6.5714}, {"query": "jamaica way augusta ga", "clicks": 1.0, "impressions": 207.0, "ctr": 0.0048, "position": 3.8357}, {"query": "le factory creteil", "clicks": 1.0, "impressions": 21.0, "ctr": 0.0476, "position": 4.1429}, {"query": "patron grill", "clicks": 1.0, "impressions": 162.0, "ctr": 0.0062, "position": 5.8333}, {"query": "patron grill livingston, tx", "clicks": 1.0, "impressions": 2.0, "ctr": 0.5, "position": 6.0}, {"query": "patron grill menu livingston, tx", "clicks": 1.0, "impressions": 19.0, "ctr": 0.0526, "position": 3.3684}, {"query": "patron livingston", "clicks": 1.0, "impressions": 15.0, "ctr": 0.0667, "position": 5.9333}, {"query": "patron livingston tx", "clicks": 1.0, "impressions": 18.0, "ctr": 0.0556, "position": 4.8333}, {"query": "patron restaurant livingston tx", "clicks": 1.0, "impressions": 13.0, "ctr": 0.0769, "position": 4.4615}, {"query": "patrons livingston", "clicks": 1.0, "impressions": 55.0, "ctr": 0.0182, "position": 4.3091}, {"query": "patrons livingston tx menu", "clicks": 1.0, "impressions": 16.0, "ctr": 0.0625, "position": 3.6875}],
+            pages: [{"page": "https://factorys-creteil.foodplacee.com/", "clicks": 69.0, "impressions": 3690.0, "ctr": 0.0187, "position": 5.4659}, {"page": "https://sissis-kaffeehaus.foodplacee.com/", "clicks": 52.0, "impressions": 554.0, "ctr": 0.0939, "position": 5.5036}, {"page": "https://fuji-hillcrest.foodplacee.com/", "clicks": 39.0, "impressions": 2499.0, "ctr": 0.0156, "position": 4.9788}, {"page": "https://jamaica-way.foodplacee.com/", "clicks": 15.0, "impressions": 1653.0, "ctr": 0.0091, "position": 5.0127}, {"page": "https://patron-grill.foodplacee.com/", "clicks": 15.0, "impressions": 1476.0, "ctr": 0.0102, "position": 6.9553}, {"page": "https://patron-grill.foodplacee.com/menu", "clicks": 14.0, "impressions": 522.0, "ctr": 0.0268, "position": 8.6935}, {"page": "https://fuji-hillcrest.foodplacee.com/menu", "clicks": 13.0, "impressions": 461.0, "ctr": 0.0282, "position": 7.0933}, {"page": "https://super-c-three-dads-cooking.foodplacee.com/", "clicks": 11.0, "impressions": 1066.0, "ctr": 0.0103, "position": 7.7505}, {"page": "https://sybils-bakery-restaurant.foodplacee.com/", "clicks": 10.0, "impressions": 1268.0, "ctr": 0.0079, "position": 6.5584}, {"page": "https://pastelaria-vianeza-prato-do-dia.foodplacee.com/", "clicks": 5.0, "impressions": 255.0, "ctr": 0.0196, "position": 7.3333}, {"page": "https://foodplacee.com/", "clicks": 2.0, "impressions": 46.0, "ctr": 0.0435, "position": 1.6739}, {"page": "https://cafe-paragrapho.foodplacee.com/", "clicks": 1.0, "impressions": 99.0, "ctr": 0.0101, "position": 4.4242}, {"page": "https://jamaica-way.foodplacee.com/menu", "clicks": 1.0, "impressions": 205.0, "ctr": 0.0049, "position": 12.878}, {"page": "https://bagga-montelavar.foodplacee.com/", "clicks": 0.0, "impressions": 56.0, "ctr": 0.0, "position": 6.4464}, {"page": "https://bagga-montelavar.foodplacee.com/menu", "clicks": 0.0, "impressions": 26.0, "ctr": 0.0, "position": 9.3077}, {"page": "https://berlin-dner-haus.foodplacee.com/", "clicks": 0.0, "impressions": 1.0, "ctr": 0.0, "position": 11.0}, {"page": "https://creme-caffe.foodplacee.com/", "clicks": 0.0, "impressions": 87.0, "ctr": 0.0, "position": 3.046}, {"page": "https://creme-caffe.foodplacee.com/menu", "clicks": 0.0, "impressions": 18.0, "ctr": 0.0, "position": 18.0556}, {"page": "https://cru-coffee-roasters-cellars.foodplacee.com/", "clicks": 0.0, "impressions": 2.0, "ctr": 0.0, "position": 11.0}, {"page": "https://double-d-puchong-restaurant.foodplacee.com/", "clicks": 0.0, "impressions": 1.0, "ctr": 0.0, "position": 7.0}, {"page": "https://factorys-creteil.foodplacee.com/menu", "clicks": 0.0, "impressions": 46.0, "ctr": 0.0, "position": 11.4783}, {"page": "https://fuji-hillcrest.foodplacee.com/#Feel", "clicks": 0.0, "impressions": 100.0, "ctr": 0.0, "position": 5.41}, {"page": "https://fuji-hillcrest.foodplacee.com/#Why", "clicks": 0.0, "impressions": 107.0, "ctr": 0.0, "position": 5.5981}, {"page": "https://fuji-hillcrest.foodplacee.com/#experience", "clicks": 0.0, "impressions": 107.0, "ctr": 0.0, "position": 5.5981}, {"page": "https://fuji-hillcrest.foodplacee.com/#highlight", "clicks": 0.0, "impressions": 107.0, "ctr": 0.0, "position": 5.5981}, {"page": "https://fuji-hillcrest.foodplacee.com/#scrollspyAbout", "clicks": 0.0, "impressions": 107.0, "ctr": 0.0, "position": 5.5981}, {"page": "https://jamaica-way.foodplacee.com/#Feel", "clicks": 0.0, "impressions": 78.0, "ctr": 0.0, "position": 8.641}, {"page": "https://jamaica-way.foodplacee.com/#Why", "clicks": 0.0, "impressions": 85.0, "ctr": 0.0, "position": 8.7529}, {"page": "https://jamaica-way.foodplacee.com/#experience", "clicks": 0.0, "impressions": 85.0, "ctr": 0.0, "position": 8.7529}, {"page": "https://jamaica-way.foodplacee.com/#highlight", "clicks": 0.0, "impressions": 85.0, "ctr": 0.0, "position": 8.7529}],
+            kpi: {"sessions_recent": 4904.0, "sessions_prev": 1580.0, "users_recent": 4297.0, "users_prev": 1399.0, "pageviews_recent": 9100.0, "pageviews_prev": 3012.0, "bounce_rate_recent": 0.4583476190476191, "bounce_rate_prev": 0.47946, "engagement_rate_recent": 0.5416523809523808, "engagement_rate_prev": 0.52054, "avg_duration_recent": 99.7165, "avg_duration_prev": 182.14803999999998, "newusers_recent": 4046.0, "newusers_prev": 1372.0, "clicks_recent": 447.0, "clicks_prev": 115961.0, "impressions_recent": 37907.0, "impressions_prev": 10305865.0, "ctr_recent": 0.017814285714285723, "ctr_prev": 0.014645714285714284, "position_recent": 6.422365714285713, "position_prev": 7.36638, "sessions_change": 210.4, "users_change": 207.1, "pageviews_change": 202.1, "clicks_change": -99.6, "impressions_change": -99.6},
+            anomalies: [],
+            ga4_dates: ["2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27"],
+            ga4_sessions: [4, 96, 232, 211, 204, 167, 221, 191, 217, 245, 205, 157, 170, 145, 171, 236, 260, 219.0, 156.0, 174.0, 175.0, 138.0, 134.0, 261, 218, 200, 436, 451, 686, 67],
+            ga4_users: [3, 88, 212, 185, 180, 153, 190, 171, 181, 196, 177, 141, 150, 127, 153, 203, 221, 179.0, 133.0, 150.0, 151.0, 123.0, 118.0, 218, 191, 160, 406, 409, 629, 62],
+            ga4_pageviews: [15, 177, 482, 421, 403, 306, 393, 359, 399, 437, 397, 336, 339, 262, 344, 462, 499, 432.0, 277.0, 363.0, 358.0, 305.0, 227.0, 501, 454, 569, 731, 748, 985, 74],
+            ga4_bounce: [50.0, 43.75, 34.050000000000004, 33.18, 39.22, 38.92, 50.68, 42.93, 42.86, 41.63, 35.120000000000005, 33.76, 34.71, 35.86, 33.33, 35.589999999999996, 36.15, 41.099999999999994, 36.54, 32.18, 33.71, 29.709999999999997, 100.0, 37.16, 35.78, 39.0, 46.56, 44.79, 99.85000000000001, 100],
+            ga4_engagement: [50.0, 56.25, 65.95, 66.82000000000001, 60.78, 61.08, 49.32, 57.07, 57.14, 58.37, 64.88000000000001, 66.24, 65.29, 64.14, 66.67, 64.41, 63.849999999999994, 58.9, 63.46000000000001, 67.82000000000001, 66.29, 70.28999999999999, 0.0, 62.839999999999996, 64.22, 61.0, 53.44, 55.21, 0.15, 0],
+            ga4_duration: [392.4435, 80.4874, 166.4694, 78.2001, 154.7687, 106.3207, 94.0069, 115.0853, 83.7944, 208.2518, 112.4893, 119.4668, 65.1579, 120.191, 100.2027, 80.3733, 92.6844, 113.0406, 72.446, 99.9522, 107.4109, 103.7314, 79.4764, 102.5093, 98.8262, 115.2616, 78.3326, 79.3795, 93.4336, 51.429],
+            gsc_clicks: [1, 2, 0, 0, 1, 3, 1, 0, 3, 12, 14, 17, 25, 25, 16, 14, 21, 33, 22, 6.0, 7.0, 7.0, 13.0, 19, 20, 34, 38, 26, 29, 38],
+            gsc_impressions: [10, 13, 13, 21, 161, 405, 283, 158, 393, 554, 1058, 1178, 1085, 815, 790, 716, 834, 1126, 1176, 627.0, 375.0, 418.0, 764.0, 957, 2245, 3768, 4557, 4296, 4205, 4869],
+            gsc_ctr: [10.0, 15.379999999999999, 0, 0, 0.62, 0.74, 0.35000000000000003, 0, 0.76, 2.17, 1.32, 1.44, 2.3, 3.0700000000000003, 2.03, 1.96, 2.52, 2.93, 1.87, 0.96, 1.87, 1.67, 1.7000000000000002, 1.9900000000000002, 0.89, 0.8999999999999999, 0.83, 0.61, 0.69, 0.7799999999999999],
+            gsc_position: [5.4, 5.1538, 7.0769, 5.381, 6.3727, 5.1333, 6.7703, 8.981, 6.5674, 5.7347, 6.4972, 5.9745, 6.1806, 5.589, 5.9519, 6.0559, 4.7374, 4.5595, 5.6088, 7.134, 6.9307, 8.4904, 6.3678, 6.5298, 7.3385, 8.1388, 8.582, 8.9169, 8.7239, 9.2707]
+        };
+
+        // Dark mode toggle
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark-mode'));
+        }
+
+        // Initialize dark mode from localStorage
+        window.addEventListener('load', function() {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        });
+
+        // Table of Contents with IntersectionObserver
+        const tocLinks = document.querySelectorAll('.toc a');
+        const sections = document.querySelectorAll('section');
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                tocLinks.forEach(link => {
+                    link.parentElement.classList.remove('active');
+                    if (link.getAttribute('href').slice(1) === entry.target.id && entry.isIntersecting) {
+                        link.parentElement.classList.add('active');
+                    }
+                });
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => observer.observe(section));
+
+        // Smooth scrolling
+        tocLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Initialize tables and charts
+        window.addEventListener('load', function() {
+            initializeDailyTable();
+            initializeKeywordsTable();
+            initializePagesTable();
+            initializeAnomalies();
+            initializeRecommendations();
+            initializeCharts();
+        });
+
+        // Table sorting
+        function makeTableSortable(tableId) {
+            const table = document.getElementById(tableId);
+            const headers = table.querySelectorAll('th.sortable');
+
+            headers.forEach((header, index) => {
+                header.addEventListener('click', function() {
+                    let ascending = !this.classList.contains('sorted-asc');
+
+                    // Remove all sorted classes
+                    headers.forEach(h => {
+                        h.classList.remove('sorted-asc', 'sorted-desc');
+                    });
+
+                    this.classList.add(ascending ? 'sorted-asc' : 'sorted-desc');
+
+                    // Sort rows
+                    const rows = Array.from(table.querySelectorAll('tbody tr')).filter(row => !row.classList.contains('summary-row'));
+
+                    rows.sort((a, b) => {
+                        let aVal = a.cells[index].textContent.trim();
+                        let bVal = b.cells[index].textContent.trim();
+
+                        // Try to convert to number
+                        const aNum = parseFloat(aVal.replace(/,/g, '').replace('%', ''));
+                        const bNum = parseFloat(bVal.replace(/,/g, '').replace('%', ''));
+
+                        if (!isNaN(aNum) && !isNaN(bNum)) {
+                            return ascending ? aNum - bNum : bNum - aNum;
+                        }
+
+                        return ascending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                    });
+
+                    const tbody = table.querySelector('tbody');
+                    rows.forEach(row => tbody.appendChild(row));
+                });
+            });
+        }
+
+        function initializeDailyTable() {
+            const table = document.getElementById('dailyTable');
+            const tbody = table.querySelector('tbody');
+            const anomalyDates = new Set(DATA.anomalies.map(a => a.date));
+
+            let totalSessions = 0, totalUsers = 0, totalPageviews = 0;
+            let totalClicks = 0, totalImpressions = 0;
+
+            DATA.ga4_rows.forEach((row, idx) => {
+                const gscRow = DATA.gsc_daily_rows[idx] || {};
+                const tr = document.createElement('tr');
+
+                if (anomalyDates.has(row.date)) {
+                    tr.classList.add('anomaly-row');
+                }
+
+                tr.innerHTML = `
+                    <td>${row.date}</td>
+                    <td>${row.sessions.toLocaleString()}</td>
+                    <td>${row.active_users.toLocaleString()}</td>
+                    <td>${row.screen_page_views.toLocaleString()}</td>
+                    <td>${(row.bounce_rate * 100).toFixed(1)}%</td>
+                    <td>${gscRow.clicks ? gscRow.clicks.toLocaleString() : '-'}</td>
+                    <td>${gscRow.impressions ? gscRow.impressions.toLocaleString() : '-'}</td>
+                    <td>${gscRow.ctr ? (gscRow.ctr * 100).toFixed(2) : '-'}%</td>
+                    <td>${gscRow.position ? gscRow.position.toFixed(1) : '-'}</td>
+                `;
+                tbody.appendChild(tr);
+
+                totalSessions += row.sessions;
+                totalUsers += row.active_users;
+                totalPageviews += row.screen_page_views;
+                totalClicks += gscRow.clicks || 0;
+                totalImpressions += gscRow.impressions || 0;
+            });
+
+            // Summary row
+            const summaryRow = document.createElement('tr');
+            summaryRow.classList.add('summary-row');
+            summaryRow.innerHTML = `
+                <td>TỔNG</td>
+                <td>${totalSessions.toLocaleString()}</td>
+                <td>${totalUsers.toLocaleString()}</td>
+                <td>${totalPageviews.toLocaleString()}</td>
+                <td>-</td>
+                <td>${totalClicks.toLocaleString()}</td>
+                <td>${totalImpressions.toLocaleString()}</td>
+                <td>${totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(2) : '-'}%</td>
+                <td>-</td>
+            `;
+            tbody.appendChild(summaryRow);
+
+            makeTableSortable('dailyTable');
+        }
+
+        function initializeKeywordsTable() {
+            const table = document.getElementById('keywordsTable');
+            const tbody = table.querySelector('tbody');
+
+            DATA.keywords.forEach(kw => {
+                const tr = document.createElement('tr');
+                const isOpportunity = kw.impressions > 100 && kw.ctr < 0.02 && kw.position >= 5 && kw.position <= 20;
+                if (isOpportunity) {
+                    tr.style.backgroundColor = 'rgba(255, 200, 100, 0.1)';
+                }
+
+                tr.innerHTML = `
+                    <td>${kw.query}</td>
+                    <td>${kw.clicks.toLocaleString()}</td>
+                    <td>${kw.impressions.toLocaleString()}</td>
+                    <td>${(kw.ctr * 100).toFixed(2)}%</td>
+                    <td>${kw.position.toFixed(1)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            makeTableSortable('keywordsTable');
+        }
+
+        function initializePagesTable() {
+            const table = document.getElementById('pagesTable');
+            const tbody = table.querySelector('tbody');
+
+            DATA.pages.forEach(page => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><a href="${page.page}" target="_blank" style="color: var(--accent-primary); text-decoration: none;">${page.page.split('/').pop() || '/'}</a></td>
+                    <td>${page.clicks.toLocaleString()}</td>
+                    <td>${page.impressions.toLocaleString()}</td>
+                    <td>${(page.ctr * 100).toFixed(2)}%</td>
+                    <td>${page.position.toFixed(1)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            makeTableSortable('pagesTable');
+        }
+
+        function initializeAnomalies() {
+            const container = document.getElementById('anomalyCards');
+
+            DATA.anomalies.forEach(anomaly => {
+                const card = document.createElement('div');
+                card.className = 'anomaly-card';
+
+                if (anomaly.level === 'critical') {
+                    card.classList.add('');
+                } else if (anomaly.level === 'warning') {
+                    card.classList.add('warning');
+                } else {
+                    card.classList.add('info');
+                }
+
+                const typeLabel = {
+                    'spike_sessions': 'Spike Phiên',
+                    'drop_sessions': 'Giảm Phiên',
+                    'spike_clicks': 'Spike Lần nhấp',
+                    'drop_clicks': 'Giảm Lần nhấp',
+                    'position_change': 'Thay đổi Vị trí'
+                }[anomaly.type] || anomaly.type;
+
+                card.innerHTML = `
+                    <div class="anomaly-date">${anomaly.date}</div>
+                    <div class="anomaly-type">${typeLabel}</div>
+                    <div class="anomaly-value">${anomaly.value.toLocaleString()}</div>
+                    <div class="anomaly-details">
+                        <strong>Trung bình:</strong> ${anomaly.avg.toLocaleString()}<br>
+                        <strong>Tỷ lệ:</strong> ${anomaly.ratio.toFixed(1)}x<br>
+                        <strong>Chi tiết:</strong> ${anomaly.desc}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            if (DATA.anomalies.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1 / -1;">Không phát hiện bất thường.</p>';
+            }
+        }
+
+        function initializeRecommendations() {
+            const container = document.getElementById('recommendationCards');
+            const recommendations = generateRecommendations();
+
+            recommendations.forEach(rec => {
+                const card = document.createElement('div');
+                card.className = 'recommendation-card ' + rec.severity.toLowerCase();
+                card.innerHTML = `
+                    <div class="recommendation-title">${rec.emoji} ${rec.title}</div>
+                    <div class="recommendation-text">${rec.text}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function generateRecommendations() {
+            const recs = [];
+            const kpi = DATA.kpi;
+
+            // High priority
+            if (kpi.bounce_rate_recent > 0.6) {
+                recs.push({
+                    severity: 'High',
+                    emoji: '🔴',
+                    title: 'Tỷ lệ thoát quá cao',
+                    text: 'Tỷ lệ thoát hiện tại là ' + (kpi.bounce_rate_recent * 100).toFixed(1) + '%. Tối ưu hóa nội dung, cải thiện UX và tốc độ tải trang.'
+                });
+            }
+
+            if (kpi.position_recent > 20) {
+                recs.push({
+                    severity: 'High',
+                    emoji: '🔴',
+                    title: 'Vị trí xếp hạng thấp',
+                    text: 'Vị trí trung bình là ' + kpi.position_recent.toFixed(1) + '. Tăng cường chiến lược liên kết ngoài và tối ưu hóa từ khóa.'
+                });
+            }
+
+            if (kpi.ctr_recent < 0.02) {
+                recs.push({
+                    severity: 'High',
+                    emoji: '🔴',
+                    title: 'CTR thấp',
+                    text: 'CTR là ' + (kpi.ctr_recent * 100).toFixed(2) + '%. Cải thiện meta descriptions và titles.'
+                });
+            }
+
+            // Medium priority
+            if (kpi.sessions_change < -0.1) {
+                recs.push({
+                    severity: 'Medium',
+                    emoji: '🟡',
+                    title: 'Giảm phiên làm việc',
+                    text: 'Phiên giảm ' + (Math.abs(kpi.sessions_change) * 100).toFixed(1) + '% so với kỳ trước. Điều tra nguyên nhân và tối ưu hóa traffic sources.'
+                });
+            }
+
+            if (kpi.engagement_rate_recent < 0.4) {
+                recs.push({
+                    severity: 'Medium',
+                    emoji: '🟡',
+                    title: 'Tỷ lệ tương tác thấp',
+                    text: 'Tỷ lệ tương tác là ' + (kpi.engagement_rate_recent * 100).toFixed(1) + '%. Tăng cường nội dung hấp dẫn và CTA.'
+                });
+            }
+
+            // Low priority
+            if (kpi.clicks_change >= 0.05) {
+                recs.push({
+                    severity: 'Low',
+                    emoji: '🟢',
+                    title: 'Tăng trưởng tốt',
+                    text: 'Lần nhấp tăng ' + (kpi.clicks_change * 100).toFixed(1) + '%. Tiếp tục duy trì chiến lược hiện tại.'
+                });
+            }
+
+            if (recs.length === 0) {
+                recs.push({
+                    severity: 'Low',
+                    emoji: '🟢',
+                    title: 'Hiệu suất tốt',
+                    text: 'Các chỉ số chính đang hoạt động tốt. Tiếp tục giám sát và tối ưu hóa.'
+                });
+            }
+
+            return recs;
+        }
+
+        function initializeCharts() {
+            const chartConfig = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                            usePointStyle: true
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary')
+                        },
+                        grid: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--border-color')
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary')
+                        },
+                        grid: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--border-color')
+                        }
+                    }
+                }
+            };
+
+            // Sessions chart
+            new Chart(document.getElementById('sessionChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Phiên',
+                            data: DATA.ga4_sessions,
+                            borderColor: '#0066cc',
+                            backgroundColor: 'rgba(0, 102, 204, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Người dùng',
+                            data: DATA.ga4_users,
+                            borderColor: '#ff9900',
+                            backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    ...chartConfig,
+                    scales: {
+                        x: chartConfig.scales.x,
+                        y: {...chartConfig.scales.y, title: {display: true, text: 'Phiên'}},
+                        y1: {...chartConfig.scales.y, position: 'right', title: {display: true, text: 'Người dùng'}}
+                    }
+                }
+            });
+
+            // Bounce/Engagement chart
+            new Chart(document.getElementById('bounceChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Tỷ lệ thoát (%)',
+                            data: DATA.ga4_bounce,
+                            borderColor: '#cc0000',
+                            backgroundColor: 'rgba(204, 0, 0, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Tỷ lệ tương tác (%)',
+                            data: DATA.ga4_engagement,
+                            borderColor: '#00aa00',
+                            backgroundColor: 'rgba(0, 170, 0, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Pageviews bar chart
+            new Chart(document.getElementById('pageviewChart'), {
+                type: 'bar',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Lượt xem trang',
+                            data: DATA.ga4_pageviews,
+                            backgroundColor: 'rgba(0, 102, 204, 0.6)',
+                            borderColor: '#0066cc',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Duration chart
+            new Chart(document.getElementById('durationChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Thời gian (giây)',
+                            data: DATA.ga4_duration,
+                            borderColor: '#ff9900',
+                            backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Clicks/Impressions chart
+            new Chart(document.getElementById('clicksChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Lần nhấp',
+                            data: DATA.gsc_clicks,
+                            borderColor: '#0066cc',
+                            backgroundColor: 'rgba(0, 102, 204, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Lần hiển thị',
+                            data: DATA.gsc_impressions,
+                            borderColor: '#ff9900',
+                            backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                            tension: 0.1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    ...chartConfig,
+                    scales: {
+                        x: chartConfig.scales.x,
+                        y: {...chartConfig.scales.y, title: {display: true, text: 'Lần nhấp'}},
+                        y1: {...chartConfig.scales.y, position: 'right', title: {display: true, text: 'Lần hiển thị'}}
+                    }
+                }
+            });
+
+            // CTR chart
+            new Chart(document.getElementById('ctrChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'CTR (%)',
+                            data: DATA.gsc_ctr,
+                            borderColor: '#00aa00',
+                            backgroundColor: 'rgba(0, 170, 0, 0.1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Position chart (Y reversed)
+            new Chart(document.getElementById('positionChart'), {
+                type: 'line',
+                data: {
+                    labels: DATA.ga4_dates,
+                    datasets: [
+                        {
+                            label: 'Vị trí trung bình',
+                            data: DATA.gsc_position,
+                            borderColor: '#ff9900',
+                            backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    ...chartConfig,
+                    scales: {
+                        ...chartConfig.scales,
+                        y: {
+                            ...chartConfig.scales.y,
+                            reverse: true,
+                            title: {display: true, text: 'Vị trí (1 tốt nhất)'}
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
