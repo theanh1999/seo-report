@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Điều Khiển SEO - Khách Sạn</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --primary: #007AFF;
+            --secondary: #5AC8FA;
+            --success: #34C759;
+            --danger: #FF3B30;
+            --warning: #FF9500;
+            --info: #17C0EB;
+            --dark-bg: #1a1a2e;
+            --dark-card: #16213e;
+            --dark-border: #0f3460;
+            --light-bg: #ffffff;
+            --light-card: #f5f5f5;
+            --light-border: #e0e0e0;
+            --text-dark: #333333;
+            --text-light: #f0f0f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .nav-bar {
+            background: var(--light-card);
+            border-bottom: 1px solid var(--light-border);
+            padding: 0;
+            display: flex;
+            gap: 2rem;
+            padding: 0 2rem;
+            overflow-x: auto;
+            position: sticky;
+            top: 80px;
+            z-index: 99;
+        }
+
+        body.dark-mode .nav-bar {
+            background: var(--dark-card);
+            border-bottom-color: var(--dark-border);
+        }
+
+        .nav-item {
+            padding: 1rem 0;
+            text-decoration: none;
+            color: var(--text-dark);
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        body.dark-mode .nav-item {
+            color: var(--text-light);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .cross-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            padding: 1rem;
+            background: var(--light-card);
+            border-bottom: 1px solid var(--light-border);
+            flex-wrap: wrap;
+        }
+
+        body.dark-mode .cross-links {
+            background: var(--dark-card);
+            border-bottom-color: var(--dark-border);
+        }
+
+        .cross-links a {
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .cross-links a:hover {
+            background: var(--secondary);
+        }
+
+        .toggle-dark {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 1.5rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--light-card);
+            border: 1px solid var(--light-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        body.dark-mode .kpi-card {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .kpi-label {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.dark-mode .kpi-label {
+            color: #aaa;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .kpi-change {
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .kpi-change.good {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .kpi-change.bad {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        body.dark-mode .kpi-change.good {
+            background: #1E4620;
+            color: #6ECB63;
+        }
+
+        body.dark-mode .kpi-change.bad {
+            background: #4D2D2D;
+            color: #FF6B6B;
+        }
+
+        .filters {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .filters input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1000px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container {
+            background: var(--light-card);
+            border: 1px solid var(--light-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+            height: 400px;
+        }
+
+        body.dark-mode .chart-container {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+        }
+
+        .chart-container canvas {
+            max-height: 350px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--light-card);
+            border: 1px solid var(--light-border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        body.dark-mode table {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            background: var(--secondary);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        body.dark-mode td {
+            border-bottom-color: var(--dark-border);
+        }
+
+        tr:hover {
+            background: var(--light-border);
+        }
+
+        body.dark-mode tr:hover {
+            background: var(--dark-border);
+        }
+
+        .site-name {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .site-name:hover {
+            text-decoration: underline;
+        }
+
+        .change-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .change-badge.positive {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .change-badge.negative {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        body.dark-mode .change-badge.positive {
+            background: #1E4620;
+            color: #6ECB63;
+        }
+
+        body.dark-mode .change-badge.negative {
+            background: #4D2D2D;
+            color: #FF6B6B;
+        }
+
+        .anomaly-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .anomaly-card {
+            background: var(--light-card);
+            border-left: 5px solid var(--primary);
+            border-radius: 4px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        body.dark-mode .anomaly-card {
+            background: var(--dark-card);
+        }
+
+        .anomaly-card.critical {
+            border-left-color: var(--danger);
+            background: #FFF5F5;
+        }
+
+        body.dark-mode .anomaly-card.critical {
+            background: #4D2D2D;
+        }
+
+        .anomaly-card.warning {
+            border-left-color: var(--warning);
+            background: #FFFBF0;
+        }
+
+        body.dark-mode .anomaly-card.warning {
+            background: #4D3A1A;
+        }
+
+        .anomaly-card.info {
+            border-left-color: var(--info);
+            background: #F0F9FF;
+        }
+
+        body.dark-mode .anomaly-card.info {
+            background: #1A3A4D;
+        }
+
+        .anomaly-level {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .anomaly-level.critical {
+            background: var(--danger);
+            color: white;
+        }
+
+        .anomaly-level.warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .anomaly-level.info {
+            background: var(--info);
+            color: white;
+        }
+
+        .anomaly-domain {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+
+        body.dark-mode .anomaly-domain {
+            color: #aaa;
+        }
+
+        .recommendations {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .recommendation {
+            background: var(--light-card);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        body.dark-mode .recommendation {
+            background: var(--dark-card);
+        }
+
+        .recommendation.high {
+            border-left-color: var(--danger);
+        }
+
+        .recommendation.medium {
+            border-left-color: var(--warning);
+        }
+
+        .recommendation.low {
+            border-left-color: var(--success);
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .recommendation-desc {
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+            border-top: 1px solid var(--light-border);
+            margin-top: 3rem;
+        }
+
+        body.dark-mode .footer {
+            border-top-color: var(--dark-border);
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Bảng Điều Khiển SEO - Khách Sạn</h1>
+        <p>Giám sát hiệu suất SEO cho 1 website khách sạn</p>
+    </div>
+
+    <div class="cross-links">
+        <a href="index.html">Trang Chính</a>
+        <a href="seo-restaurants-2026-04-06.html">Bảng Điều Khiển Nhà Hàng</a>
+        <button class="toggle-dark" onclick="toggleDarkMode()">🌙 Chế Độ Tối</button>
+    </div>
+
+    <nav class="nav-bar" id="navBar">
+        <div class="nav-item active" onclick="scrollTo('kpi')">KPI</div>
+        <div class="nav-item" onclick="scrollTo('trends')">Xu Hướng</div>
+        <div class="nav-item" onclick="scrollTo('comparison')">So Sánh</div>
+        <div class="nav-item" onclick="scrollTo('keywords')">Từ Khóa</div>
+        <div class="nav-item" onclick="scrollTo('anomalies')">Bất Thường</div>
+        <div class="nav-item" onclick="scrollTo('analysis')">Phân Tích</div>
+        <div class="nav-item" onclick="scrollTo('recommendations')">Khuyến Nghị</div>
+    </nav>
+
+    <div class="container">
+        <!-- KPI Section -->
+        <section id="kpi" class="section">
+            <h2 class="section-title">Chỉ Số Hiệu Suất Chính (KPI)</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Phiên Làm Việc</div>
+                    <div class="kpi-value">{agg['total_sessions']:,}</div>
+                    <div class="kpi-change bad">
+                        {agg['sessions_change']:.1f}%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Người Dùng Hoạt Động</div>
+                    <div class="kpi-value">{agg['total_users']:,}</div>
+                    <div class="kpi-change bad">
+                        {agg['users_change']:.1f}%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lượt Xem Trang</div>
+                    <div class="kpi-value">{agg['total_pageviews']:,}</div>
+                    <div class="kpi-change bad">
+                        {agg['pageviews_change']:.1f}%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lượt Nhấp</div>
+                    <div class="kpi-value">{agg['total_clicks']:,}</div>
+                    <div class="kpi-change good">
+                        {agg['clicks_change']:.1f}%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Lần Hiển Thị</div>
+                    <div class="kpi-value">{agg['total_impressions']:,}</div>
+                    <div class="kpi-change good">
+                        {agg['impressions_change']:.1f}%
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ Lệ Thoát</div>
+                    <div class="kpi-value">{agg['avg_bounce_rate']:.1%}</div>
+                    <div class="kpi-change bad">
+                        {-agg['bounce_rate_change']:.1%}
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ Lệ Tương Tác</div>
+                    <div class="kpi-value">{agg['avg_engagement_rate']:.1%}</div>
+                    <div class="kpi-change bad">
+                        {agg['engagement_rate_change']:.1%}
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Vị Trí Trung Bình</div>
+                    <div class="kpi-value">{agg['avg_position']:.1f}</div>
+                    <div class="kpi-change bad">
+                        {-agg['position_change']:.1f}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters Section -->
+        <section class="section">
+            <div class="filters">
+                <label>Bộ Lọc:</label>
+                <button onclick="toggleAllWebsites()">Chọn Tất Cả</button>
+                <button onclick="uncheckAllWebsites()">Bỏ Chọn Tất Cả</button>
+                <div id="checkboxes" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+            </div>
+        </section>
+
+        <!-- Trends Section -->
+        <section id="trends" class="section">
+            <h2 class="section-title">Xu Hướng 90 Ngày</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Phiên Làm Việc</h3>
+                    <canvas id="sessionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Lượt Nhấp</h3>
+                    <canvas id="clicksChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Lần Hiển Thị</h3>
+                    <canvas id="impressionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Vị Trí Trung Bình</h3>
+                    <canvas id="positionChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Section -->
+        <section id="comparison" class="section">
+            <h2 class="section-title">So Sánh Các Website</h2>
+            <div class="table-responsive">
+                <table id="comparisonTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Website</th>
+                            <th onclick="sortTable(1)">Phiên</th>
+                            <th onclick="sortTable(2)">Người Dùng</th>
+                            <th onclick="sortTable(3)">Lượt Xem</th>
+                            <th onclick="sortTable(4)">Lượt Nhấp</th>
+                            <th onclick="sortTable(5)">Lần Hiển Thị</th>
+                            <th onclick="sortTable(6)">CTR</th>
+                            <th onclick="sortTable(7)">Vị Trí</th>
+                            <th onclick="sortTable(8)">% Thay Đổi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparisonTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Keywords Section -->
+        <section id="keywords" class="section">
+            <h2 class="section-title">Top 20 Từ Khóa</h2>
+            <div class="table-responsive">
+                <table id="keywordsTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Từ Khóa</th>
+                            <th onclick="sortTable(1)">Lượt Nhấp</th>
+                            <th onclick="sortTable(2)">Lần Hiển Thị</th>
+                            <th onclick="sortTable(3)">CTR</th>
+                            <th onclick="sortTable(4)">Vị Trí</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keywordsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Anomalies Section -->
+        <section id="anomalies" class="section">
+            <h2 class="section-title">Phát Hiện Bất Thường</h2>
+            <div class="anomaly-cards" id="anomaliesContainer">
+            </div>
+        </section>
+
+        <!-- Analysis Section -->
+        <section id="analysis" class="section">
+            <h2 class="section-title">Phân Tích Xu Hướng SEO</h2>
+            <div id="trendAnalysis" style="line-height: 1.8; font-size: 1rem;">
+            </div>
+        </section>
+
+        <!-- Recommendations Section -->
+        <section id="recommendations" class="section">
+            <h2 class="section-title">Khuyến Nghị Tối Ưu Hóa</h2>
+            <div class="recommendations" id="recommendationsContainer">
+            </div>
+        </section>
+    </div>
+
+    <div class="footer">
+        <p>Báo Cáo Được Tạo Vào: 2026-04-06 17:10:05</p>
+        <p>© 2026 SEO Monitoring System</p>
+    </div>
+
+    <script>
+        // Data embedded in the page
+        const DATA = {"domains": ["gohotelly.com"], "comparison": [{"domain": "gohotelly.com", "sessions_recent": 28152.0, "users_recent": 25057.0, "pageviews_recent": 32158.0, "clicks_recent": 2800.0, "impressions_recent": 292590.0, "ctr": 0.00967631578947368, "position": 10.107371052631581, "sessions_change": -1.6, "bounce_rate": 0.5615256410256411, "engagement_rate": 0.438474358974359}], "keywords": [{"query": "nau salgados dunas suites", "clicks": 100, "impressions": 1369, "ctr": 0.07304601899196493, "position": 3.3747}, {"query": "ariyana reach hotel", "clicks": 65, "impressions": 2283, "ctr": 0.02847130968024529, "position": 2.855}, {"query": "ariyana reach", "clicks": 58, "impressions": 2208, "ctr": 0.026268115942028984, "position": 2.8936}, {"query": "motel urban", "clicks": 43, "impressions": 1311, "ctr": 0.03279938977879481, "position": 9.4416}, {"query": "ariyana reach hotel maharagama", "clicks": 37, "impressions": 617, "ctr": 0.059967585089141004, "position": 2.4814}, {"query": "hotel luzino", "clicks": 37, "impressions": 1065, "ctr": 0.03474178403755868, "position": 4.6075}, {"query": "the village resort & waterpark", "clicks": 36, "impressions": 666, "ctr": 0.05405405405405406, "position": 6.4324}, {"query": "udayachal tourist lodge", "clicks": 30, "impressions": 929, "ctr": 0.03229278794402583, "position": 3.3617}, {"query": "matara rest house", "clicks": 29, "impressions": 2291, "ctr": 0.012658227848101266, "position": 5.773}, {"query": "precios de motel urban villas & suites", "clicks": 28, "impressions": 572, "ctr": 0.04895104895104895, "position": 7.785}, {"query": "volets resort", "clicks": 27, "impressions": 2784, "ctr": 0.009698275862068966, "position": 5.6616}, {"query": "university of ghana guest centre prices", "clicks": 26, "impressions": 285, "ctr": 0.0912280701754386, "position": 7.2246}, {"query": "salgados dunas suites", "clicks": 25, "impressions": 832, "ctr": 0.030048076923076924, "position": 4.6022}, {"query": "motel urban villas & suites", "clicks": 22, "impressions": 926, "ctr": 0.023758099352051837, "position": 7.9276}, {"query": "mehran lodges", "clicks": 20, "impressions": 586, "ctr": 0.034129692832764506, "position": 2.3191}, {"query": "ranowell hotel", "clicks": 18, "impressions": 2307, "ctr": 0.007802340702210663, "position": 7.8522}, {"query": "h\u00f4tel magic iliade djerba", "clicks": 17, "impressions": 844, "ctr": 0.02014218009478673, "position": 8.3815}, {"query": "mehran lodges murree", "clicks": 17, "impressions": 643, "ctr": 0.026438569206842923, "position": 2.4883}, {"query": "ud\u00edrna jind\u0159ich\u016fv hradec", "clicks": 17, "impressions": 671, "ctr": 0.02533532041728763, "position": 4.6438}, {"query": "tui suneo dunas", "clicks": 16, "impressions": 539, "ctr": 0.029684601113172542, "position": 8.3692}], "anomalies": [], "chart_datasets": {"sessions": {"datasets": [{"label": "gohotelly.com", "data": [726, 730, 634, 716, 753, 741, 891, 816, 688, 795, 988, 914, 790, 786, 786, 746, 978, 897, 682, 738, 648, 705, 590, 602, 676, 762, 720, 704, 554, 614, 725, 842, 782, 817, 673, 636, 571, 581, 601, 572, 643, 639, 577, 789, 660, 567, 590, 619, 651, 666, 596, 654, 633, 621, 626, 692, 629, 672, 661, 756.0, 767.0, 691.0, 736.0, 924.0, 421.0, 794, 751, 741, 816, 999, 997, 1138.0, 791.0, 785.0, 806.0, 934.0, 828.0, 720.0], "borderColor": "#FF6B6B", "backgroundColor": "#FF6B6B20", "borderWidth": 2, "tension": 0.1, "fill": false}], "labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02"]}, "clicks": {"datasets": [{"label": "gohotelly.com", "data": [35, 25, 36, 38, 29, 53, 51, 49, 50, 48, 53, 58, 49, 59, 62, 31, 43, 37, 42, 46, 46, 57, 47, 49, 52, 61, 75, 50, 57, 38, 65, 58, 40, 61, 61, 63, 66, 60, 66, 63, 80, 76, 67, 62, 63, 58, 62, 82, 64, 89, 67, 83, 57, 82, 74, 93, 90, 93, 65, 71.0, 75.0, 82.0, 95.0, 79, 77, 67, 61, 50, 70, 68, 0, 68.0, 72.0, 73.0, 80.0, 83.0, 93.0, 0], "borderColor": "#FF6B6B", "backgroundColor": "#FF6B6B20", "borderWidth": 2, "tension": 0.1, "fill": false}], "labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02"]}, "impressions": {"datasets": [{"label": "gohotelly.com", "data": [4922, 4630, 4939, 4790, 5141, 5704, 5701, 6246, 5836, 6275, 5541, 6225, 6259, 6062, 7601, 5408, 5814, 5181, 5552, 5628, 5521, 5610, 6077, 6309, 5410, 6525, 6229, 6323, 6184, 6211, 6407, 5333, 6473, 5398, 5383, 5674, 6239, 6810, 6028, 6747, 6361, 6374, 6220, 6876, 6049, 6369, 7259, 6599, 7063, 7200, 7126, 8057, 6839, 7323, 8345, 8140, 7737, 8556, 7776, 7189.0, 7174.0, 7587.0, 7772.0, 8083, 8521, 8589, 7815, 8600, 7990, 8345, 0, 9086.0, 9480.0, 9514.0, 8989.0, 9455.0, 9357.0, 0], "borderColor": "#FF6B6B", "backgroundColor": "#FF6B6B20", "borderWidth": 2, "tension": 0.1, "fill": false}], "labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02"]}, "position": {"datasets": [{"label": "gohotelly.com", "data": [8.6233, 8.8438, 9.2162, 9.6267, 9.5466, 9.3166, 9.1033, 9.1916, 9.8358, 8.7681, 9.6878, 9.6699, 9.0663, 8.7735, 7.6481, 9.3404, 9.8806, 10.5233, 11.6349, 9.0858, 9.5532, 9.5861, 9.0464, 8.8117, 8.9688, 9.6417, 8.8289, 9.2692, 9.5228, 8.9205, 8.8982, 9.0842, 10.5373, 9.5302, 9.575, 9.528, 9.6254, 9.7646, 9.8359, 10.6203, 9.5961, 9.505, 9.9195, 9.3694, 9.343, 9.7508, 11.2892, 9.404, 10.5366, 10.0956, 10.2254, 10.1215, 10.2648, 9.9507, 11.4376, 9.7781, 9.6248, 9.6426, 9.7582, 10.1562, 10.048, 10.5045, 10.1414, 10.4078, 10.6205, 10.5455, 10.4631, 10.617, 9.3352, 9.6594, 0, 9.9799, 10.4825, 11.2296, 9.9834, 9.9623, 9.8747, 0], "borderColor": "#FF6B6B", "backgroundColor": "#FF6B6B20", "borderWidth": 2, "tension": 0.1, "fill": false}], "labels": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02"]}}, "dates": ["2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02"]};
+
+        let charts = {};
+        let currentSort = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCheckboxes();
+            populateComparisonTable();
+            populateKeywordsTable();
+            populateAnomalies();
+            generateTrendAnalysis();
+            generateRecommendations();
+            initializeCharts();
+
+            // Restore dark mode preference
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+
+            // Setup IntersectionObserver for nav highlighting
+            setupNavObserver();
+        });
+
+        function initializeCheckboxes() {
+            const container = document.getElementById('checkboxes');
+            DATA.domains.forEach(domain => {
+                const label = document.createElement('label');
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.value = domain;
+                input.checked = true;
+                input.onchange = updateCharts;
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(domain));
+                container.appendChild(label);
+            });
+        }
+
+        function toggleAllWebsites() {
+            document.querySelectorAll('#checkboxes input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+            });
+            updateCharts();
+        }
+
+        function uncheckAllWebsites() {
+            document.querySelectorAll('#checkboxes input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            updateCharts();
+        }
+
+        function getSelectedDomains() {
+            return Array.from(document.querySelectorAll('#checkboxes input[type="checkbox"]:checked')).map(cb => cb.value);
+        }
+
+        function populateComparisonTable() {
+            const tbody = document.getElementById('comparisonTableBody');
+            tbody.innerHTML = '';
+
+            DATA.comparison.forEach(row => {
+                const tr = document.createElement('tr');
+                const changeClass = row.sessions_change >= 0 ? 'positive' : 'negative';
+                tr.innerHTML = `
+                    <td>{domainLink(row.domain)}</td>
+                    <td>{row.sessions_recent.toLocaleString()}</td>
+                    <td>{row.users_recent.toLocaleString()}</td>
+                    <td>{row.pageviews_recent.toLocaleString()}</td>
+                    <td>{row.clicks_recent.toLocaleString()}</td>
+                    <td>{row.impressions_recent.toLocaleString()}</td>
+                    <td>{(row.ctr * 100).toFixed(2)}%</td>
+                    <td>{row.position.toFixed(1)}</td>
+                    <td><span class="change-badge {changeClass}">{row.sessions_change.toFixed(1)}%</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function populateKeywordsTable() {
+            const tbody = document.getElementById('keywordsTableBody');
+            tbody.innerHTML = '';
+
+            DATA.keywords.forEach(kw => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>{kw.query}</td>
+                    <td>{kw.clicks.toLocaleString()}</td>
+                    <td>{kw.impressions.toLocaleString()}</td>
+                    <td>{(kw.ctr * 100).toFixed(2)}%</td>
+                    <td>{kw.position.toFixed(1)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function populateAnomalies() {
+            const container = document.getElementById('anomaliesContainer');
+            container.innerHTML = '';
+
+            if (DATA.anomalies.length === 0) {
+                container.innerHTML = '<p>Không có bất thường nào được phát hiện.</p>';
+                return;
+            }
+
+            DATA.anomalies.forEach(anom => {
+                const div = document.createElement('div');
+                div.className = `anomaly-card {anom.level}`;
+                div.innerHTML = `
+                    <div class="anomaly-level {anom.level}">{anom.level.toUpperCase()}</div>
+                    <div><strong>{anom.desc}</strong></div>
+                    <div class="anomaly-domain">{anom.domain} - {anom.date}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function generateTrendAnalysis() {
+            const container = document.getElementById('trendAnalysis');
+            container.innerHTML = `
+                <p><strong>Thời Kỳ Báo Cáo:</strong> 90 ngày gần nhất</p>
+                <p><strong>Tóm Tắt:</strong> Hệ thống đang theo dõi {DATA.domains.length} website.
+                Tổng cộng {DATA.comparison.reduce((s, r) => s + r.sessions_recent, 0).toLocaleString()} phiên làm việc
+                được ghi nhận với {DATA.comparison.reduce((s, r) => s + r.clicks_recent, 0).toLocaleString()} lượt nhấp từ kết quả tìm kiếm.</p>
+                <p><strong>Insights:</strong> Xem chi tiết từng website bằng cách nhấp vào tên domain để phân tích sâu hơn.</p>
+            `;
+        }
+
+        function generateRecommendations() {
+            const container = document.getElementById('recommendationsContainer');
+            const recs = [
+                {priority: 'High', title: 'Tối Ưu Hóa Từ Khóa', desc: 'Tập trung vào các từ khóa có CTR thấp nhưng impressions cao'},
+                {priority: 'High', title: 'Cải Thiện Vị Trí', desc: 'Nhắm mục tiêu cải thiện xếp hạng cho các từ khóa hàng đầu'},
+                {priority: 'Medium', title: 'Tăng Tương Tác', desc: 'Thiết kế lại các trang có tỷ lệ thoát cao'},
+                {priority: 'Medium', title: 'Theo Dõi Bất Thường', desc: 'Điều tra các spike hoặc dip bất ngờ trong hiệu suất'},
+                {priority: 'Low', title: 'Nội Dung Mới', desc: 'Phát triển nội dung cho các chủ đề trending'},
+            ];
+
+            container.innerHTML = '';
+            recs.forEach(rec => {
+                const div = document.createElement('div');
+                div.className = `recommendation {rec.priority.toLowerCase()}`;
+                div.innerHTML = `
+                    <div class="recommendation-title">{rec.title}</div>
+                    <div class="recommendation-desc">{rec.desc}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function domainLink(domain) {
+            return `<a class="site-name" href="seo-detail-${domain}-2026-04-06.html" title="Xem chi tiết ${domain}">${domain}</a>`;
+        }
+
+        function initializeCharts() {
+            const selectedDomains = getSelectedDomains();
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B', '#A2D5C6', '#D7BDE2', '#F1948A'];
+
+            // Sessions Chart
+            if (charts.sessions) charts.sessions.destroy();
+            const sessionsCtx = document.getElementById('sessionsChart').getContext('2d');
+            const sessionsDatasets = DATA.chart_datasets.sessions.datasets.filter(d => selectedDomains.includes(d.label));
+            charts.sessions = new Chart(sessionsCtx, {
+                type: 'line',
+                data: {
+                    labels: DATA.chart_datasets.sessions.labels,
+                    datasets: sessionsDatasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {color: document.body.classList.contains('dark-mode') ? '#fff' : '#000'}
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {color: document.body.classList.contains('dark-mode') ? '#aaa' : '#666'},
+                            grid: {color: document.body.classList.contains('dark-mode') ? '#333' : '#eee'}
+                        },
+                        x: {
+                            ticks: {color: document.body.classList.contains('dark-mode') ? '#aaa' : '#666'},
+                            grid: {color: document.body.classList.contains('dark-mode') ? '#333' : '#eee'}
+                        }
+                    }
+                }
+            });
+
+            // Clicks Chart
+            if (charts.clicks) charts.clicks.destroy();
+            const clicksCtx = document.getElementById('clicksChart').getContext('2d');
+            const clicksDatasets = DATA.chart_datasets.clicks.datasets.filter(d => selectedDomains.includes(d.label));
+            charts.clicks = new Chart(clicksCtx, {
+                type: 'line',
+                data: {
+                    labels: DATA.chart_datasets.clicks.labels,
+                    datasets: clicksDatasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {color: document.body.classList.contains('dark-mode') ? '#fff' : '#000'}
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {color: document.body.classList.contains('dark-mode') ? '#aaa' : '#666'},
+                            grid: {color: document.body.classList.contains('dark-mode') ? '#333' : '#eee'}
+                        },
+                        x: {
+                            ticks: {color: document.body.classList.contains('dark-mode') ? '#aaa' : '#666'},
+                            grid: {color: document.body.classList.contains('dark-mode') ? '#333' : '#eee'}
+                        }
+                    }
+                }
+            });
+
+            // Impressions Chart
+            if (charts.impressions) charts.impressions.destroy();
+            const impressionsCtx = document.getElementById('impressionsChart').getContext('2d');
+            const impressionsDatasets = DATA.chart_datasets.impressions.datasets.filter(d => selectedDomains.includes(d.label));
+            charts.impressions = new Chart(impressionsCtx, {
+                type: 'line',
+                data: {
+                    labels: DATA.chart_datasets.impressions.labels,
+                    datasets: impressionsDatasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {color: document.body.classList.contains('dark-mode') ? '#fff' : '#000'}
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {color: document.body.classList.contains('dark-mode') ? '#aaa' : '#666'},
+                            grid: {color: document.body.classList.contains('dark-mode') ? '#333' : '#eee'}
+                        },
+                        x: {
+                            ticks: {color: document.body.classList.contains('dark-mode') ? '#aaa' : '#666'},
+                            grid: {color: document.body.classList.contains('dark-mode') ? '#333' : '#eee'}
+                        }
+                    }
+                }
+            });
+
+            // Position Chart (reversed)
+            if (charts.position) charts.position.destroy();
+            const positionCtx = document.getElementById('positionChart').getContext('2d');
+            const positionDatasets = DATA.chart_datasets.position.datasets.filter(d => selectedDomains.includes(d.label));
+            charts.position = new Chart(positionCtx, {
+                type: 'line',
+                data: {
+                    labels: DATA.chart_datasets.position.labels,
+                    datasets: positionDatasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {color: document.body.classList.contains('dark-mode') ? '#fff' : '#000'}
+                        }
+                    },
+                    scales: {
+                        y: {
+                            reverse: true,
+                            ticks: {color: document.body.classList.contains('dark-mode') ? '#aaa' : '#666'},
+                            grid: {color: document.body.classList.contains('dark-mode') ? '#333' : '#eee'}
+                        },
+                        x: {
+                            ticks: {color: document.body.classList.contains('dark-mode') ? '#aaa' : '#666'},
+                            grid: {color: document.body.classList.contains('dark-mode') ? '#333' : '#eee'}
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            initializeCharts();
+        }
+
+        function sortTable(column) {
+            const tables = ['comparisonTable', 'keywordsTable'];
+
+            tables.forEach(tableId => {
+                const table = document.getElementById(tableId);
+                if (!table) return;
+
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                const isAscending = currentSort[tableId] !== column || !currentSort[tableId + 'Asc'];
+
+                rows.sort((a, b) => {
+                    const aVal = a.children[column].textContent.trim();
+                    const bVal = b.children[column].textContent.trim();
+
+                    const aNum = parseFloat(aVal.replace(/[^0-9.-]/g, ''));
+                    const bNum = parseFloat(bVal.replace(/[^0-9.-]/g, ''));
+
+                    if (!isNaN(aNum) && !isNaN(bNum)) {
+                        return isAscending ? aNum - bNum : bNum - aNum;
+                    }
+
+                    return isAscending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                });
+
+                rows.forEach(row => tbody.appendChild(row));
+                currentSort[tableId] = column;
+                currentSort[tableId + 'Asc'] = isAscending;
+            });
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            initializeCharts();
+        }
+
+        function scrollTo(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({behavior: 'smooth'});
+            }
+        }
+
+        function setupNavObserver() {
+            const sections = document.querySelectorAll('.section');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navItems.forEach(item => item.classList.remove('active'));
+                        const activeItem = Array.from(navItems).find(item => item.textContent.toLowerCase().includes(entry.target.id.toLowerCase()));
+                        if (activeItem) activeItem.classList.add('active');
+                    }
+                });
+            }, {threshold: 0.5});
+
+            sections.forEach(section => observer.observe(section));
+        }
+    </script>
+</body>
+</html>
