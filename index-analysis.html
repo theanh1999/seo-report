@@ -819,48 +819,47 @@
                 domains.forEach(domain => {
                     const canvasId = sanitizeId(domain) + '-' + group;
                     const canvas = document.getElementById(canvasId);
-                    if (!canvas || canvas.offsetParent === null) return; // Skip if not visible
+                    if (!canvas || canvas.offsetParent === null) return;
                     const values = filteredData.map(d => d[group][domain] || 0);
                     const ma7 = calculateMovingAverage(values, 7);
                     const dates = filteredData.map((_, i) => i);
 
                     if (charts[canvasId]) { charts[canvasId].destroy(); delete charts[canvasId]; }
                     charts[canvasId] = new Chart(canvas, {
-                            type: 'line',
-                            data: {
-                                labels: dates,
-                                datasets: [
-                                    {
-                                        label: 'Daily',
-                                        data: values,
-                                        borderColor: DOMAIN_PALETTE[SITE_GROUPS[group].indexOf(domain) % DOMAIN_PALETTE.length],
-                                        pointRadius: 0,
-                                        borderWidth: 1,
-                                        tension: 0.3
-                                    },
-                                    {
-                                        label: '7-day MA',
-                                        data: ma7,
-                                        borderColor: '#94a3b8',
-                                        borderDash: [5, 5],
-                                        pointRadius: 0,
-                                        borderWidth: 1,
-                                        tension: 0.3
-                                    }
-                                ]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: { legend: { display: false } },
-                                scales: {
-                                    y: { display: false, beginAtZero: true },
-                                    x: { display: false }
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: 'Daily',
+                                    data: values,
+                                    borderColor: DOMAIN_PALETTE[SITE_GROUPS[group].indexOf(domain) % DOMAIN_PALETTE.length],
+                                    pointRadius: 0,
+                                    borderWidth: 1,
+                                    tension: 0.3
                                 },
-                                animation: false
-                            }
-                        });
-                    }
+                                {
+                                    label: '7-day MA',
+                                    data: ma7,
+                                    borderColor: '#94a3b8',
+                                    borderDash: [5, 5],
+                                    pointRadius: 0,
+                                    borderWidth: 1,
+                                    tension: 0.3
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { display: false, beginAtZero: true },
+                                x: { display: false }
+                            },
+                            animation: false
+                        }
+                    });
                 });
             }, 50);
         }
