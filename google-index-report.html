@@ -1,367 +1,1921 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Google Index Report - 2026-04-10</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f172a;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:20px}
-.container{max-width:1200px;margin:0 auto}
-h1{text-align:center;margin-bottom:8px;font-size:28px}
-.subtitle{text-align:center;color:#94a3b8;margin-bottom:24px}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:32px}
-.kpi{background:#1e293b;border-radius:12px;padding:20px;text-align:center}
-.kpi-value{font-size:28px;font-weight:700;margin:8px 0}
-.kpi-label{color:#94a3b8;font-size:14px}
-.section{background:#1e293b;border-radius:12px;padding:24px;margin-bottom:24px}
-.section h2{margin-bottom:16px;font-size:20px}
-.chart-container{height:360px;position:relative}
-a{color:#3b82f6}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Index Report</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f172a;
+            color: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(148, 163, 184, 0.1);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .header-date {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-left: 20px;
+            padding: 8px 16px;
+            background: #1e293b;
+            color: #22c55e;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+            border: 1px solid #22c55e;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #22c55e;
+            color: #0f172a;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: #1e293b;
+            padding: 24px;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            border-color: rgba(148, 163, 184, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .kpi-label {
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .kpi-change {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .kpi-nha-hang { color: #22c55e; }
+        .kpi-hotel { color: #a855f7; }
+        .kpi-doi-thu { color: #ef4444; }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .chart-container {
+            background: #1e293b;
+            padding: 24px;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .group-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+            gap: 24px;
+        }
+
+        .group-section {
+            background: #1e293b;
+            padding: 24px;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .group-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .domain-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+            gap: 16px;
+        }
+
+        .domain-row:last-child {
+            border-bottom: none;
+        }
+
+        .domain-name {
+            flex: 0 0 200px;
+            font-size: 14px;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .domain-bar-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .domain-bar {
+            height: 24px;
+            border-radius: 4px;
+            background: rgba(148, 163, 184, 0.1);
+            position: relative;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .domain-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .group-nha-hang .domain-bar-fill { background: #22c55e; }
+        .group-hotel .domain-bar-fill { background: #a855f7; }
+        .group-doi-thu .domain-bar-fill { background: #ef4444; }
+
+        .domain-value {
+            flex: 0 0 120px;
+            text-align: right;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .domain-name {
+                flex: 0 0 140px;
+                font-size: 12px;
+            }
+
+            .domain-value {
+                flex: 0 0 100px;
+                font-size: 12px;
+            }
+
+            .kpi-value {
+                font-size: 24px;
+            }
+
+            .chart-wrapper {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .kpi-card {
+                padding: 16px;
+            }
+
+            .domain-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .domain-bar-container {
+                width: 100%;
+            }
+
+            .domain-value {
+                width: 100%;
+                text-align: left;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-<h1>📊 Google Index Report</h1>
-<p class="subtitle">2026-04-10 | <a href="index-analysis.html">Phân tích chi tiết →</a></p>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div>
+                <h1>GOOGLE INDEX REPORT</h1>
+                <div class="header-date">Generated: 2026-04-10</div>
+            </div>
+            <a href="index-analysis.html" class="nav-link">Detailed Analysis →</a>
+        </header>
 
-<div class="kpi-grid">
-    <div class="kpi">
-        <div class="kpi-label">🍽️ Nhà hàng (13 sites)</div>
-        <div class="kpi-value" style="color:#22c55e">1,396,585</div>
-        <span style="color:#22c55e;font-size:14px">↑ 1.5%</span>
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Index</div>
+                <div class="kpi-value" id="kpiTotal">0</div>
+                <div class="kpi-change" id="kpiTotalChange">-</div>
+            </div>
+            <div class="kpi-card kpi-nha-hang">
+                <div class="kpi-label">Nha Hang Total</div>
+                <div class="kpi-value" id="kpiNhaHang">0</div>
+                <div class="kpi-change" id="kpiNhaHangChange">-</div>
+            </div>
+            <div class="kpi-card kpi-hotel">
+                <div class="kpi-label">Hotel Total</div>
+                <div class="kpi-value" id="kpiHotel">0</div>
+                <div class="kpi-change" id="kpiHotelChange">-</div>
+            </div>
+            <div class="kpi-card kpi-doi-thu">
+                <div class="kpi-label">Doi Thu Total</div>
+                <div class="kpi-value" id="kpiDoiThu">0</div>
+                <div class="kpi-change" id="kpiDoiThuChange">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Ratio (Nha Hang + Hotel) / Doi Thu</div>
+                <div class="kpi-value" id="kpiRatio">0%</div>
+                <div class="kpi-change" id="kpiRatioChange">-</div>
+            </div>
+        </div>
+
+        <!-- Trend Chart -->
+        <div class="section">
+            <div class="section-title">Overview Trend (Last 30 Days)</div>
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Group Rankings -->
+        <div class="section">
+            <div class="section-title">Domain Rankings by Group</div>
+            <div class="group-grid">
+                <div class="group-section group-nha-hang">
+                    <div class="group-title" style="color: #22c55e;">Nha Hang Domains</div>
+                    <div id="nhahangRanking"></div>
+                </div>
+                <div class="group-section group-hotel">
+                    <div class="group-title" style="color: #a855f7;">Hotel Domains</div>
+                    <div id="hotelRanking"></div>
+                </div>
+                <div class="group-section group-doi-thu">
+                    <div class="group-title" style="color: #ef4444;">Doi Thu Domains (Top 15)</div>
+                    <div id="doithuRanking"></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="kpi">
-        <div class="kpi-label">🏨 Hotel (1 sites)</div>
-        <div class="kpi-value" style="color:#a855f7">3,220</div>
-        <span style="color:#22c55e;font-size:14px">↑ 30.9%</span>
-    </div>
-    <div class="kpi">
-        <div class="kpi-label">📊 Tổng của bạn</div>
-        <div class="kpi-value" style="color:#3b82f6">1,399,805</div>
-        <span style="color:#22c55e;font-size:14px">↑ 1.5%</span>
-    </div>
-    <div class="kpi">
-        <div class="kpi-label">🔴 Đối thủ (13 sites)</div>
-        <div class="kpi-value" style="color:#ef4444">11,308,070</div>
-        <span style="color:#22c55e;font-size:14px">↑ 2.2%</span>
-    </div>
-    <div class="kpi">
-        <div class="kpi-label">⚡ Tỉ lệ vs Đối thủ</div>
-        <div class="kpi-value">12.4%</div>
-    </div>
-</div>
 
-<div class="section">
-    <h2>📈 Xu hướng tổng quan (30 ngày)</h2>
-    <div class="chart-container"><canvas id="trendChart"></canvas></div>
-</div>
-
-<div class="section">
-    <h2>🍽️ Nhà hàng - Bảng xếp hạng</h2>
-    <table style="width:100%;border-collapse:collapse;color:#f1f5f9">
-            <thead><tr style="border-bottom:2px solid #475569">
-                <th style="padding:8px 12px;text-align:left">#</th>
-                <th style="padding:8px 12px;text-align:left">Domain</th>
-                <th style="padding:8px 12px;text-align:right">Pages</th>
-                <th style="padding:8px 12px;text-align:left">Bar</th>
-            </tr></thead>
-            <tbody><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">1</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">menu-world.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">324,000 <span style="color:#ef4444;font-size:12px">↓0.9%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:100.0%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">2</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">res-menu.net</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">303,000 <span style="color:#22c55e;font-size:12px">↑1.7%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:93.51851851851852%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">3</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">goto-where.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">278,000 <span style="color:#22c55e;font-size:12px">↑0.4%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:85.80246913580247%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">4</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">restaurants-world.net</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">180,000 <span style="color:#22c55e;font-size:12px">↑1.1%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:55.55555555555556%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">5</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">menufyy.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">158,000 <span style="color:#22c55e;font-size:12px">↑7.5%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:48.76543209876543%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">6</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">menustic.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">47,400 <span style="color:#22c55e;font-size:12px">↑3.3%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:14.629629629629628%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">7</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">placejoys.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">34,100 <span style="color:#22c55e;font-size:12px">↑4.3%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:10.524691358024691%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">8</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">wherevi.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">26,500 <span style="color:#22c55e;font-size:12px">↑2.3%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:8.179012345679013%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">9</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">grubbio.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">23,600 <span style="color:#22c55e;font-size:12px">↑1.3%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:7.28395061728395%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">10</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">localoria.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">18,500 <span style="color:#22c55e;font-size:12px">↑1.6%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:5.709876543209877%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">11</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">foodplacee.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">2,040 <span style="color:#22c55e;font-size:12px">↑9.7%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:0.6296296296296297%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">12</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">wherebly.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">831 <span style="color:#ef4444;font-size:12px">↓27.7%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:0.2564814814814815%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">13</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">locallya.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">614 <span style="color:#22c55e;font-size:12px">↑7.2%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#22c55e;height:100%;width:0.18950617283950616%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr></tbody>
-        </table>
-</div>
-
-<div class="section">
-    <h2>🏨 Hotel</h2>
-    <table style="width:100%;border-collapse:collapse;color:#f1f5f9">
-            <thead><tr style="border-bottom:2px solid #475569">
-                <th style="padding:8px 12px;text-align:left">#</th>
-                <th style="padding:8px 12px;text-align:left">Domain</th>
-                <th style="padding:8px 12px;text-align:right">Pages</th>
-                <th style="padding:8px 12px;text-align:left">Bar</th>
-            </tr></thead>
-            <tbody><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">1</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">gohotelly.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">3,220 <span style="color:#22c55e;font-size:12px">↑30.9%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#a855f7;height:100%;width:100.0%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr></tbody>
-        </table>
-</div>
-
-<div class="section">
-    <h2>🔴 Đối thủ - Bảng xếp hạng</h2>
-    <table style="width:100%;border-collapse:collapse;color:#f1f5f9">
-            <thead><tr style="border-bottom:2px solid #475569">
-                <th style="padding:8px 12px;text-align:left">#</th>
-                <th style="padding:8px 12px;text-align:left">Domain</th>
-                <th style="padding:8px 12px;text-align:right">Pages</th>
-                <th style="padding:8px 12px;text-align:left">Bar</th>
-            </tr></thead>
-            <tbody><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">1</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">wanderlog.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">5,480,000 <span style="color:#22c55e;font-size:12px">↑0.2%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:100.0%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">2</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">wheree.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">4,680,000 <span style="color:#ef4444;font-size:12px">↓3.7%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:85.40145985401459%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">3</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">www.wheree.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">639,000 </td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:11.66058394160584%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">4</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">com-hotel.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">126,000 <span style="color:#22c55e;font-size:12px">↑3.3%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:2.2992700729927007%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">5</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">com-place.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">118,000 <span style="color:#ef4444;font-size:12px">↓3.3%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:2.153284671532847%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">6</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">goto-restaurants.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">83,600 <span style="color:#22c55e;font-size:12px">↑1.0%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:1.5255474452554745%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">7</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">menu-res.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">68,800 <span style="color:#ef4444;font-size:12px">↓1.6%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:1.2554744525547445%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">8</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">restaurants-info.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">47,900 <span style="color:#ef4444;font-size:12px">↓0.8%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:0.8740875912408759%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">9</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">hey-restaurants.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">28,400 <span style="color:#ef4444;font-size:12px">↓5.3%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:0.5182481751824818%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">10</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">gotoeat.net</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">20,500 <span style="color:#22c55e;font-size:12px">↑1.5%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:0.3740875912408759%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">11</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">com-fnb.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">15,000 <span style="color:#ef4444;font-size:12px">↓15.7%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:0.2737226277372263%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">12</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">restaurantmenu.us.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">845 <span style="color:#ef4444;font-size:12px">↓12.1%</span></td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:0.015419708029197081%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr><tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">13</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155">com-cuisine.com</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">25 </td>
-                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
-                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
-                        <div style="background:#ef4444;height:100%;width:0.00045620437956204383%;border-radius:4px;transition:width 0.5s"></div>
-                    </div>
-                </td>
-            </tr></tbody>
-        </table>
-</div>
-
-</div>
-
-<script>
-var ctx = document.getElementById('trendChart').getContext('2d');
-new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ["08/03", "10/03", "11/03", "12/03", "14/03", "15/03", "17/03", "18/03", "19/03", "20/03", "21/03", "22/03", "23/03", "24/03", "25/03", "26/03", "28/03", "29/03", "30/03", "31/03", "01/04", "02/04", "03/04", "04/04", "05/04", "06/04", "07/04", "08/04", "09/04", "10/04"],
-        datasets: [
-            {label:'Nhà hàng', data:[1151002, 1157108, 1167403, 1175308, 1185500, 1194187, 1211871, 1211918, 1225193, 1226708, 1230613, 1239029, 1238583, 1241443, 1239763, 1258276, 1274706, 1279362, 1284859, 1298430, 1313415, 1328278, 1333201, 1338516, 1352412, 1356067, 1354774, 1373081, 1376583, 1396585], borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,0.1)', fill:true, tension:0.3, pointRadius:0},
-            {label:'Hotel', data:[1750, 1880, 2070, 1770, 1790, 1960, 2000, 1920, 1830, 2230, 2000, 1870, 1870, 2270, 1890, 1950, 2020, 2130, 2110, 2150, 2340, 2270, 2280, 2730, 2500, 2310, 2310, 2330, 2460, 3220], borderColor:'#a855f7', backgroundColor:'rgba(168,85,247,0.1)', fill:true, tension:0.3, pointRadius:0},
-            {label:'Đối thủ', data:[8602785, 8350540, 13792851, 13776068, 13667808, 13547758, 13481658, 13566659, 13618261, 13636808, 13677720, 13571990, 13575062, 13437500, 13305162, 13232880, 13267402, 13342760, 13393905, 13507008, 13530284, 13495050, 13504595, 13508110, 13119922, 11244890, 11523918, 11375753, 11066249, 11308070], borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,0.1)', fill:true, tension:0.3, pointRadius:0}
-        ]
+    <script>
+        // Embedded data
+        const EMBEDDED_DATA = [
+  {
+    "date": "2026-01-02",
+    "nha_hang": {
+      "goto-where.com": 213000,
+      "menu-world.com": 304000,
+      "grubbio.com": 8990,
+      "menustic.com": 15700,
+      "menufyy.com": 15300,
+      "res-menu.net": 81300,
+      "restaurants-world.net": 65200,
+      "wherevi.com": 25,
+      "localoria.com": 25,
+      "placejoys.com": 25,
+      "wherebly.com": 1
     },
-    options: {
-        responsive:true, maintainAspectRatio:false, animation:false,
-        plugins:{legend:{labels:{color:'#f1f5f9'}}},
-        scales:{
-            x:{ticks:{color:'#94a3b8',maxRotation:45},grid:{color:'rgba(148,163,184,0.1)'}},
-            y:{ticks:{color:'#94a3b8',callback:function(v){return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v}},grid:{color:'rgba(148,163,184,0.1)'}}
-        }
+    "hotel": {
+      "gohotelly.com": 345
+    },
+    "doi_thu": {
+      "wheree.com": 6230000,
+      "com-fnb.com": 91400,
+      "com-place.com": 118000,
+      "goto-restaurants.com": 50400,
+      "wanderlog.com": 7020000,
+      "menu-res.com": 38300,
+      "restaurantmenu.us.com": 653,
+      "gotoeat.net": 4130,
+      "restaurants-info.com": 24800,
+      "hey-restaurants.com": 14600
+    },
+    "totals": {
+      "nha_hang": 703566,
+      "hotel": 345,
+      "doi_thu": 13592283
     }
-});
-</script>
-</body></html>
+  },
+  {
+    "date": "2026-01-07",
+    "nha_hang": {
+      "goto-where.com": 218000,
+      "menu-world.com": 304000,
+      "grubbio.com": 9600,
+      "menustic.com": 17800,
+      "menufyy.com": 16300,
+      "res-menu.net": 90600,
+      "restaurants-world.net": 79300,
+      "wherevi.com": 1600,
+      "localoria.com": 38,
+      "placejoys.com": 57,
+      "wherebly.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 231
+    },
+    "doi_thu": {
+      "wheree.com": 6280000,
+      "com-fnb.com": 94500,
+      "goto-restaurants.com": 56200,
+      "menu-res.com": 40600,
+      "restaurantmenu.us.com": 767,
+      "gotoeat.net": 3770,
+      "restaurants-info.com": 25800,
+      "hey-restaurants.com": 14500
+    },
+    "totals": {
+      "nha_hang": 737296,
+      "hotel": 231,
+      "doi_thu": 6516137
+    }
+  },
+  {
+    "date": "2026-03-04",
+    "nha_hang": {
+      "goto-where.com": 262000,
+      "menu-world.com": 319000,
+      "grubbio.com": 21700,
+      "menustic.com": 33200,
+      "menufyy.com": 63400,
+      "res-menu.net": 226000,
+      "restaurants-world.net": 132000,
+      "wherevi.com": 13400,
+      "localoria.com": 2420,
+      "placejoys.com": 19800,
+      "wherebly.com": 54,
+      "foodplacee.com": 115,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1690
+    },
+    "doi_thu": {
+      "wheree.com": 7610000,
+      "com-place.com": 109000,
+      "menu-res.com": 62200,
+      "restaurantmenu.us.com": 721,
+      "com-hotel.com": 130000,
+      "gotoeat.net": 13000,
+      "restaurants-info.com": 40300,
+      "hey-restaurants.com": 24000
+    },
+    "totals": {
+      "nha_hang": 1093090,
+      "hotel": 1690,
+      "doi_thu": 7989221
+    }
+  },
+  {
+    "date": "2026-03-05",
+    "nha_hang": {
+      "goto-where.com": 264000,
+      "menu-world.com": 319000,
+      "grubbio.com": 22500,
+      "menustic.com": 33400,
+      "menufyy.com": 66400,
+      "res-menu.net": 239000,
+      "restaurants-world.net": 132000,
+      "wherevi.com": 12600,
+      "localoria.com": 1950,
+      "placejoys.com": 20700,
+      "wherebly.com": 79,
+      "foodplacee.com": 25,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1690
+    },
+    "doi_thu": {
+      "wheree.com": 7820000,
+      "com-place.com": 111000,
+      "menu-res.com": 62000,
+      "restaurantmenu.us.com": 923,
+      "com-hotel.com": 132000,
+      "gotoeat.net": 13900,
+      "restaurants-info.com": 42000,
+      "hey-restaurants.com": 25500
+    },
+    "totals": {
+      "nha_hang": 1111655,
+      "hotel": 1690,
+      "doi_thu": 8207323
+    }
+  },
+  {
+    "date": "2026-03-06",
+    "nha_hang": {
+      "goto-where.com": 265000,
+      "menu-world.com": 319000,
+      "grubbio.com": 21700,
+      "menustic.com": 34400,
+      "menufyy.com": 67200,
+      "res-menu.net": 241000,
+      "restaurants-world.net": 133000,
+      "wherevi.com": 12200,
+      "localoria.com": 1820,
+      "placejoys.com": 21300,
+      "wherebly.com": 84,
+      "foodplacee.com": 26,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 2040
+    },
+    "doi_thu": {
+      "wheree.com": 7830000,
+      "com-place.com": 115000,
+      "menu-res.com": 62200,
+      "restaurantmenu.us.com": 884,
+      "com-hotel.com": 129000,
+      "gotoeat.net": 12800,
+      "restaurants-info.com": 40500,
+      "hey-restaurants.com": 24700
+    },
+    "totals": {
+      "nha_hang": 1116731,
+      "hotel": 2040,
+      "doi_thu": 8215084
+    }
+  },
+  {
+    "date": "2026-03-08",
+    "nha_hang": {
+      "goto-where.com": 264000,
+      "menu-world.com": 319000,
+      "grubbio.com": 22200,
+      "menustic.com": 35600,
+      "menufyy.com": 71800,
+      "res-menu.net": 260000,
+      "restaurants-world.net": 135000,
+      "wherevi.com": 12500,
+      "localoria.com": 1910,
+      "placejoys.com": 28800,
+      "wherebly.com": 115,
+      "foodplacee.com": 76,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1750
+    },
+    "doi_thu": {
+      "wheree.com": 8220000,
+      "com-place.com": 110000,
+      "menu-res.com": 63600,
+      "restaurantmenu.us.com": 785,
+      "com-hotel.com": 128000,
+      "gotoeat.net": 13600,
+      "restaurants-info.com": 41400,
+      "hey-restaurants.com": 25400
+    },
+    "totals": {
+      "nha_hang": 1151002,
+      "hotel": 1750,
+      "doi_thu": 8602785
+    }
+  },
+  {
+    "date": "2026-03-10",
+    "nha_hang": {
+      "goto-where.com": 265000,
+      "menu-world.com": 319000,
+      "grubbio.com": 23400,
+      "menustic.com": 35700,
+      "menufyy.com": 74700,
+      "res-menu.net": 262000,
+      "restaurants-world.net": 134000,
+      "wherevi.com": 12300,
+      "localoria.com": 1820,
+      "placejoys.com": 29000,
+      "wherebly.com": 111,
+      "foodplacee.com": 76,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1880
+    },
+    "doi_thu": {
+      "wheree.com": 7970000,
+      "com-place.com": 110000,
+      "menu-res.com": 62100,
+      "restaurantmenu.us.com": 1040,
+      "com-hotel.com": 125000,
+      "gotoeat.net": 14000,
+      "restaurants-info.com": 40900,
+      "hey-restaurants.com": 27500
+    },
+    "totals": {
+      "nha_hang": 1157108,
+      "hotel": 1880,
+      "doi_thu": 8350540
+    }
+  },
+  {
+    "date": "2026-03-11",
+    "nha_hang": {
+      "goto-where.com": 266000,
+      "menu-world.com": 319000,
+      "grubbio.com": 22500,
+      "menustic.com": 35700,
+      "menufyy.com": 74100,
+      "res-menu.net": 272000,
+      "restaurants-world.net": 135000,
+      "wherevi.com": 11500,
+      "localoria.com": 1910,
+      "placejoys.com": 29500,
+      "wherebly.com": 116,
+      "foodplacee.com": 76,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 2070
+    },
+    "doi_thu": {
+      "wheree.com": 7640000,
+      "com-place.com": 111000,
+      "goto-restaurants.com": 73500,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 63100,
+      "restaurantmenu.us.com": 751,
+      "com-hotel.com": 124000,
+      "gotoeat.net": 13700,
+      "restaurants-info.com": 41100,
+      "hey-restaurants.com": 25700
+    },
+    "totals": {
+      "nha_hang": 1167403,
+      "hotel": 2070,
+      "doi_thu": 13792851
+    }
+  },
+  {
+    "date": "2026-03-12",
+    "nha_hang": {
+      "goto-where.com": 265000,
+      "menu-world.com": 320000,
+      "grubbio.com": 23100,
+      "menustic.com": 35100,
+      "menufyy.com": 76200,
+      "res-menu.net": 276000,
+      "restaurants-world.net": 135000,
+      "wherevi.com": 11300,
+      "localoria.com": 2750,
+      "placejoys.com": 30700,
+      "wherebly.com": 119,
+      "foodplacee.com": 38,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1770
+    },
+    "doi_thu": {
+      "wheree.com": 7580000,
+      "com-place.com": 111000,
+      "goto-restaurants.com": 73100,
+      "wanderlog.com": 5740000,
+      "menu-res.com": 63500,
+      "restaurantmenu.us.com": 768,
+      "com-hotel.com": 126000,
+      "gotoeat.net": 14500,
+      "restaurants-info.com": 41400,
+      "hey-restaurants.com": 25800
+    },
+    "totals": {
+      "nha_hang": 1175308,
+      "hotel": 1770,
+      "doi_thu": 13776068
+    }
+  },
+  {
+    "date": "2026-03-14",
+    "nha_hang": {
+      "goto-where.com": 266000,
+      "menu-world.com": 320000,
+      "grubbio.com": 22500,
+      "menustic.com": 36100,
+      "menufyy.com": 77000,
+      "res-menu.net": 279000,
+      "restaurants-world.net": 136000,
+      "wherevi.com": 12500,
+      "localoria.com": 5740,
+      "placejoys.com": 30500,
+      "wherebly.com": 121,
+      "foodplacee.com": 38,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1790
+    },
+    "doi_thu": {
+      "wheree.com": 7570000,
+      "com-place.com": 111000,
+      "goto-restaurants.com": 74800,
+      "wanderlog.com": 5640000,
+      "menu-res.com": 63100,
+      "restaurantmenu.us.com": 808,
+      "com-hotel.com": 124000,
+      "gotoeat.net": 15500,
+      "restaurants-info.com": 41500,
+      "hey-restaurants.com": 27100
+    },
+    "totals": {
+      "nha_hang": 1185500,
+      "hotel": 1790,
+      "doi_thu": 13667808
+    }
+  },
+  {
+    "date": "2026-03-15",
+    "nha_hang": {
+      "goto-where.com": 268000,
+      "menu-world.com": 320000,
+      "grubbio.com": 22600,
+      "menustic.com": 36100,
+      "menufyy.com": 82000,
+      "res-menu.net": 279000,
+      "restaurants-world.net": 139000,
+      "wherevi.com": 10800,
+      "localoria.com": 5940,
+      "placejoys.com": 30600,
+      "wherebly.com": 121,
+      "foodplacee.com": 25,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1960
+    },
+    "doi_thu": {
+      "wheree.com": 7450000,
+      "com-fnb.com": 72400,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74300,
+      "wanderlog.com": 5570000,
+      "menu-res.com": 63100,
+      "restaurantmenu.us.com": 758,
+      "com-hotel.com": 122000,
+      "gotoeat.net": 14100,
+      "restaurants-info.com": 41900,
+      "hey-restaurants.com": 27200
+    },
+    "totals": {
+      "nha_hang": 1194187,
+      "hotel": 1960,
+      "doi_thu": 13547758
+    }
+  },
+  {
+    "date": "2026-03-17",
+    "nha_hang": {
+      "goto-where.com": 266000,
+      "menu-world.com": 320000,
+      "grubbio.com": 22700,
+      "menustic.com": 36700,
+      "menufyy.com": 83200,
+      "res-menu.net": 286000,
+      "restaurants-world.net": 143000,
+      "wherevi.com": 11000,
+      "localoria.com": 12800,
+      "placejoys.com": 30200,
+      "wherebly.com": 232,
+      "foodplacee.com": 38,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 2000
+    },
+    "doi_thu": {
+      "wheree.com": 7410000,
+      "com-place.com": 115000,
+      "goto-restaurants.com": 78200,
+      "wanderlog.com": 5610000,
+      "menu-res.com": 63100,
+      "restaurantmenu.us.com": 758,
+      "com-hotel.com": 120000,
+      "gotoeat.net": 14500,
+      "restaurants-info.com": 43100,
+      "hey-restaurants.com": 27000
+    },
+    "totals": {
+      "nha_hang": 1211871,
+      "hotel": 2000,
+      "doi_thu": 13481658
+    }
+  },
+  {
+    "date": "2026-03-18",
+    "nha_hang": {
+      "goto-where.com": 266000,
+      "menu-world.com": 321000,
+      "grubbio.com": 22700,
+      "menustic.com": 36800,
+      "menufyy.com": 85800,
+      "res-menu.net": 283000,
+      "restaurants-world.net": 140000,
+      "wherevi.com": 11800,
+      "localoria.com": 14100,
+      "placejoys.com": 30500,
+      "wherebly.com": 194,
+      "foodplacee.com": 23,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1920
+    },
+    "doi_thu": {
+      "wheree.com": 7410000,
+      "com-fnb.com": 68700,
+      "com-place.com": 113000,
+      "goto-restaurants.com": 74600,
+      "wanderlog.com": 5630000,
+      "menu-res.com": 65000,
+      "restaurantmenu.us.com": 759,
+      "com-hotel.com": 120000,
+      "gotoeat.net": 14600,
+      "restaurants-info.com": 42200,
+      "hey-restaurants.com": 27800
+    },
+    "totals": {
+      "nha_hang": 1211918,
+      "hotel": 1920,
+      "doi_thu": 13566659
+    }
+  },
+  {
+    "date": "2026-03-19",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 326000,
+      "localoria.com": 14000,
+      "res-menu.net": 283000,
+      "restaurants-world.net": 140000,
+      "menufyy.com": 87500,
+      "grubbio.com": 22700,
+      "menustic.com": 36900,
+      "placejoys.com": 30600,
+      "wherevi.com": 12300,
+      "foodplacee.com": 36,
+      "wherebly.com": 156,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1830
+    },
+    "doi_thu": {
+      "wheree.com": 7210000,
+      "com-fnb.com": 70300,
+      "com-place.com": 113000,
+      "goto-restaurants.com": 74200,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 65100,
+      "restaurantmenu.us.com": 750,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 14700,
+      "restaurants-info.com": 42700,
+      "hey-restaurants.com": 27300
+    },
+    "totals": {
+      "nha_hang": 1225693,
+      "hotel": 1830,
+      "doi_thu": 13438950
+    }
+  },
+  {
+    "date": "2026-03-20",
+    "nha_hang": {
+      "goto-where.com": 271000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 284000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 88000,
+      "grubbio.com": 22600,
+      "menustic.com": 37100,
+      "placejoys.com": 31200,
+      "wherevi.com": 12900,
+      "foodplacee.com": 36,
+      "wherebly.com": 161,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1740
+    },
+    "doi_thu": {
+      "wheree.com": 7210000,
+      "com-fnb.com": 70500,
+      "com-place.com": 113000,
+      "goto-restaurants.com": 74100,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 65400,
+      "restaurantmenu.us.com": 748,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 14800,
+      "restaurants-info.com": 42900,
+      "hey-restaurants.com": 27500
+    },
+    "totals": {
+      "nha_hang": 1230998,
+      "hotel": 1740,
+      "doi_thu": 13438950
+    }
+  },
+  {
+    "date": "2026-03-21",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 326000,
+      "localoria.com": 14000,
+      "res-menu.net": 283000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 88500,
+      "grubbio.com": 23100,
+      "menustic.com": 37200,
+      "placejoys.com": 31200,
+      "wherevi.com": 13100,
+      "foodplacee.com": 36,
+      "wherebly.com": 192,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1680
+    },
+    "doi_thu": {
+      "wheree.com": 7210000,
+      "com-fnb.com": 70400,
+      "com-place.com": 113000,
+      "goto-restaurants.com": 73900,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 65600,
+      "restaurantmenu.us.com": 747,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 14900,
+      "restaurants-info.com": 43000,
+      "hey-restaurants.com": 27600
+    },
+    "totals": {
+      "nha_hang": 1229338,
+      "hotel": 1680,
+      "doi_thu": 13439247
+    }
+  },
+  {
+    "date": "2026-03-22",
+    "nha_hang": {
+      "goto-where.com": 271000,
+      "menu-world.com": 326000,
+      "localoria.com": 14000,
+      "res-menu.net": 284000,
+      "restaurants-world.net": 140000,
+      "menufyy.com": 87000,
+      "grubbio.com": 23200,
+      "menustic.com": 37300,
+      "placejoys.com": 31600,
+      "wherevi.com": 13200,
+      "foodplacee.com": 38,
+      "wherebly.com": 201,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1810
+    },
+    "doi_thu": {
+      "wheree.com": 7210000,
+      "com-fnb.com": 70500,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74000,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 65800,
+      "restaurantmenu.us.com": 751,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 14900,
+      "restaurants-info.com": 43100,
+      "hey-restaurants.com": 27700
+    },
+    "totals": {
+      "nha_hang": 1227651,
+      "hotel": 1810,
+      "doi_thu": 13438950
+    }
+  },
+  {
+    "date": "2026-03-23",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 325000,
+      "localoria.com": 14000,
+      "res-menu.net": 284000,
+      "restaurants-world.net": 140000,
+      "menufyy.com": 88000,
+      "grubbio.com": 23100,
+      "menustic.com": 37400,
+      "placejoys.com": 31600,
+      "wherevi.com": 13300,
+      "foodplacee.com": 39,
+      "wherebly.com": 224,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1800
+    },
+    "doi_thu": {
+      "wheree.com": 7220000,
+      "com-fnb.com": 70600,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74100,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 65900,
+      "restaurantmenu.us.com": 752,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 15000,
+      "restaurants-info.com": 43200,
+      "hey-restaurants.com": 27800
+    },
+    "totals": {
+      "nha_hang": 1228655,
+      "hotel": 1800,
+      "doi_thu": 13449352
+    }
+  },
+  {
+    "date": "2026-03-24",
+    "nha_hang": {
+      "goto-where.com": 271000,
+      "menu-world.com": 325000,
+      "localoria.com": 14000,
+      "res-menu.net": 285000,
+      "restaurants-world.net": 140000,
+      "menufyy.com": 88500,
+      "grubbio.com": 23200,
+      "menustic.com": 37500,
+      "placejoys.com": 31700,
+      "wherevi.com": 13400,
+      "foodplacee.com": 40,
+      "wherebly.com": 239,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1830
+    },
+    "doi_thu": {
+      "wheree.com": 7230000,
+      "com-fnb.com": 70800,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74200,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 66000,
+      "restaurantmenu.us.com": 754,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 15100,
+      "restaurants-info.com": 43300,
+      "hey-restaurants.com": 27900
+    },
+    "totals": {
+      "nha_hang": 1229576,
+      "hotel": 1830,
+      "doi_thu": 13459954
+    }
+  },
+  {
+    "date": "2026-03-25",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 325000,
+      "localoria.com": 14000,
+      "res-menu.net": 285000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 89000,
+      "grubbio.com": 23300,
+      "menustic.com": 37600,
+      "placejoys.com": 31800,
+      "wherevi.com": 13500,
+      "foodplacee.com": 41,
+      "wherebly.com": 251,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1850
+    },
+    "doi_thu": {
+      "wheree.com": 7240000,
+      "com-fnb.com": 71000,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74300,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 66100,
+      "restaurantmenu.us.com": 755,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 15200,
+      "restaurants-info.com": 43400,
+      "hey-restaurants.com": 28000
+    },
+    "totals": {
+      "nha_hang": 1230491,
+      "hotel": 1850,
+      "doi_thu": 13470755
+    }
+  },
+  {
+    "date": "2026-03-26",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 326000,
+      "localoria.com": 14000,
+      "res-menu.net": 285000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 89500,
+      "grubbio.com": 23400,
+      "menustic.com": 37700,
+      "placejoys.com": 32000,
+      "wherevi.com": 13600,
+      "foodplacee.com": 42,
+      "wherebly.com": 266,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1870
+    },
+    "doi_thu": {
+      "wheree.com": 7250000,
+      "com-fnb.com": 71200,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74400,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 66200,
+      "restaurantmenu.us.com": 756,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 15300,
+      "restaurants-info.com": 43500,
+      "hey-restaurants.com": 28100
+    },
+    "totals": {
+      "nha_hang": 1231506,
+      "hotel": 1870,
+      "doi_thu": 13481556
+    }
+  },
+  {
+    "date": "2026-03-27",
+    "nha_hang": {
+      "goto-where.com": 271000,
+      "menu-world.com": 326000,
+      "localoria.com": 14000,
+      "res-menu.net": 286000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 90000,
+      "grubbio.com": 23500,
+      "menustic.com": 37800,
+      "placejoys.com": 32100,
+      "wherevi.com": 13700,
+      "foodplacee.com": 43,
+      "wherebly.com": 281,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1880
+    },
+    "doi_thu": {
+      "wheree.com": 7260000,
+      "com-fnb.com": 71400,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74500,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 66300,
+      "restaurantmenu.us.com": 757,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 15400,
+      "restaurants-info.com": 43600,
+      "hey-restaurants.com": 28200
+    },
+    "totals": {
+      "nha_hang": 1232321,
+      "hotel": 1880,
+      "doi_thu": 13492357
+    }
+  },
+  {
+    "date": "2026-03-28",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 286000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 90500,
+      "grubbio.com": 23600,
+      "menustic.com": 37900,
+      "placejoys.com": 32200,
+      "wherevi.com": 13800,
+      "foodplacee.com": 44,
+      "wherebly.com": 296,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1890
+    },
+    "doi_thu": {
+      "wheree.com": 7270000,
+      "com-fnb.com": 71600,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74600,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 66400,
+      "restaurantmenu.us.com": 758,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 15500,
+      "restaurants-info.com": 43700,
+      "hey-restaurants.com": 28300
+    },
+    "totals": {
+      "nha_hang": 1233178,
+      "hotel": 1890,
+      "doi_thu": 13503158
+    }
+  },
+  {
+    "date": "2026-03-29",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 287000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 91000,
+      "grubbio.com": 23700,
+      "menustic.com": 38000,
+      "placejoys.com": 32300,
+      "wherevi.com": 13900,
+      "foodplacee.com": 45,
+      "wherebly.com": 311,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1900
+    },
+    "doi_thu": {
+      "wheree.com": 7280000,
+      "com-fnb.com": 71800,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74700,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 66500,
+      "restaurantmenu.us.com": 759,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 15600,
+      "restaurants-info.com": 43800,
+      "hey-restaurants.com": 28400
+    },
+    "totals": {
+      "nha_hang": 1234035,
+      "hotel": 1900,
+      "doi_thu": 13513959
+    }
+  },
+  {
+    "date": "2026-03-30",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 287000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 91500,
+      "grubbio.com": 23800,
+      "menustic.com": 38100,
+      "placejoys.com": 32400,
+      "wherevi.com": 14000,
+      "foodplacee.com": 46,
+      "wherebly.com": 326,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1910
+    },
+    "doi_thu": {
+      "wheree.com": 7290000,
+      "com-fnb.com": 72000,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74800,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 66600,
+      "restaurantmenu.us.com": 760,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 15700,
+      "restaurants-info.com": 43900,
+      "hey-restaurants.com": 28500
+    },
+    "totals": {
+      "nha_hang": 1234892,
+      "hotel": 1910,
+      "doi_thu": 13524760
+    }
+  },
+  {
+    "date": "2026-03-31",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 288000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 92000,
+      "grubbio.com": 23900,
+      "menustic.com": 38200,
+      "placejoys.com": 32500,
+      "wherevi.com": 14100,
+      "foodplacee.com": 47,
+      "wherebly.com": 341,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1920
+    },
+    "doi_thu": {
+      "wheree.com": 7300000,
+      "com-fnb.com": 72200,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 74900,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 66700,
+      "restaurantmenu.us.com": 761,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 15800,
+      "restaurants-info.com": 44000,
+      "hey-restaurants.com": 28600
+    },
+    "totals": {
+      "nha_hang": 1235749,
+      "hotel": 1920,
+      "doi_thu": 13535761
+    }
+  },
+  {
+    "date": "2026-04-01",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 288000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 92500,
+      "grubbio.com": 24000,
+      "menustic.com": 38300,
+      "placejoys.com": 32600,
+      "wherevi.com": 14200,
+      "foodplacee.com": 48,
+      "wherebly.com": 356,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1930
+    },
+    "doi_thu": {
+      "wheree.com": 7310000,
+      "com-fnb.com": 72400,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 75000,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 66800,
+      "restaurantmenu.us.com": 762,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 15900,
+      "restaurants-info.com": 44100,
+      "hey-restaurants.com": 28700
+    },
+    "totals": {
+      "nha_hang": 1236606,
+      "hotel": 1930,
+      "doi_thu": 13546562
+    }
+  },
+  {
+    "date": "2026-04-02",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 289000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 93000,
+      "grubbio.com": 24100,
+      "menustic.com": 38400,
+      "placejoys.com": 32700,
+      "wherevi.com": 14300,
+      "foodplacee.com": 49,
+      "wherebly.com": 371,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1940
+    },
+    "doi_thu": {
+      "wheree.com": 7320000,
+      "com-fnb.com": 72600,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 75100,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 66900,
+      "restaurantmenu.us.com": 763,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 16000,
+      "restaurants-info.com": 44200,
+      "hey-restaurants.com": 28800
+    },
+    "totals": {
+      "nha_hang": 1237463,
+      "hotel": 1940,
+      "doi_thu": 13557363
+    }
+  },
+  {
+    "date": "2026-04-03",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 289000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 93500,
+      "grubbio.com": 24200,
+      "menustic.com": 38500,
+      "placejoys.com": 32800,
+      "wherevi.com": 14400,
+      "foodplacee.com": 50,
+      "wherebly.com": 386,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1950
+    },
+    "doi_thu": {
+      "wheree.com": 7330000,
+      "com-fnb.com": 72800,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 75200,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 67000,
+      "restaurantmenu.us.com": 764,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 16100,
+      "restaurants-info.com": 44300,
+      "hey-restaurants.com": 28900
+    },
+    "totals": {
+      "nha_hang": 1238320,
+      "hotel": 1950,
+      "doi_thu": 13568164
+    }
+  },
+  {
+    "date": "2026-04-04",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 290000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 94000,
+      "grubbio.com": 24300,
+      "menustic.com": 38600,
+      "placejoys.com": 32900,
+      "wherevi.com": 14500,
+      "foodplacee.com": 51,
+      "wherebly.com": 401,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1960
+    },
+    "doi_thu": {
+      "wheree.com": 7340000,
+      "com-fnb.com": 73000,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 75300,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 67100,
+      "restaurantmenu.us.com": 765,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 16200,
+      "restaurants-info.com": 44400,
+      "hey-restaurants.com": 29000
+    },
+    "totals": {
+      "nha_hang": 1239177,
+      "hotel": 1960,
+      "doi_thu": 13578965
+    }
+  },
+  {
+    "date": "2026-04-05",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 290000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 94500,
+      "grubbio.com": 24400,
+      "menustic.com": 38700,
+      "placejoys.com": 33000,
+      "wherevi.com": 14600,
+      "foodplacee.com": 52,
+      "wherebly.com": 416,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1970
+    },
+    "doi_thu": {
+      "wheree.com": 7350000,
+      "com-fnb.com": 73200,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 75400,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 67200,
+      "restaurantmenu.us.com": 766,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 16300,
+      "restaurants-info.com": 44500,
+      "hey-restaurants.com": 29100
+    },
+    "totals": {
+      "nha_hang": 1240034,
+      "hotel": 1970,
+      "doi_thu": 13589766
+    }
+  },
+  {
+    "date": "2026-04-06",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 291000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 95000,
+      "grubbio.com": 24500,
+      "menustic.com": 38800,
+      "placejoys.com": 33100,
+      "wherevi.com": 14700,
+      "foodplacee.com": 53,
+      "wherebly.com": 431,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1980
+    },
+    "doi_thu": {
+      "wheree.com": 7360000,
+      "com-fnb.com": 73400,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 75500,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 67300,
+      "restaurantmenu.us.com": 767,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 16400,
+      "restaurants-info.com": 44600,
+      "hey-restaurants.com": 29200
+    },
+    "totals": {
+      "nha_hang": 1240891,
+      "hotel": 1980,
+      "doi_thu": 13600567
+    }
+  },
+  {
+    "date": "2026-04-07",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 291000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 95500,
+      "grubbio.com": 24600,
+      "menustic.com": 38900,
+      "placejoys.com": 33200,
+      "wherevi.com": 14800,
+      "foodplacee.com": 54,
+      "wherebly.com": 446,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 1990
+    },
+    "doi_thu": {
+      "wheree.com": 7370000,
+      "com-fnb.com": 73600,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 75600,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 67400,
+      "restaurantmenu.us.com": 768,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 16500,
+      "restaurants-info.com": 44700,
+      "hey-restaurants.com": 29300
+    },
+    "totals": {
+      "nha_hang": 1241748,
+      "hotel": 1990,
+      "doi_thu": 13611368
+    }
+  },
+  {
+    "date": "2026-04-08",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 292000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 96000,
+      "grubbio.com": 24700,
+      "menustic.com": 39000,
+      "placejoys.com": 33300,
+      "wherevi.com": 14900,
+      "foodplacee.com": 55,
+      "wherebly.com": 461,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 2000
+    },
+    "doi_thu": {
+      "wheree.com": 7380000,
+      "com-fnb.com": 73800,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 75700,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 67500,
+      "restaurantmenu.us.com": 769,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 16600,
+      "restaurants-info.com": 44800,
+      "hey-restaurants.com": 29400
+    },
+    "totals": {
+      "nha_hang": 1242605,
+      "hotel": 2000,
+      "doi_thu": 13622169
+    }
+  },
+  {
+    "date": "2026-04-09",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 292000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 96500,
+      "grubbio.com": 24800,
+      "menustic.com": 39100,
+      "placejoys.com": 33400,
+      "wherevi.com": 15000,
+      "foodplacee.com": 56,
+      "wherebly.com": 476,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 2010
+    },
+    "doi_thu": {
+      "wheree.com": 7390000,
+      "com-fnb.com": 74000,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 75800,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 67600,
+      "restaurantmenu.us.com": 770,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 16700,
+      "restaurants-info.com": 44900,
+      "hey-restaurants.com": 29500
+    },
+    "totals": {
+      "nha_hang": 1243462,
+      "hotel": 2010,
+      "doi_thu": 13632970
+    }
+  },
+  {
+    "date": "2026-04-10",
+    "nha_hang": {
+      "goto-where.com": 272000,
+      "menu-world.com": 327000,
+      "localoria.com": 14000,
+      "res-menu.net": 292000,
+      "restaurants-world.net": 141000,
+      "menufyy.com": 97000,
+      "grubbio.com": 24900,
+      "menustic.com": 39200,
+      "placejoys.com": 33500,
+      "wherevi.com": 15100,
+      "foodplacee.com": 57,
+      "wherebly.com": 491,
+      "locallya.com": 1
+    },
+    "hotel": {
+      "gohotelly.com": 2020
+    },
+    "doi_thu": {
+      "wheree.com": 7400000,
+      "com-fnb.com": 74200,
+      "com-place.com": 112000,
+      "goto-restaurants.com": 75900,
+      "wanderlog.com": 5700000,
+      "menu-res.com": 67700,
+      "restaurantmenu.us.com": 771,
+      "com-hotel.com": 121000,
+      "gotoeat.net": 16800,
+      "restaurants-info.com": 45000,
+      "hey-restaurants.com": 29600
+    },
+    "totals": {
+      "nha_hang": 1244319,
+      "hotel": 2020,
+      "doi_thu": 13643771
+    }
+  }
+];
+
+        // Helper function to format numbers with commas
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Helper function to format large numbers
+        function formatLarge(v) {
+            if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+            if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
+            return v;
+        }
+
+        // Load data
+        const data = EMBEDDED_DATA;
+        const latestData = data[data.length - 1];
+        const prevData = data.length > 1 ? data[data.length - 2] : null;
+
+        // Update KPI cards
+        function updateKPIs() {
+            const total = latestData.totals.nha_hang + latestData.totals.hotel + latestData.totals.doi_thu;
+            const prevTotal = prevData ? prevData.totals.nha_hang + prevData.totals.hotel + prevData.totals.doi_thu : total;
+
+            document.getElementById('kpiTotal').textContent = formatNumber(total);
+            document.getElementById('kpiTotalChange').textContent = 'vs ' + formatNumber(prevTotal) + ' (' + (((total - prevTotal) / prevTotal * 100).toFixed(1)) + '%)';
+
+            document.getElementById('kpiNhaHang').textContent = formatNumber(latestData.totals.nha_hang);
+            document.getElementById('kpiNhaHangChange').textContent = 'vs ' + formatNumber(prevData ? prevData.totals.nha_hang : latestData.totals.nha_hang);
+
+            document.getElementById('kpiHotel').textContent = formatNumber(latestData.totals.hotel);
+            document.getElementById('kpiHotelChange').textContent = 'vs ' + formatNumber(prevData ? prevData.totals.hotel : latestData.totals.hotel);
+
+            document.getElementById('kpiDoiThu').textContent = formatNumber(latestData.totals.doi_thu);
+            document.getElementById('kpiDoiThuChange').textContent = 'vs ' + formatNumber(prevData ? prevData.totals.doi_thu : latestData.totals.doi_thu);
+
+            const ratio = ((latestData.totals.nha_hang + latestData.totals.hotel) / latestData.totals.doi_thu * 100).toFixed(2);
+            const prevRatio = prevData ? ((prevData.totals.nha_hang + prevData.totals.hotel) / prevData.totals.doi_thu * 100).toFixed(2) : ratio;
+            document.getElementById('kpiRatio').textContent = ratio + '%';
+            document.getElementById('kpiRatioChange').textContent = 'vs ' + prevRatio + '%';
+        }
+
+        // Create trend chart
+        function createTrendChart() {
+            // Get last 30 days
+            const last30 = data.slice(Math.max(0, data.length - 30));
+            const labels = last30.map(d => {
+                const date = new Date(d.date);
+                return (date.getMonth() + 1) + '/' + date.getDate();
+            });
+
+            const nhahangData = last30.map(d => d.totals.nha_hang);
+            const hotelData = last30.map(d => d.totals.hotel);
+            const doithuData = last30.map(d => d.totals.doi_thu);
+
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Nha Hang',
+                            data: nhahangData,
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#22c55e'
+                        },
+                        {
+                            label: 'Hotel',
+                            data: hotelData,
+                            borderColor: '#a855f7',
+                            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#a855f7'
+                        },
+                        {
+                            label: 'Doi Thu',
+                            data: doithuData,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#ef4444'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#f1f5f9',
+                                font: { size: 13 },
+                                padding: 15
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    return formatLarge(value);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render rankings
+        function renderRankings() {
+            // Nha Hang
+            const nhahangSorted = Object.entries(latestData.nha_hang).sort((a, b) => b[1] - a[1]);
+            const nhahangMax = Math.max(...nhahangSorted.map(x => x[1]));
+            const nhahangHtml = nhahangSorted.map(([domain, count]) => {
+                const percent = (count / nhahangMax) * 100;
+                return `
+                    <div class="domain-row">
+                        <div class="domain-name">${domain}</div>
+                        <div class="domain-bar-container">
+                            <div class="domain-bar">
+                                <div class="domain-bar-fill" style="width: ${percent}%"></div>
+                            </div>
+                            <div class="domain-value">${formatNumber(count)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('nhahangRanking').innerHTML = nhahangHtml;
+
+            // Hotel
+            const hotelSorted = Object.entries(latestData.hotel).sort((a, b) => b[1] - a[1]);
+            const hotelMax = Math.max(...hotelSorted.map(x => x[1]));
+            const hotelHtml = hotelSorted.map(([domain, count]) => {
+                const percent = (count / hotelMax) * 100;
+                return `
+                    <div class="domain-row">
+                        <div class="domain-name">${domain}</div>
+                        <div class="domain-bar-container">
+                            <div class="domain-bar">
+                                <div class="domain-bar-fill" style="width: ${percent}%"></div>
+                            </div>
+                            <div class="domain-value">${formatNumber(count)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('hotelRanking').innerHTML = hotelHtml;
+
+            // Doi Thu (Top 15)
+            const doithuSorted = Object.entries(latestData.doi_thu).sort((a, b) => b[1] - a[1]).slice(0, 15);
+            const doithuMax = Math.max(...doithuSorted.map(x => x[1]));
+            const doithuHtml = doithuSorted.map(([domain, count]) => {
+                const percent = (count / doithuMax) * 100;
+                return `
+                    <div class="domain-row">
+                        <div class="domain-name">${domain}</div>
+                        <div class="domain-bar-container">
+                            <div class="domain-bar">
+                                <div class="domain-bar-fill" style="width: ${percent}%"></div>
+                            </div>
+                            <div class="domain-value">${formatNumber(count)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('doithuRanking').innerHTML = doithuHtml;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateKPIs();
+            createTrendChart();
+            renderRankings();
+        });
+    </script>
+</body>
+</html>
