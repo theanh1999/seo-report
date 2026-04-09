@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEO Dashboard - Restaurants</title>
+    <title>SEO Dashboard - Mảng Restaurants</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <style>
         * {
@@ -12,1170 +12,1126 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border-color: #ddd;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --chart-grid: #e0e0e0;
+            --good-color: #27ae60;
+            --bad-color: #e74c3c;
+            --neutral-color: #3498db;
+        }
+
+        html.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --border-color: #444;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            --chart-grid: #444444;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #0f172a;
-            color: #f1f5f9;
-            transition: background-color 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        body.light-mode {
-            background-color: #f8fafc;
-            color: #1e293b;
-        }
-
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            padding: 2rem;
-            border-bottom: 2px solid #3b82f6;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
         }
 
-        body.light-mode .header {
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-            color: #1e293b;
-        }
-
-        .header-top {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .header-title {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #3b82f6;
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .theme-toggle {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            background-color: #2563eb;
+        .header h1 {
+            margin-bottom: 10px;
         }
 
         .cross-link {
-            background-color: #ec4899;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .cross-link a {
+            color: var(--neutral-color);
             text-decoration: none;
-            display: inline-block;
-            transition: background-color 0.3s ease;
+            margin-left: 15px;
         }
 
-        .cross-link:hover {
-            background-color: #db2777;
-        }
-
-        .nav-bar {
-            background-color: #1e293b;
-            padding: 1rem;
-            border-bottom: 1px solid #334155;
-            position: sticky;
-            top: 100px;
-            z-index: 99;
-        }
-
-        body.light-mode .nav-bar {
-            background-color: #e2e8f0;
-            border-bottom-color: #cbd5e1;
-        }
-
-        .nav-bar ul {
-            list-style: none;
-            display: flex;
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            flex-wrap: wrap;
-        }
-
-        .nav-bar a {
-            color: #94a3b8;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-            cursor: pointer;
-        }
-
-        body.light-mode .nav-bar a {
-            color: #475569;
-        }
-
-        .nav-bar a:hover {
-            color: #3b82f6;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .kpi-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .kpi-card {
-            background-color: #1e293b;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            border-left: 4px solid #3b82f6;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        body.light-mode .kpi-card {
-            background-color: #f1f5f9;
-            color: #1e293b;
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .kpi-label {
-            font-size: 0.875rem;
-            color: #94a3b8;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        body.light-mode .kpi-label {
-            color: #64748b;
-        }
-
-        .kpi-value {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .kpi-change {
-            font-size: 0.875rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .section {
-            background-color: #1e293b;
-            border-radius: 0.75rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        body.light-mode .section {
-            background-color: #f1f5f9;
-            color: #1e293b;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #3b82f6;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin-bottom: 2rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        th {
-            background-color: #0f172a;
-            color: #3b82f6;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid #3b82f6;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        body.light-mode th {
-            background-color: #e2e8f0;
-            color: #3b82f6;
-        }
-
-        td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #334155;
-        }
-
-        body.light-mode td {
-            border-bottom-color: #cbd5e1;
-        }
-
-        tr:hover {
-            background-color: #334155;
-        }
-
-        body.light-mode tr:hover {
-            background-color: #e2e8f0;
-        }
-
-        .anomaly-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: white;
-        }
-
-        .anomaly-critical {
-            background-color: #ef4444;
-        }
-
-        .anomaly-warning {
-            background-color: #f97316;
-        }
-
-        .anomaly-info {
-            background-color: #3b82f6;
-        }
-
-        .recommendation {
-            background-color: #0f172a;
-            border-left: 4px solid #3b82f6;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 0.5rem;
-        }
-
-        body.light-mode .recommendation {
-            background-color: #e2e8f0;
-        }
-
-        .recommendation.high {
-            border-left-color: #ef4444;
-        }
-
-        .recommendation.medium {
-            border-left-color: #f97316;
-        }
-
-        .recommendation.low {
-            border-left-color: #3b82f6;
-        }
-
-        .recommendation-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .recommendation-title {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .priority-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .priority-high {
-            background-color: #ef4444;
-            color: white;
-        }
-
-        .priority-medium {
-            background-color: #f97316;
-            color: white;
-        }
-
-        .priority-low {
-            background-color: #3b82f6;
-            color: white;
-        }
-
-        .recommendation-description {
-            font-size: 0.875rem;
-            color: #cbd5e1;
-            margin-bottom: 0.5rem;
-        }
-
-        body.light-mode .recommendation-description {
-            color: #64748b;
-        }
-
-        .recommendation-category {
-            display: inline-block;
-            background-color: #334155;
-            color: #e2e8f0;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        body.light-mode .recommendation-category {
-            background-color: #cbd5e1;
-            color: #1e293b;
-        }
-
-        .domain-link {
-            color: #3b82f6;
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .domain-link:hover {
-            color: #2563eb;
+        .cross-link a:hover {
             text-decoration: underline;
         }
 
-        .footer {
-            text-align: center;
-            color: #64748b;
-            padding: 2rem;
-            border-top: 1px solid #334155;
-            margin-top: 3rem;
+        /* Dark mode toggle */
+        .dark-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
         }
 
-        body.light-mode .footer {
-            color: #94a3b8;
-            border-top-color: #cbd5e1;
+        .dark-toggle:hover {
+            box-shadow: var(--card-shadow);
+        }
+
+        /* TOC */
+        .toc-nav {
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            z-index: 100;
+            margin-bottom: 30px;
+        }
+
+        .toc-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .toc-nav a.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--neutral-color);
+        }
+
+        .toc-nav a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+        }
+
+        .kpi-card-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .kpi-card-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .kpi-card-change {
+            font-size: 13px;
+        }
+
+        .good {
+            color: var(--good-color);
+        }
+
+        .bad {
+            color: var(--bad-color);
+        }
+
+        .neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Filter */
+        .filter-section {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .filter-select {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .filter-button {
+            background: var(--neutral-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .filter-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Chart */
+        .chart-wrapper {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-wrapper h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .chart-container {
+            height: 350px;
+            margin-bottom: 10px;
+        }
+
+        .chart-legend {
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--border-color);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: var(--text-secondary);
+        }
+
+        th::after {
+            content: " ⇅";
+            opacity: 0.3;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--bg-primary);
+        }
+
+        .numeric {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        .site-name {
+            color: var(--neutral-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .site-name:hover {
+            text-decoration: underline;
+        }
+
+        /* Anomaly cards */
+        .anomaly-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .anomaly-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .anomaly-card.critical {
+            border-left-color: var(--bad-color);
+        }
+
+        .anomaly-card.warning {
+            border-left-color: #f39c12;
+        }
+
+        .anomaly-card.info {
+            border-left-color: var(--neutral-color);
+        }
+
+        .anomaly-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .anomaly-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Recommendations */
+        .recommendation-table {
+            width: 100%;
+        }
+
+        .priority-high {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .priority-medium {
+            background: rgba(243, 156, 18, 0.1);
+        }
+
+        .priority-low {
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .toc-nav {
+                font-size: 12px;
+                gap: 10px;
+            }
+
+            .toc-nav a {
+                padding: 6px 8px;
+            }
         }
 
         @media (max-width: 768px) {
-            .kpi-cards {
-                grid-template-columns: 1fr;
+            .header {
+                padding: 15px;
             }
 
-            .header-top {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
+            .container {
+                padding: 0 10px 30px;
             }
 
-            .nav-bar ul {
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .toc-nav {
                 flex-direction: column;
-                gap: 1rem;
+                gap: 5px;
+                padding: 10px;
+            }
+
+            .toc-nav a {
+                padding: 5px 0;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                padding-left: 10px;
+            }
+
+            .toc-nav a.active {
+                border-left-color: var(--neutral-color);
+                border-bottom: none;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 8px 10px;
             }
         }
     </style>
 </head>
 <body>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
     <div class="header">
-        <div class="header-top">
-            <div class="header-title">📊 SEO Dashboard - Restaurants</div>
-            <div class="header-controls">
-                <a href="seo-index-tracker.html" class="cross-link">Index Tracker</a>
-                <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
-            </div>
+        <h1>SEO Dashboard - Restaurants (13 websites)</h1>
+        <div class="cross-link">
+            Bạn đang xem: Mảng Restaurants (13 websites) — 2026-04-09
+            | <a href="seo-hotels-2026-04-09.html">→ Xem Mảng Khách sạn</a>            | <a href="index-2026-04-09.html">→ Tất cả báo cáo</a>
         </div>
-        <div style="font-size: 0.875rem; color: #94a3b8;">Dữ liệu từ GA4 & GSC | Cập nhật: 2026-04-09 | GA4 loại trừ: 2026-04-08, 2026-04-09</div>
     </div>
-
-    <div class="nav-bar">
-        <ul>
-            <li><a href="#kpi" onclick="scrollToSection('kpi')">📈 KPI</a></li>
-            <li><a href="#charts" onclick="scrollToSection('charts')">📊 Biểu đồ</a></li>
-            <li><a href="#comparison" onclick="scrollToSection('comparison')">⚖️ So sánh</a></li>
-            <li><a href="#keywords" onclick="scrollToSection('keywords')">🔍 Keywords</a></li>
-            <li><a href="#anomalies" onclick="scrollToSection('anomalies')">⚠️ Bất thường</a></li>
-            <li><a href="#recommendations" onclick="scrollToSection('recommendations')">💡 Đề xuất</a></li>
-        </ul>
+    <div class="toc-nav">
+        <a href="#kpis">KPI</a>
+        <a href="#filter">Website</a>
+        <a href="#charts">Biểu đồ</a>
+        <a href="#comparison">So sánh</a>
+        <a href="#keywords">Từ khóa</a>
+        <a href="#anomalies">Bất thường</a>
+        <a href="#trends">Xu hướng</a>
+        <a href="#recommendations">Kiến nghị</a>
     </div>
-
     <div class="container">
-        <section id="kpi">
-            <h2 class="section-title">📈 Chỉ số chính (30 ngày)</h2>
-            <div class="kpi-cards">
+        <div class="section" id="kpis">
+            <h2>📊 KPI Tổng hợp</h2>
+            <div class="kpi-grid">
                 <div class="kpi-card">
-                    <div class="kpi-label">Sessions</div>
-                    <div class="kpi-value">6.4M</div>
-                    <div class="kpi-change" style="color: #22c55e;">
-                        ↑ 2.6%
-                    </div>
+                    <div class="kpi-card-label">Sessions</div>
+                    <div class="kpi-card-value">6.4M</div>
+                    <div class="kpi-card-change"><span class="good">+2.6%</span></div>
                 </div>
-
                 <div class="kpi-card">
-                    <div class="kpi-label">Người dùng</div>
-                    <div class="kpi-value">5.8M</div>
-                    <div class="kpi-change" style="color: #94a3b8;">vs 30 ngày trước</div>
+                    <div class="kpi-card-label">Users</div>
+                    <div class="kpi-card-value">5.8M</div>
+                    <div class="kpi-card-change"><span class="good">+2.0%</span></div>
                 </div>
-
                 <div class="kpi-card">
-                    <div class="kpi-label">Pageviews</div>
-                    <div class="kpi-value">9.8M</div>
-                    <div class="kpi-change" style="color: #94a3b8;">Tổng lượt xem</div>
+                    <div class="kpi-card-label">Pageviews</div>
+                    <div class="kpi-card-value">9.8M</div>
+                    <div class="kpi-card-change"><span class="good">+0.4%</span></div>
                 </div>
-
                 <div class="kpi-card">
-                    <div class="kpi-label">Clicks (GSC)</div>
-                    <div class="kpi-value">2.6M</div>
-                    <div class="kpi-change" style="color: #22c55e;">
-                        ↑ 13.6%
-                    </div>
+                    <div class="kpi-card-label">GSC Clicks</div>
+                    <div class="kpi-card-value">2.6M</div>
+                    <div class="kpi-card-change"><span class="good">+13.6%</span></div>
                 </div>
-
                 <div class="kpi-card">
-                    <div class="kpi-label">Impressions</div>
-                    <div class="kpi-value">261.4M</div>
-                    <div class="kpi-change" style="color: #94a3b8;">Lượt hiển thị</div>
+                    <div class="kpi-card-label">GSC Impressions</div>
+                    <div class="kpi-card-value">261.4M</div>
+                    <div class="kpi-card-change"><span class="good">+22.5%</span></div>
                 </div>
-
                 <div class="kpi-card">
-                    <div class="kpi-label">Bounce Rate</div>
-                    <div class="kpi-value">45.9%</div>
-                    <div class="kpi-change" style="color: #22c55e;">
-                        ↓ 0.02%
-                    </div>
+                    <div class="kpi-card-label">TB Bounce Rate</div>
+                    <div class="kpi-card-value">45.9%</div>
+                    <div class="kpi-card-change"><span class="good">-5.0%</span></div>
                 </div>
-
                 <div class="kpi-card">
-                    <div class="kpi-label">Engagement Rate</div>
-                    <div class="kpi-value">54.1%</div>
-                    <div class="kpi-change" style="color: #22c55e;">
-                        ↑ 0.02%
-                    </div>
+                    <div class="kpi-card-label">TB Engagement Rate</div>
+                    <div class="kpi-card-value">54.1%</div>
+                    <div class="kpi-card-change"><span class="good">+4.7%</span></div>
                 </div>
-
                 <div class="kpi-card">
-                    <div class="kpi-label">Avg Position</div>
-                    <div class="kpi-value">8.6</div>
-                    <div class="kpi-change" style="color: #ef4444;">
-                        ↓ 0.1
-                    </div>
+                    <div class="kpi-card-label">TB Vị trí</div>
+                    <div class="kpi-card-value">8.6</div>
+                    <div class="kpi-card-change"><span class="bad">+1.7%</span></div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section id="charts">
-            <h2 class="section-title">📊 Biểu đồ xu hướng</h2>
+        <div class="section" id="filter">
+            <h2>🔍 Chọn Website</h2>
+            <div class="filter-section">
+                <select id="website-filter" class="filter-select" onchange="filterWebsites()">
+                    <option value="">-- Tất cả --</option>
+                    <option value="localoria.com">localoria.com</option>
+                    <option value="wherebly.com">wherebly.com</option>
+                    <option value="res-menu.net">res-menu.net</option>
+                    <option value="foodplacee.com">foodplacee.com</option>
+                    <option value="restaurants-world.net">restaurants-world.net</option>
+                    <option value="goto-where.com">goto-where.com</option>
+                    <option value="menu-world.com">menu-world.com</option>
+                    <option value="grubbio.com">grubbio.com</option>
+                    <option value="menustic.com">menustic.com</option>
+                    <option value="menufyy.com">menufyy.com</option>
+                    <option value="wherevi.com">wherevi.com</option>
+                    <option value="placejoys.com">placejoys.com</option>
+                    <option value="locallya.com">locallya.com</option>
+                </select>
+                <button class="filter-button" onclick="selectAllWebsites()">Chọn tất cả</button>
+                <button class="filter-button" onclick="deselectAllWebsites()">Bỏ chọn tất cả</button>
+            </div>
+        </div>
 
-            <div style="margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 1rem;">Sessions theo thời gian</h3>
+        <div class="section" id="charts">
+            <h2>📈 Biểu đồ Trend</h2>
+            <div class="chart-wrapper">
+                <h3>Sessions theo ngày (mỗi website 1 đường)</h3>
                 <div class="chart-container">
-                    <canvas id="sessionsChart"></canvas>
+                    <canvas id="chart-sessions"></canvas>
                 </div>
+                <div class="chart-legend" id="legend-sessions"></div>
             </div>
 
-            <div style="margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 1rem;">Clicks theo thời gian</h3>
+            <div class="chart-wrapper">
+                <h3>Clicks GSC theo ngày</h3>
                 <div class="chart-container">
-                    <canvas id="clicksChart"></canvas>
+                    <canvas id="chart-clicks"></canvas>
                 </div>
+                <div class="chart-legend" id="legend-clicks"></div>
             </div>
 
-            <div style="margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 1rem;">Impressions theo thời gian</h3>
+            <div class="chart-wrapper">
+                <h3>Impressions theo ngày</h3>
                 <div class="chart-container">
-                    <canvas id="impressionsChart"></canvas>
+                    <canvas id="chart-impressions"></canvas>
                 </div>
+                <div class="chart-legend" id="legend-impressions"></div>
             </div>
 
-            <div style="margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 1rem;">Average Position theo thời gian</h3>
+            <div class="chart-wrapper">
+                <h3>Vị trí TB theo ngày</h3>
                 <div class="chart-container">
-                    <canvas id="positionChart"></canvas>
+                    <canvas id="chart-position"></canvas>
                 </div>
+                <div class="chart-legend" id="legend-position"></div>
             </div>
-        </section>
+        </div>
 
-        <section id="comparison">
-            <h2 class="section-title">⚖️ So sánh Website</h2>
-            <table id="comparisonTable">
+        <div class="section" id="comparison">
+            <h2>📊 So sánh Website</h2>
+            <table id="comparison-table">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)">Website</th>
-                        <th onclick="sortTable(1)">Sessions</th>
-                        <th onclick="sortTable(2)">Users</th>
-                        <th onclick="sortTable(3)">Pageviews</th>
-                        <th onclick="sortTable(4)">Clicks</th>
-                        <th onclick="sortTable(5)">Impressions</th>
-                        <th onclick="sortTable(6)">CTR</th>
-                        <th onclick="sortTable(7)">Position</th>
+                        <th>Website</th>
+                        <th class="numeric">Sessions</th>
+                        <th class="numeric">Users</th>
+                        <th class="numeric">Pageviews</th>
+                        <th class="numeric">Clicks</th>
+                        <th class="numeric">Impressions</th>
+                        <th class="numeric">CTR</th>
+                        <th class="numeric">Vị trí</th>
+                        <th class="numeric">% Thay đổi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><a href="seo-detail-foodplacee.com-2026-04-09.html" class="domain-link">foodplacee.com</a></td>
-                        <td>21,878</td>
-                        <td>20,308</td>
-                        <td>37,620</td>
-                        <td>950</td>
-                        <td>111,044</td>
-                        <td>1.17%</td>
-                        <td>7.9</td>
+                        <td><a class="site-name" href="seo-detail-localoria.com-2026-04-09.html" title="Xem chi tiết localoria.com">localoria.com</a></td>
+                        <td class="numeric">166.4K</td>
+                        <td class="numeric">156.0K</td>
+                        <td class="numeric">235.6K</td>
+                        <td class="numeric">10.8K</td>
+                        <td class="numeric">1.4M</td>
+                        <td class="numeric">0.83%</td>
+                        <td class="numeric">9.1</td>
+                        <td class="numeric good">+49.2%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-goto-where.com-2026-04-09.html" class="domain-link">goto-where.com</a></td>
-                        <td>761.7K</td>
-                        <td>707.4K</td>
-                        <td>1.1M</td>
-                        <td>253.2K</td>
-                        <td>57.7M</td>
-                        <td>0.44%</td>
-                        <td>8.5</td>
+                        <td><a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></td>
+                        <td class="numeric">14.8K</td>
+                        <td class="numeric">13.9K</td>
+                        <td class="numeric">20.8K</td>
+                        <td class="numeric">733</td>
+                        <td class="numeric">52.3K</td>
+                        <td class="numeric">1.81%</td>
+                        <td class="numeric">7.0</td>
+                        <td class="numeric good">+564.3%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-grubbio.com-2026-04-09.html" class="domain-link">grubbio.com</a></td>
-                        <td>132.6K</td>
-                        <td>125.7K</td>
-                        <td>187.5K</td>
-                        <td>24.7K</td>
-                        <td>3.1M</td>
-                        <td>0.79%</td>
-                        <td>8.6</td>
+                        <td><a class="site-name" href="seo-detail-res-menu.net-2026-04-09.html" title="Xem chi tiết res-menu.net">res-menu.net</a></td>
+                        <td class="numeric">1.7M</td>
+                        <td class="numeric">1.5M</td>
+                        <td class="numeric">2.6M</td>
+                        <td class="numeric">829.5K</td>
+                        <td class="numeric">54.8M</td>
+                        <td class="numeric">1.51%</td>
+                        <td class="numeric">9.3</td>
+                        <td class="numeric good">+28.1%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-locallya.com-2026-04-09.html" class="domain-link">locallya.com</a></td>
-                        <td>5,628</td>
-                        <td>5,326</td>
-                        <td>7,405</td>
-                        <td>231</td>
-                        <td>32,373</td>
-                        <td>0.27%</td>
-                        <td>8.8</td>
+                        <td><a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></td>
+                        <td class="numeric">21,878</td>
+                        <td class="numeric">20,308</td>
+                        <td class="numeric">37,620</td>
+                        <td class="numeric">950</td>
+                        <td class="numeric">111,044</td>
+                        <td class="numeric">1.17%</td>
+                        <td class="numeric">7.9</td>
+                        <td class="numeric good">+911.0%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-localoria.com-2026-04-09.html" class="domain-link">localoria.com</a></td>
-                        <td>166.4K</td>
-                        <td>156.0K</td>
-                        <td>235.6K</td>
-                        <td>10.8K</td>
-                        <td>1.4M</td>
-                        <td>0.83%</td>
-                        <td>9.1</td>
+                        <td><a class="site-name" href="seo-detail-restaurants-world.net-2026-04-09.html" title="Xem chi tiết restaurants-world.net">restaurants-world.net</a></td>
+                        <td class="numeric">625.7K</td>
+                        <td class="numeric">579.5K</td>
+                        <td class="numeric">859.4K</td>
+                        <td class="numeric">298.0K</td>
+                        <td class="numeric">32.6M</td>
+                        <td class="numeric">0.92%</td>
+                        <td class="numeric">9.5</td>
+                        <td class="numeric bad">-0.8%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-menu-world.com-2026-04-09.html" class="domain-link">menu-world.com</a></td>
-                        <td>1.4M</td>
-                        <td>1.3M</td>
-                        <td>2.5M</td>
-                        <td>796.1K</td>
-                        <td>71.3M</td>
-                        <td>1.12%</td>
-                        <td>8.6</td>
+                        <td><a class="site-name" href="seo-detail-goto-where.com-2026-04-09.html" title="Xem chi tiết goto-where.com">goto-where.com</a></td>
+                        <td class="numeric">761.7K</td>
+                        <td class="numeric">707.4K</td>
+                        <td class="numeric">1.1M</td>
+                        <td class="numeric">253.2K</td>
+                        <td class="numeric">57.7M</td>
+                        <td class="numeric">0.44%</td>
+                        <td class="numeric">8.5</td>
+                        <td class="numeric bad">-26.9%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-menufyy.com-2026-04-09.html" class="domain-link">menufyy.com</a></td>
-                        <td>450.1K</td>
-                        <td>424.1K</td>
-                        <td>616.4K</td>
-                        <td>177.3K</td>
-                        <td>19.0M</td>
-                        <td>0.94%</td>
-                        <td>7.8</td>
+                        <td><a class="site-name" href="seo-detail-menu-world.com-2026-04-09.html" title="Xem chi tiết menu-world.com">menu-world.com</a></td>
+                        <td class="numeric">1.4M</td>
+                        <td class="numeric">1.3M</td>
+                        <td class="numeric">2.5M</td>
+                        <td class="numeric">796.1K</td>
+                        <td class="numeric">71.3M</td>
+                        <td class="numeric">1.12%</td>
+                        <td class="numeric">8.6</td>
+                        <td class="numeric bad">-8.2%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-menustic.com-2026-04-09.html" class="domain-link">menustic.com</a></td>
-                        <td>192.7K</td>
-                        <td>179.3K</td>
-                        <td>283.0K</td>
-                        <td>70.7K</td>
-                        <td>8.8M</td>
-                        <td>0.80%</td>
-                        <td>7.3</td>
+                        <td><a class="site-name" href="seo-detail-grubbio.com-2026-04-09.html" title="Xem chi tiết grubbio.com">grubbio.com</a></td>
+                        <td class="numeric">132.6K</td>
+                        <td class="numeric">125.7K</td>
+                        <td class="numeric">187.5K</td>
+                        <td class="numeric">24.7K</td>
+                        <td class="numeric">3.1M</td>
+                        <td class="numeric">0.79%</td>
+                        <td class="numeric">8.6</td>
+                        <td class="numeric bad">-21.1%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-placejoys.com-2026-04-09.html" class="domain-link">placejoys.com</a></td>
-                        <td>635.4K</td>
-                        <td>586.6K</td>
-                        <td>1.1M</td>
-                        <td>129.2K</td>
-                        <td>10.7M</td>
-                        <td>1.21%</td>
-                        <td>7.9</td>
+                        <td><a class="site-name" href="seo-detail-menustic.com-2026-04-09.html" title="Xem chi tiết menustic.com">menustic.com</a></td>
+                        <td class="numeric">192.7K</td>
+                        <td class="numeric">179.3K</td>
+                        <td class="numeric">283.0K</td>
+                        <td class="numeric">70.7K</td>
+                        <td class="numeric">8.8M</td>
+                        <td class="numeric">0.80%</td>
+                        <td class="numeric">7.3</td>
+                        <td class="numeric good">+2.6%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-res-menu.net-2026-04-09.html" class="domain-link">res-menu.net</a></td>
-                        <td>1.7M</td>
-                        <td>1.5M</td>
-                        <td>2.6M</td>
-                        <td>829.5K</td>
-                        <td>54.8M</td>
-                        <td>1.51%</td>
-                        <td>9.3</td>
+                        <td><a class="site-name" href="seo-detail-menufyy.com-2026-04-09.html" title="Xem chi tiết menufyy.com">menufyy.com</a></td>
+                        <td class="numeric">450.1K</td>
+                        <td class="numeric">424.1K</td>
+                        <td class="numeric">616.4K</td>
+                        <td class="numeric">177.3K</td>
+                        <td class="numeric">19.0M</td>
+                        <td class="numeric">0.94%</td>
+                        <td class="numeric">7.8</td>
+                        <td class="numeric good">+77.0%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-restaurants-world.net-2026-04-09.html" class="domain-link">restaurants-world.net</a></td>
-                        <td>625.7K</td>
-                        <td>579.5K</td>
-                        <td>859.4K</td>
-                        <td>298.0K</td>
-                        <td>32.6M</td>
-                        <td>0.92%</td>
-                        <td>9.5</td>
+                        <td><a class="site-name" href="seo-detail-wherevi.com-2026-04-09.html" title="Xem chi tiết wherevi.com">wherevi.com</a></td>
+                        <td class="numeric">215.1K</td>
+                        <td class="numeric">208.6K</td>
+                        <td class="numeric">277.1K</td>
+                        <td class="numeric">17.7K</td>
+                        <td class="numeric">1.7M</td>
+                        <td class="numeric">1.31%</td>
+                        <td class="numeric">11.0</td>
+                        <td class="numeric good">+15.7%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-wherebly.com-2026-04-09.html" class="domain-link">wherebly.com</a></td>
-                        <td>14.8K</td>
-                        <td>13.9K</td>
-                        <td>20.8K</td>
-                        <td>733</td>
-                        <td>52.3K</td>
-                        <td>1.81%</td>
-                        <td>7.0</td>
+                        <td><a class="site-name" href="seo-detail-placejoys.com-2026-04-09.html" title="Xem chi tiết placejoys.com">placejoys.com</a></td>
+                        <td class="numeric">635.4K</td>
+                        <td class="numeric">586.6K</td>
+                        <td class="numeric">1.1M</td>
+                        <td class="numeric">129.2K</td>
+                        <td class="numeric">10.7M</td>
+                        <td class="numeric">1.21%</td>
+                        <td class="numeric">7.9</td>
+                        <td class="numeric bad">-12.2%</td>
                     </tr>
                     <tr>
-                        <td><a href="seo-detail-wherevi.com-2026-04-09.html" class="domain-link">wherevi.com</a></td>
-                        <td>215.1K</td>
-                        <td>208.6K</td>
-                        <td>277.1K</td>
-                        <td>17.7K</td>
-                        <td>1.7M</td>
-                        <td>1.31%</td>
-                        <td>11.0</td>
+                        <td><a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></td>
+                        <td class="numeric">5,628</td>
+                        <td class="numeric">5,326</td>
+                        <td class="numeric">7,405</td>
+                        <td class="numeric">231</td>
+                        <td class="numeric">32,373</td>
+                        <td class="numeric">0.27%</td>
+                        <td class="numeric">8.8</td>
+                        <td class="numeric good">+25481.8%</td>
                     </tr>
                 </tbody>
             </table>
-        </section>
+        </div>
 
-        <section id="keywords">
-            <h2 class="section-title">🔍 Top 20 Keywords</h2>
-            <table id="keywordsTable">
+        <div class="section" id="keywords">
+            <h2>🔑 Top Từ khóa</h2>
+            <table id="keywords-table">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)">Từ khóa</th>
-                        <th onclick="sortTable(1)">Clicks</th>
-                        <th onclick="sortTable(2)">Impressions</th>
-                        <th onclick="sortTable(3)">CTR</th>
-                        <th onclick="sortTable(4)">Position</th>
+                        <th>Từ khóa</th>
+                        <th class="numeric">Clicks</th>
+                        <th class="numeric">Impressions</th>
+                        <th class="numeric">CTR</th>
+                        <th class="numeric">Vị trí</th>
                     </tr>
                 </thead>
                 <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="anomalies">
+            <h2>⚠️ Phát hiện Bất thường</h2>
+            <div class="anomaly-cards">
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 89296 (baseline: 28868) <a class="site-name" href="seo-detail-localoria.com-2026-04-09.html" title="Xem chi tiết localoria.com">localoria.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1515 (baseline: 207) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1560 (baseline: 207) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1159 (baseline: 207) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1266 (baseline: 207) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1385 (baseline: 207) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1249 (baseline: 207) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 3771 (baseline: 729) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 4121 (baseline: 729) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 4156 (baseline: 729) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 3308 (baseline: 729) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 3057 (baseline: 729) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 3848 (baseline: 729) <a class="site-name" href="seo-detail-wherebly.com-2026-04-09.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1717 (baseline: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1863 (baseline: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1803 (baseline: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1568 (baseline: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1568 (baseline: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 1521 (baseline: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 6747 (baseline: 1405) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 8108 (baseline: 1405) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 8140 (baseline: 1405) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 7471 (baseline: 1405) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 6094 (baseline: 1405) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 6283 (baseline: 1405) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-09.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions drop: 18632 (baseline: 31296) <a class="site-name" href="seo-detail-goto-where.com-2026-04-09.html" title="Xem chi tiết goto-where.com">goto-where.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions drop: 4027 (baseline: 7052) <a class="site-name" href="seo-detail-wherevi.com-2026-04-09.html" title="Xem chi tiết wherevi.com">wherevi.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 590 (baseline: 52) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 547 (baseline: 52) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 552 (baseline: 52) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 652 (baseline: 52) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 945 (baseline: 52) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card critical">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Sessions spike: 917 (baseline: 52) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 2715 (baseline: 145) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 4112 (baseline: 145) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 4770 (baseline: 145) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 5257 (baseline: 145) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 4929 (baseline: 145) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title"></div>
+                    <div class="anomaly-description">Impressions spike: 5833 (baseline: 145) <a class="site-name" href="seo-detail-locallya.com-2026-04-09.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="trends">
+            <h2>⭐ Phân tích Xu hướng</h2>
+        </div>
+
+        <div class="section" id="recommendations">
+            <h2>💡 Kiến nghị Tối ưu</h2>
+            <table class="recommendation-table">
+                <thead>
                     <tr>
-                        <td>los betos menu</td>
-                        <td>2,348</td>
-                        <td>11,880</td>
-                        <td>19.76%</td>
-                        <td>4.4</td>
+                        <th>Mức độ</th>
+                        <th>Kiến nghị</th>
+                        <th>Chi tiết</th>
                     </tr>
-                    <tr>
-                        <td>chez lucien</td>
-                        <td>2,017</td>
-                        <td>10,639</td>
-                        <td>18.96%</td>
-                        <td>2.7</td>
+                </thead>
+                <tbody>
+                    <tr class="priority-High">
+                        <td><strong>HIGH</strong></td>
+                        <td>Improve Click-Through Rate</td>
+                        <td>CTR is 1.01%. Optimize title tags and meta descriptions for better appeal.</td>
                     </tr>
-                    <tr>
-                        <td>pjs oyster bar</td>
-                        <td>1,799</td>
-                        <td>5,020</td>
-                        <td>35.84%</td>
-                        <td>1.4</td>
+                    <tr class="priority-Medium">
+                        <td><strong>MEDIUM</strong></td>
+                        <td>Extend Session Duration</td>
+                        <td>Average session duration is 92s. Add more engaging content and internal links.</td>
                     </tr>
-                    <tr>
-                        <td>osteria santo spirito</td>
-                        <td>1,531</td>
-                        <td>14,501</td>
-                        <td>10.56%</td>
-                        <td>4.9</td>
+                    <tr class="priority-High">
+                        <td><strong>HIGH</strong></td>
+                        <td>Investigate Anomalies</td>
+                        <td>Detected 39 anomalies. Investigate technical issues and traffic patterns.</td>
                     </tr>
-                    <tr>
-                        <td>kawa revolving sushi menu</td>
-                        <td>1,413</td>
-                        <td>3,650</td>
-                        <td>38.71%</td>
-                        <td>2.0</td>
+                    <tr class="priority-Medium">
+                        <td><strong>MEDIUM</strong></td>
+                        <td>Leverage High Impression Volume</td>
+                        <td>With 261425961 impressions, improving CTR could significantly boost traffic.</td>
                     </tr>
-                    <tr>
-                        <td>bistrot paul bert menu</td>
-                        <td>1,382</td>
-                        <td>5,525</td>
-                        <td>25.01%</td>
-                        <td>2.3</td>
-                    </tr>
-                    <tr>
-                        <td>keens steakhouse menu</td>
-                        <td>1,145</td>
-                        <td>16,380</td>
-                        <td>6.99%</td>
-                        <td>3.7</td>
-                    </tr>
-                    <tr>
-                        <td>panoramic 34 menu</td>
-                        <td>1,129</td>
-                        <td>3,129</td>
-                        <td>36.08%</td>
-                        <td>2.2</td>
-                    </tr>
-                    <tr>
-                        <td>cafe continental menu</td>
-                        <td>1,122</td>
-                        <td>8,082</td>
-                        <td>13.88%</td>
-                        <td>4.1</td>
-                    </tr>
-                    <tr>
-                        <td>sofia&#x27;s pizza &amp; roast beef menu</td>
-                        <td>1,109</td>
-                        <td>2,648</td>
-                        <td>41.88%</td>
-                        <td>2.5</td>
-                    </tr>
-                    <tr>
-                        <td>johnny longboats menu</td>
-                        <td>1,068</td>
-                        <td>4,443</td>
-                        <td>24.04%</td>
-                        <td>2.1</td>
-                    </tr>
-                    <tr>
-                        <td>shukette menu</td>
-                        <td>1,068</td>
-                        <td>5,522</td>
-                        <td>19.34%</td>
-                        <td>1.9</td>
-                    </tr>
-                    <tr>
-                        <td>meat me liverpool</td>
-                        <td>1,063</td>
-                        <td>7,237</td>
-                        <td>14.69%</td>
-                        <td>2.9</td>
-                    </tr>
-                    <tr>
-                        <td>bell city diner menu</td>
-                        <td>1,021</td>
-                        <td>4,056</td>
-                        <td>25.17%</td>
-                        <td>2.0</td>
-                    </tr>
-                    <tr>
-                        <td>sushi kushi</td>
-                        <td>1,021</td>
-                        <td>8,975</td>
-                        <td>11.38%</td>
-                        <td>2.5</td>
-                    </tr>
-                    <tr>
-                        <td>terra madre dublin</td>
-                        <td>1,014</td>
-                        <td>4,552</td>
-                        <td>22.28%</td>
-                        <td>2.8</td>
-                    </tr>
-                    <tr>
-                        <td>donut hole menu</td>
-                        <td>977</td>
-                        <td>4,347</td>
-                        <td>22.48%</td>
-                        <td>3.5</td>
-                    </tr>
-                    <tr>
-                        <td>the hive waterfront restaurant &amp; tiki menu</td>
-                        <td>977</td>
-                        <td>5,294</td>
-                        <td>18.45%</td>
-                        <td>2.0</td>
-                    </tr>
-                    <tr>
-                        <td>donut hole bakery cafe menu</td>
-                        <td>944</td>
-                        <td>5,230</td>
-                        <td>18.05%</td>
-                        <td>2.9</td>
-                    </tr>
-                    <tr>
-                        <td>ok cafe menu</td>
-                        <td>925</td>
-                        <td>4,823</td>
-                        <td>19.18%</td>
-                        <td>3.3</td>
+                    <tr class="priority-Medium">
+                        <td><strong>MEDIUM</strong></td>
+                        <td>Optimize Target Keywords</td>
+                        <td>Review keyword performance and focus on high-intent queries with conversion potential.</td>
                     </tr>
                 </tbody>
             </table>
-        </section>
-
-        <section id="anomalies">
-            <h2 class="section-title">⚠️ Bất thường phát hiện (39)</h2>
-            <div style="background-color: #0f172a; padding: 1.5rem; border-radius: 0.5rem;">
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #f97316; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">localoria.com - 2026-04-04</div>
-                        <span class="anomaly-badge anomaly-warning">WARNING</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Impressions spike: 89296 (baseline: 28868)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-02</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1515 (baseline: 207)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-03</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1560 (baseline: 207)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-04</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1159 (baseline: 207)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-05</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1266 (baseline: 207)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-06</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1385 (baseline: 207)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-07</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1249 (baseline: 207)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #f97316; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-02</div>
-                        <span class="anomaly-badge anomaly-warning">WARNING</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Impressions spike: 3771 (baseline: 729)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #f97316; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-03</div>
-                        <span class="anomaly-badge anomaly-warning">WARNING</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Impressions spike: 4121 (baseline: 729)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #f97316; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-04</div>
-                        <span class="anomaly-badge anomaly-warning">WARNING</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Impressions spike: 4156 (baseline: 729)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #f97316; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-05</div>
-                        <span class="anomaly-badge anomaly-warning">WARNING</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Impressions spike: 3308 (baseline: 729)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #f97316; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-06</div>
-                        <span class="anomaly-badge anomaly-warning">WARNING</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Impressions spike: 3057 (baseline: 729)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #f97316; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">wherebly.com - 2026-04-07</div>
-                        <span class="anomaly-badge anomaly-warning">WARNING</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Impressions spike: 3848 (baseline: 729)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">foodplacee.com - 2026-04-02</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1717 (baseline: 333)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">foodplacee.com - 2026-04-03</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1863 (baseline: 333)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">foodplacee.com - 2026-04-04</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1803 (baseline: 333)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">foodplacee.com - 2026-04-05</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1568 (baseline: 333)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">foodplacee.com - 2026-04-06</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1568 (baseline: 333)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #ef4444; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">foodplacee.com - 2026-04-07</div>
-                        <span class="anomaly-badge anomaly-critical">CRITICAL</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Sessions spike: 1521 (baseline: 333)</div>
-                </div>
-
-                <div style="margin-bottom: 1rem; padding: 1rem; background-color: #1e293b; border-left: 4px solid #f97316; border-radius: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600;">foodplacee.com - 2026-04-02</div>
-                        <span class="anomaly-badge anomaly-warning">WARNING</span>
-                    </div>
-                    <div style="font-size: 0.875rem; color: #cbd5e1;">Impressions spike: 6747 (baseline: 1405)</div>
-                </div>
-            </div>
-        </section>
-
-        <section id="recommendations">
-            <h2 class="section-title">💡 Đề xuất tối ưu hóa</h2>
-            <div class="recommendation high">
-                <div class="recommendation-header">
-                    <div>
-                        <div class="recommendation-title">Improve Click-Through Rate</div>
-                        <div class="recommendation-category">Search Optimization</div>
-                    </div>
-                    <span class="priority-badge priority-high">High</span>
-                </div>
-                <div class="recommendation-description">CTR is 1.01%. Optimize title tags and meta descriptions for better appeal.</div>
-                <div style="font-size: 0.75rem; color: #64748b;">Impact: Medium</div>
-            </div>
-            <div class="recommendation medium">
-                <div class="recommendation-header">
-                    <div>
-                        <div class="recommendation-title">Extend Session Duration</div>
-                        <div class="recommendation-category">Content & Engagement</div>
-                    </div>
-                    <span class="priority-badge priority-medium">Medium</span>
-                </div>
-                <div class="recommendation-description">Average session duration is 92s. Add more engaging content and internal links.</div>
-                <div style="font-size: 0.75rem; color: #64748b;">Impact: Medium</div>
-            </div>
-            <div class="recommendation high">
-                <div class="recommendation-header">
-                    <div>
-                        <div class="recommendation-title">Investigate Anomalies</div>
-                        <div class="recommendation-category">Performance</div>
-                    </div>
-                    <span class="priority-badge priority-high">High</span>
-                </div>
-                <div class="recommendation-description">Detected 39 anomalies. Investigate technical issues and traffic patterns.</div>
-                <div style="font-size: 0.75rem; color: #64748b;">Impact: High</div>
-            </div>
-            <div class="recommendation medium">
-                <div class="recommendation-header">
-                    <div>
-                        <div class="recommendation-title">Leverage High Impression Volume</div>
-                        <div class="recommendation-category">Search Optimization</div>
-                    </div>
-                    <span class="priority-badge priority-medium">Medium</span>
-                </div>
-                <div class="recommendation-description">With 261425961 impressions, improving CTR could significantly boost traffic.</div>
-                <div style="font-size: 0.75rem; color: #64748b;">Impact: Medium</div>
-            </div>
-            <div class="recommendation medium">
-                <div class="recommendation-header">
-                    <div>
-                        <div class="recommendation-title">Optimize Target Keywords</div>
-                        <div class="recommendation-category">SEO</div>
-                    </div>
-                    <span class="priority-badge priority-medium">Medium</span>
-                </div>
-                <div class="recommendation-description">Review keyword performance and focus on high-intent queries with conversion potential.</div>
-                <div style="font-size: 0.75rem; color: #64748b;">Impact: Medium</div>
-            </div>
-
-        </section>
-
-        <div class="footer">
-            <p>SEO Analysis Dashboard | 2026-04-09</p>
-            <p style="font-size: 0.75rem; margin-top: 0.5rem;">Data: Google Analytics 4 & Google Search Console</p>
         </div>
     </div>
-
     <script>
-        // Chart data
-        const chartLabels = ["2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07"];
-        const domainColors = {"localoria.com": "#3b82f6", "wherebly.com": "#22c55e", "res-menu.net": "#ef4444", "foodplacee.com": "#eab308", "restaurants-world.net": "#a855f7", "goto-where.com": "#06b6d4", "menu-world.com": "#f97316", "grubbio.com": "#ec4899", "menustic.com": "#8b5cf6", "menufyy.com": "#14b8a6", "wherevi.com": "#f43f5e", "placejoys.com": "#84cc16", "locallya.com": "#0ea5e9"};
-        const sessionsData = {"localoria.com": [2826.0, 2975.0, 3019.0, 42753.0, 3699.0, 3455.0, 3596.0, 3778.0, 3731.0, 3811.0, 4436.0, 4503.0, 4594.0, 3518.0, 3758.0, 4032.0, 4470.0, 15321.0, 4914.0, 4627.0, 4284.0, 4052.0, 4132.0, 4210.0, 4840.0, 4736.0, 4323.0, 4047.0, 3933.0], "wherebly.com": [159.0, 212.0, 209.0, 237.0, 268.0, 267.0, 165.0, 195.0, 185.0, 181.0, 235.0, 266.0, 198.0, 150.0, 175.0, 187.0, 202.0, 225.0, 533.0, 465.0, 394.0, 677.0, 881.0, 1515.0, 1560.0, 1159.0, 1266.0, 1385.0, 1249.0], "res-menu.net": [47451.0, 46853.0, 50898.0, 63313.0, 99269.0, 51793.0, 43592.0, 51054.0, 50854.0, 54088.0, 64927.0, 63780.0, 51125.0, 43830.0, 47827.0, 48897.0, 51467.0, 64226.0, 163507.0, 53381.0, 51697.0, 53087.0, 53084.0, 60138.0, 66946.0, 62774.0, 44534.0, 46070.0, 51472.0], "foodplacee.com": [170, 145, 171, 236, 260, 219, 156, 174, 175, 138, 193, 261, 218, 200, 436, 451, 730, 923, 1279, 1217, 1158, 1465, 1463, 1717, 1863, 1803, 1568, 1568, 1521], "restaurants-world.net": [19935.0, 18331.0, 18285.0, 22355.0, 24789.0, 23655.0, 19130.0, 23463.0, 18201.0, 20037.0, 27158.0, 40359.0, 20308.0, 17500.0, 18399.0, 17864.0, 18405.0, 23009.0, 25278.0, 21449.0, 18443.0, 18714.0, 22059.0, 24564.0, 26835.0, 23633.0, 17788.0, 17380.0, 18391.0], "goto-where.com": [31624.0, 25432.0, 23628.0, 29654.0, 31992.0, 29249.0, 25313.0, 25513.0, 24767.0, 25344.0, 28682.0, 28727.0, 26065.0, 22682.0, 23136.0, 23856.0, 24082.0, 27769.0, 29655.0, 26044.0, 26009.0, 26936.0, 30696.0, 29832.0, 28946.0, 26189.0, 21939.0, 18632.0, 19308.0], "menu-world.com": [45604.0, 49507.0, 50230.0, 56591.0, 83349.0, 49257.0, 42716.0, 47224.0, 45095.0, 45726.0, 52899.0, 54466.0, 44286.0, 40882.0, 44242.0, 44303.0, 47064.0, 61127.0, 65609.0, 45247.0, 43263.0, 46854.0, 48253.0, 50859.0, 58319.0, 52817.0, 39651.0, 36150.0, 43170.0], "grubbio.com": [4296.0, 4300.0, 4706.0, 4961.0, 5075.0, 4810.0, 4386.0, 4745.0, 4566.0, 4611.0, 4731.0, 4739.0, 4718.0, 3905.0, 3923.0, 4076.0, 4134.0, 4199.0, 4281.0, 4357.0, 3880.0, 4073.0, 4085.0, 4209.0, 10442.0, 4490.0, 4066.0, 3979.0, 3891.0], "menustic.com": [6259.0, 6082.0, 6364.0, 6943.0, 7385.0, 6788.0, 6036.0, 6401.0, 6144.0, 6320.0, 7068.0, 7287.0, 6390.0, 5588.0, 5846.0, 5787.0, 6376.0, 6803.0, 7171.0, 6179.0, 6840.0, 7190.0, 7883.0, 7466.0, 7849.0, 7178.0, 6306.0, 6247.0, 6535.0], "menufyy.com": [10234.0, 79260.0, 11336.0, 12699.0, 13943.0, 12465.0, 11261.0, 12278.0, 11799.0, 11969.0, 13463.0, 14003.0, 13128.0, 11261.0, 12030.0, 12222.0, 12813.0, 14333.0, 15735.0, 13907.0, 12453.0, 12897.0, 13899.0, 15459.0, 18266.0, 16011.0, 14023.0, 13814.0, 13185.0], "wherevi.com": [20330.0, 5324.0, 5442.0, 5924.0, 6455.0, 5512.0, 4883.0, 5521.0, 5269.0, 5179.0, 6057.0, 5366.0, 5035.0, 4514.0, 60260.0, 4413.0, 4457.0, 5268.0, 4771.0, 4817.0, 4244.0, 4634.0, 4197.0, 4786.0, 4639.0, 4511.0, 4027.0, 4646.0, 4629.0], "placejoys.com": [18423.0, 18987.0, 21678.0, 24153.0, 26451.0, 22989.0, 20573.0, 21432.0, 21309.0, 22292.0, 26295.0, 27312.0, 24316.0, 19595.0, 21126.0, 20705.0, 20794.0, 24526.0, 25913.0, 23691.0, 19880.0, 20137.0, 19713.0, 21194.0, 23624.0, 23028.0, 18637.0, 18009.0, 18638.0], "locallya.com": [1, 1, 0, 2, 2, 2, 2, 0, 3, 3, 2, 1, 0, 0, 65, 68, 76, 94, 190, 173, 151, 256, 333, 590, 547, 552, 652, 945, 917]};
-        const clicksData = {"localoria.com": [188.0, 193.0, 198.0, 267.0, 246.0, 233.0, 239.0, 299.0, 270.0, 322.0, 398.0, 364.0, 359.0, 332.0, 376.0, 373.0, 402.0, 444.0, 502.0, 468.0, 467.0, 463.0, 433.0, 455.0, 542.0, 566.0, 461.0, 487.0, 493.0], "wherebly.com": [25.0, 28.0, 10.0, 27.0, 26.0, 16.0, 11.0, 24.0, 17.0, 17.0, 24.0, 25.0, 27.0, 20.0, 21.0, 21.0, 21.0, 25.0, 33.0, 22.0, 26.0, 30.0, 36.0, 36.0, 49.0, 42.0, 27.0, 24.0, 23.0], "res-menu.net": [20078.0, 22742.0, 26436.0, 34415.0, 35708.0, 26909.0, 22713.0, 26767.0, 26833.0, 28515.0, 35090.0, 35179.0, 27157.0, 21878.0, 23944.0, 25721.0, 27317.0, 35407.0, 37183.0, 28948.0, 24301.0, 26740.0, 27704.0, 30689.0, 38497.0, 35850.0, 23142.0, 25102.0, 28514.0], "foodplacee.com": [16, 14, 21, 33, 22, 6, 7, 7, 13, 19, 20, 34, 38, 26, 29, 38, 34, 34, 42, 31, 24, 41, 61, 58, 70, 76, 53, 37, 46], "restaurants-world.net": [8233.0, 8285.0, 9025.0, 11808.0, 12356.0, 9240.0, 8299.0, 9099.0, 9156.0, 9929.0, 11881.0, 11918.0, 9349.0, 8086.0, 8932.0, 8998.0, 9489.0, 12334.0, 13037.0, 10508.0, 8574.0, 9515.0, 11039.0, 12405.0, 14725.0, 13670.0, 8937.0, 9303.0, 9868.0], "goto-where.com": [8326.0, 8472.0, 9249.0, 10877.0, 10672.0, 9074.0, 8510.0, 8519.0, 8548.0, 8944.0, 10128.0, 10098.0, 8631.0, 7672.0, 7937.0, 8513.0, 8736.0, 10429.0, 9759.0, 7976.0, 7022.0, 7234.0, 7761.0, 8815.0, 9888.0, 9327.0, 7073.0, 7545.0, 7443.0], "menu-world.com": [24418.0, 25349.0, 28334.0, 34230.0, 33281.0, 26349.0, 23412.0, 25566.0, 25589.0, 27270.0, 32896.0, 31899.0, 25555.0, 22539.0, 24295.0, 25604.0, 27694.0, 34564.0, 32688.0, 25072.0, 22619.0, 24373.0, 26143.0, 29046.0, 34483.0, 31264.0, 21209.0, 24573.0, 25753.0], "grubbio.com": [731.0, 701.0, 789.0, 958.0, 954.0, 807.0, 785.0, 788.0, 813.0, 866.0, 883.0, 904.0, 815.0, 682.0, 746.0, 745.0, 830.0, 952.0, 950.0, 880.0, 766.0, 849.0, 892.0, 976.0, 1160.0, 1009.0, 809.0, 833.0, 817.0], "menustic.com": [2149.0, 2173.0, 2295.0, 2599.0, 2607.0, 2361.0, 2160.0, 2098.0, 2112.0, 2212.0, 2443.0, 2492.0, 2203.0, 1906.0, 2156.0, 2153.0, 2369.0, 2644.0, 2719.0, 2429.0, 2305.0, 2364.0, 2579.0, 2929.0, 3321.0, 3147.0, 2639.0, 2519.0, 2595.0], "menufyy.com": [4122.0, 4323.0, 4858.0, 5636.0, 6162.0, 5365.0, 4621.0, 4877.0, 5040.0, 5267.0, 6054.0, 6421.0, 5689.0, 4766.0, 5155.0, 5498.0, 5964.0, 7169.0, 7532.0, 6519.0, 5629.0, 6262.0, 6878.0, 7997.0, 9085.0, 9011.0, 7387.0, 7179.0, 6877.0], "wherevi.com": [1210.0, 1107.0, 1246.0, 1470.0, 1516.0, 1000.0, 899.0, 830.0, 801.0, 788.0, 990.0, 911.0, 716.0, 615.0, 570.0, 211.0, 234.0, 264.0, 281.0, 214.0, 190.0, 165.0, 201.0, 238.0, 278.0, 252.0, 172.0, 158.0, 192.0], "placejoys.com": [3017.0, 3472.0, 4032.0, 4911.0, 4870.0, 4340.0, 3581.0, 4202.0, 4211.0, 4564.0, 5636.0, 5799.0, 4873.0, 4196.0, 4441.0, 4638.0, 4800.0, 5876.0, 6101.0, 5210.0, 4410.0, 4541.0, 4091.0, 4363.0, 4762.0, 4384.0, 3054.0, 3215.0, 3588.0], "locallya.com": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 4, 9, 22, 21, 18, 38, 35, 47, 33]};
-        const impressionsData = {"localoria.com": [13762.0, 14655.0, 15724.0, 22003.0, 23719.0, 21339.0, 23733.0, 32858.0, 36498.0, 39979.0, 51362.0, 55569.0, 54085.0, 46173.0, 46442.0, 48271.0, 52203.0, 61550.0, 65616.0, 62930.0, 61033.0, 65412.0, 65658.0, 71666.0, 80673.0, 89296.0, 80408.0, 71045.0, 72469.0], "wherebly.com": [1369.0, 1530.0, 1774.0, 2093.0, 2015.0, 1763.0, 1535.0, 1195.0, 719.0, 786.0, 1019.0, 1097.0, 792.0, 566.0, 672.0, 740.0, 826.0, 1022.0, 1290.0, 1108.0, 1110.0, 2067.0, 2933.0, 3771.0, 4121.0, 4156.0, 3308.0, 3057.0, 3848.0], "res-menu.net": [1258885.0, 1452296.0, 1607530.0, 2035676.0, 2144067.0, 1795835.0, 1502900.0, 1749217.0, 1812792.0, 1894266.0, 2307567.0, 2375670.0, 1968940.0, 1556607.0, 1622073.0, 1690854.0, 1780330.0, 2227602.0, 2402894.0, 1996239.0, 1652572.0, 1812888.0, 1857803.0, 1988873.0, 2387793.0, 2336669.0, 1875976.0, 1815131.0, 1924178.0], "foodplacee.com": [790, 716, 834, 1126, 1176, 627, 375, 418, 764, 957, 2245, 3768, 4557, 4296, 4205, 4869, 4794, 5519, 5828, 5058, 4591, 4909, 5779, 6747, 8108, 8140, 7471, 6094, 6283], "restaurants-world.net": [829056.0, 873211.0, 949987.0, 1178796.0, 1216973.0, 1023044.0, 892833.0, 977846.0, 1011099.0, 1063880.0, 1291670.0, 1310065.0, 1114022.0, 907059.0, 944297.0, 989752.0, 1038623.0, 1303456.0, 1389842.0, 1173906.0, 985131.0, 1082514.0, 1200262.0, 1318093.0, 1544715.0, 1490478.0, 1207577.0, 1098719.0, 1148430.0], "goto-where.com": [1743066.0, 1849489.0, 1961916.0, 2364553.0, 2439982.0, 2103379.0, 1797734.0, 1916441.0, 1929541.0, 2029705.0, 2375304.0, 2411395.0, 2081964.0, 1751451.0, 1785239.0, 1834401.0, 1908389.0, 2322774.0, 2354623.0, 1916528.0, 1602019.0, 1709034.0, 1792340.0, 1983075.0, 2235549.0, 2189470.0, 1834066.0, 1742695.0, 1753804.0], "menu-world.com": [2076535.0, 2233040.0, 2343762.0, 2869603.0, 2920476.0, 2453627.0, 2108450.0, 2315180.0, 2333606.0, 2447244.0, 2962688.0, 2997426.0, 2501787.0, 2085883.0, 2150593.0, 2229267.0, 2336768.0, 2895762.0, 2952032.0, 2380798.0, 2006468.0, 2172053.0, 2304500.0, 2506003.0, 2935439.0, 2818143.0, 2303598.0, 2271232.0, 2394884.0], "grubbio.com": [91154.0, 95807.0, 99567.0, 115827.0, 122026.0, 108916.0, 90652.0, 96142.0, 98352.0, 106485.0, 117988.0, 123772.0, 112293.0, 92916.0, 93583.0, 95142.0, 98080.0, 115136.0, 124481.0, 109856.0, 93595.0, 101992.0, 107089.0, 123160.0, 134209.0, 134626.0, 121762.0, 106971.0, 110272.0], "menustic.com": [244061.0, 249975.0, 261926.0, 307478.0, 326834.0, 298186.0, 245925.0, 257824.0, 257600.0, 277988.0, 323887.0, 339891.0, 311453.0, 259234.0, 260887.0, 264226.0, 274554.0, 325987.0, 349244.0, 313578.0, 269659.0, 290188.0, 311748.0, 359304.0, 405484.0, 409120.0, 374380.0, 329678.0, 320188.0], "menufyy.com": [412406.0, 439510.0, 480376.0, 575004.0, 630389.0, 591051.0, 475508.0, 507256.0, 539553.0, 576537.0, 673800.0, 718825.0, 656828.0, 543354.0, 566166.0, 581918.0, 614381.0, 743379.0, 804144.0, 716892.0, 620536.0, 669693.0, 725642.0, 835195.0, 953488.0, 974355.0, 853205.0, 778487.0, 760449.0], "wherevi.com": [85830.0, 88332.0, 97283.0, 118304.0, 122667.0, 99910.0, 84354.0, 91681.0, 93620.0, 98313.0, 119471.0, 124235.0, 103676.0, 82594.0, 63607.0, 13350.0, 12882.0, 15773.0, 17412.0, 14039.0, 11735.0, 12709.0, 12893.0, 13539.0, 15496.0, 13802.0, 11609.0, 9740.0, 10420.0], "placejoys.com": [233016.0, 277674.0, 301846.0, 368239.0, 391583.0, 327050.0, 269907.0, 330576.0, 341172.0, 369324.0, 451840.0, 464806.0, 400732.0, 330852.0, 345478.0, 358834.0, 378353.0, 463915.0, 488616.0, 411845.0, 355252.0, 376088.0, 349575.0, 375471.0, 445119.0, 435981.0, 359832.0, 348567.0, 376415.0], "locallya.com": [1, 4, 2, 3, 1, 5, 4, 3, 9, 3, 4, 2, 5, 4, 16, 34, 98, 206, 326, 513, 793, 1076, 1645, 2715, 4112, 4770, 5257, 4929, 5833]};
-        const positionData = {"localoria.com": [9.0496, 9.6377, 8.9654, 9.4803, 9.2092, 9.5084, 9.8669, 10.2483, 9.9604, 9.8295, 9.5619, 9.113, 8.9609, 9.067, 8.6619, 9.4419, 9.4235, 9.2736, 9.4996, 9.1184, 8.9369, 8.6918, 8.5633, 8.6906, 8.5386, 7.913, 8.0495, 8.3143, 7.9888], "wherebly.com": [8.1351, 7.332, 6.9301, 6.5308, 7.5385, 7.6398, 7.3075, 7.79, 6.0195, 6.4898, 5.946, 5.443, 6.173, 6.0512, 4.8095, 5.8297, 5.1332, 5.8757, 5.9643, 8.1525, 7.9694, 8.3111, 8.1732, 7.7887, 8.4009, 8.1607, 8.3177, 8.3356, 7.8604], "res-menu.net": [10.0518, 10.0549, 9.5393, 9.2181, 8.8629, 9.1671, 9.4495, 9.466, 9.4778, 9.3204, 9.4809, 9.1331, 9.3361, 9.2975, 8.9338, 9.2382, 9.3537, 9.197, 9.2585, 9.1916, 9.566, 9.4043, 9.2394, 9.2172, 8.8146, 8.4815, 8.9721, 9.0202, 8.9254], "foodplacee.com": [5.9519, 6.0559, 4.7374, 4.5595, 5.6088, 7.134, 6.9307, 8.4904, 6.3678, 6.5298, 7.3385, 8.1388, 8.582, 8.9169, 8.7239, 9.2707, 9.408, 9.2317, 9.3099, 9.397, 9.3969, 9.1023, 8.8353, 8.5457, 8.5962, 8.2004, 8.1434, 8.8293, 8.6436], "restaurants-world.net": [9.8656, 10.2052, 9.7375, 9.4445, 9.0517, 9.3876, 9.5878, 9.8448, 9.7877, 9.5199, 9.8066, 9.4667, 9.6479, 9.552, 9.1821, 9.5461, 9.7579, 9.5549, 9.6752, 9.52, 10.017, 9.8458, 9.3472, 9.2068, 8.8944, 8.5735, 9.1714, 9.3607, 9.2893], "goto-where.com": [8.4602, 8.6151, 8.3818, 8.3663, 8.2647, 8.4065, 8.4316, 8.6081, 8.634, 8.5885, 8.69, 8.5372, 8.5941, 8.4553, 8.2382, 8.48, 8.5367, 8.4496, 8.6013, 8.6664, 8.8386, 8.7891, 8.6312, 8.6704, 8.4979, 8.2087, 8.4174, 8.4997, 8.4579], "menu-world.com": [8.7714, 8.9361, 8.4674, 8.3721, 8.1566, 8.497, 8.6846, 8.8462, 8.8681, 8.7245, 8.8062, 8.5617, 8.7729, 8.6511, 8.2707, 8.6332, 8.6952, 8.508, 8.6766, 8.7444, 9.0611, 8.9345, 8.6855, 8.7134, 8.3467, 7.9679, 8.4481, 8.4184, 8.315], "grubbio.com": [8.8728, 8.8985, 8.5495, 8.6169, 8.5696, 8.8515, 8.7858, 8.9206, 8.8988, 8.8255, 9.0241, 8.8498, 8.7953, 8.6575, 8.3136, 8.7325, 8.7494, 8.655, 8.6902, 8.5893, 8.7869, 8.6916, 8.5642, 8.371, 8.4598, 8.167, 8.1169, 8.3549, 8.0514], "menustic.com": [7.234, 7.4057, 7.2474, 7.3253, 7.3348, 7.4635, 7.3488, 7.4878, 7.521, 7.4793, 7.5135, 7.4601, 7.4622, 7.3169, 7.1788, 7.3859, 7.4089, 7.3816, 7.446, 7.3981, 7.4488, 7.3449, 7.2839, 7.1552, 7.2343, 6.9848, 6.9958, 7.1472, 6.9819], "menufyy.com": [7.9561, 7.9462, 7.6879, 7.7635, 7.7412, 7.7906, 7.8852, 7.9414, 7.8533, 7.9074, 7.9267, 7.8733, 7.8585, 7.7515, 7.5483, 7.7402, 7.7418, 7.6913, 7.7656, 7.7542, 7.8613, 7.8002, 7.7394, 7.7015, 7.8251, 7.5547, 7.6017, 7.7324, 7.5594], "wherevi.com": [8.8614, 9.2969, 8.9397, 8.6305, 8.2011, 8.3929, 8.593, 8.9453, 8.8088, 8.4458, 8.731, 8.5004, 8.5896, 8.494, 8.2789, 12.689, 13.9731, 14.0859, 15.0344, 13.8286, 16.3952, 15.8904, 14.4181, 13.1491, 11.2068, 10.2325, 11.3511, 13.6215, 12.4512], "placejoys.com": [8.3646, 8.2244, 7.8342, 7.8677, 7.6255, 7.6823, 8.0022, 7.9466, 7.812, 7.6807, 7.9067, 7.6418, 7.716, 7.5242, 7.3189, 7.7656, 7.853, 7.7701, 7.9634, 7.8011, 8.1244, 8.0251, 8.2709, 8.1809, 7.9242, 7.6141, 7.8799, 7.8928, 7.5221], "locallya.com": [8.0, 3.25, 5.0, 3.0, 56.0, 2.4, 3.0, 30.0, 4.6667, 1.0, 3.5, 2.0, 4.4, 2.5, 5.3125, 7.3824, 10.2041, 10.5437, 8.3834, 9.4288, 8.9105, 8.8959, 8.5678, 8.0214, 8.0109, 7.6122, 7.8547, 8.0674, 7.9119]};
+        const CHART_DATA = {"dates": ["2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07"], "datasets_sessions": [{"label": "localoria.com", "data": [2867.0, 2826.0, 2975.0, 3019.0, 42753.0, 3699.0, 3455.0, 3596.0, 3778.0, 3731.0, 3811.0, 4436.0, 4503.0, 4594.0, 3518.0, 3758.0, 4032.0, 4470.0, 15321.0, 4914.0, 4627.0, 4284.0, 4052.0, 4132.0, 4210.0, 4840.0, 4736.0, 4323.0, 4047.0, 3933.0], "borderColor": "#e74c3c", "backgroundColor": "#e74c3c20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "wherebly.com", "data": [147.0, 159.0, 212.0, 209.0, 237.0, 268.0, 267.0, 165.0, 195.0, 185.0, 181.0, 235.0, 266.0, 198.0, 150.0, 175.0, 187.0, 202.0, 225.0, 533.0, 465.0, 394.0, 677.0, 881.0, 1515.0, 1560.0, 1159.0, 1266.0, 1385.0, 1249.0], "borderColor": "#3498db", "backgroundColor": "#3498db20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "res-menu.net", "data": [43423.0, 47451.0, 46853.0, 50898.0, 63313.0, 99269.0, 51793.0, 43592.0, 51054.0, 50854.0, 54088.0, 64927.0, 63780.0, 51125.0, 43830.0, 47827.0, 48897.0, 51467.0, 64226.0, 163507.0, 53381.0, 51697.0, 53087.0, 53084.0, 60138.0, 66946.0, 62774.0, 44534.0, 46070.0, 51472.0], "borderColor": "#2ecc71", "backgroundColor": "#2ecc7120", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "foodplacee.com", "data": [157, 170, 145, 171, 236, 260, 219, 156, 174, 175, 138, 193, 261, 218, 200, 436, 451, 730, 923, 1279, 1217, 1158, 1465, 1463, 1717, 1863, 1803, 1568, 1568, 1521], "borderColor": "#f39c12", "backgroundColor": "#f39c1220", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "restaurants-world.net", "data": [19197.0, 19935.0, 18331.0, 18285.0, 22355.0, 24789.0, 23655.0, 19130.0, 23463.0, 18201.0, 20037.0, 27158.0, 40359.0, 20308.0, 17500.0, 18399.0, 17864.0, 18405.0, 23009.0, 25278.0, 21449.0, 18443.0, 18714.0, 22059.0, 24564.0, 26835.0, 23633.0, 17788.0, 17380.0, 18391.0], "borderColor": "#9b59b6", "backgroundColor": "#9b59b620", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "goto-where.com", "data": [133654.0, 31624.0, 25432.0, 23628.0, 29654.0, 31992.0, 29249.0, 25313.0, 25513.0, 24767.0, 25344.0, 28682.0, 28727.0, 26065.0, 22682.0, 23136.0, 23856.0, 24082.0, 27769.0, 29655.0, 26044.0, 26009.0, 26936.0, 30696.0, 29832.0, 28946.0, 26189.0, 21939.0, 18632.0, 19308.0], "borderColor": "#1abc9c", "backgroundColor": "#1abc9c20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menu-world.com", "data": [44795.0, 45604.0, 49507.0, 50230.0, 56591.0, 83349.0, 49257.0, 42716.0, 47224.0, 45095.0, 45726.0, 52899.0, 54466.0, 44286.0, 40882.0, 44242.0, 44303.0, 47064.0, 61127.0, 65609.0, 45247.0, 43263.0, 46854.0, 48253.0, 50859.0, 58319.0, 52817.0, 39651.0, 36150.0, 43170.0], "borderColor": "#e67e22", "backgroundColor": "#e67e2220", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "grubbio.com", "data": [4274.0, 4296.0, 4300.0, 4706.0, 4961.0, 5075.0, 4810.0, 4386.0, 4745.0, 4566.0, 4611.0, 4731.0, 4739.0, 4718.0, 3905.0, 3923.0, 4076.0, 4134.0, 4199.0, 4281.0, 4357.0, 3880.0, 4073.0, 4085.0, 4209.0, 10442.0, 4490.0, 4066.0, 3979.0, 3891.0], "borderColor": "#34495e", "backgroundColor": "#34495e20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menustic.com", "data": [6113.0, 6259.0, 6082.0, 6364.0, 6943.0, 7385.0, 6788.0, 6036.0, 6401.0, 6144.0, 6320.0, 7068.0, 7287.0, 6390.0, 5588.0, 5846.0, 5787.0, 6376.0, 6803.0, 7171.0, 6179.0, 6840.0, 7190.0, 7883.0, 7466.0, 7849.0, 7178.0, 6306.0, 6247.0, 6535.0], "borderColor": "#16a085", "backgroundColor": "#16a08520", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menufyy.com", "data": [9818.0, 10234.0, 79260.0, 11336.0, 12699.0, 13943.0, 12465.0, 11261.0, 12278.0, 11799.0, 11969.0, 13463.0, 14003.0, 13128.0, 11261.0, 12030.0, 12222.0, 12813.0, 14333.0, 15735.0, 13907.0, 12453.0, 12897.0, 13899.0, 15459.0, 18266.0, 16011.0, 14023.0, 13814.0, 13185.0], "borderColor": "#c0392b", "backgroundColor": "#c0392b20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "wherevi.com", "data": [4922.0, 20330.0, 5324.0, 5442.0, 5924.0, 6455.0, 5512.0, 4883.0, 5521.0, 5269.0, 5179.0, 6057.0, 5366.0, 5035.0, 4514.0, 60260.0, 4413.0, 4457.0, 5268.0, 4771.0, 4817.0, 4244.0, 4634.0, 4197.0, 4786.0, 4639.0, 4511.0, 4027.0, 4646.0, 4629.0], "borderColor": "#2980b9", "backgroundColor": "#2980b920", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "placejoys.com", "data": [17924.0, 18423.0, 18987.0, 21678.0, 24153.0, 26451.0, 22989.0, 20573.0, 21432.0, 21309.0, 22292.0, 26295.0, 27312.0, 24316.0, 19595.0, 21126.0, 20705.0, 20794.0, 24526.0, 25913.0, 23691.0, 19880.0, 20137.0, 19713.0, 21194.0, 23624.0, 23028.0, 18637.0, 18009.0, 18638.0], "borderColor": "#27ae60", "backgroundColor": "#27ae6020", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "locallya.com", "data": [5, 1, 1, 0, 2, 2, 2, 2, 0, 3, 3, 2, 1, 0, 0, 65, 68, 76, 94, 190, 173, 151, 256, 333, 590, 547, 552, 652, 945, 917], "borderColor": "#8e44ad", "backgroundColor": "#8e44ad20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}], "datasets_clicks": [{"label": "localoria.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#e74c3c", "backgroundColor": "#e74c3c20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "wherebly.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#3498db", "backgroundColor": "#3498db20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "res-menu.net", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#2ecc71", "backgroundColor": "#2ecc7120", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "foodplacee.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#f39c12", "backgroundColor": "#f39c1220", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "restaurants-world.net", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#9b59b6", "backgroundColor": "#9b59b620", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "goto-where.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#1abc9c", "backgroundColor": "#1abc9c20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menu-world.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#e67e22", "backgroundColor": "#e67e2220", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "grubbio.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#34495e", "backgroundColor": "#34495e20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menustic.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#16a085", "backgroundColor": "#16a08520", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menufyy.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#c0392b", "backgroundColor": "#c0392b20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "wherevi.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#2980b9", "backgroundColor": "#2980b920", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "placejoys.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#27ae60", "backgroundColor": "#27ae6020", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "locallya.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#8e44ad", "backgroundColor": "#8e44ad20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}], "datasets_impressions": [{"label": "localoria.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#e74c3c", "backgroundColor": "#e74c3c20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "wherebly.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#3498db", "backgroundColor": "#3498db20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "res-menu.net", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#2ecc71", "backgroundColor": "#2ecc7120", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "foodplacee.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#f39c12", "backgroundColor": "#f39c1220", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "restaurants-world.net", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#9b59b6", "backgroundColor": "#9b59b620", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "goto-where.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#1abc9c", "backgroundColor": "#1abc9c20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menu-world.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#e67e22", "backgroundColor": "#e67e2220", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "grubbio.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#34495e", "backgroundColor": "#34495e20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menustic.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#16a085", "backgroundColor": "#16a08520", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menufyy.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#c0392b", "backgroundColor": "#c0392b20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "wherevi.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#2980b9", "backgroundColor": "#2980b920", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "placejoys.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#27ae60", "backgroundColor": "#27ae6020", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "locallya.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#8e44ad", "backgroundColor": "#8e44ad20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}], "datasets_position": [{"label": "localoria.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#e74c3c", "backgroundColor": "#e74c3c20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "wherebly.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#3498db", "backgroundColor": "#3498db20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "res-menu.net", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#2ecc71", "backgroundColor": "#2ecc7120", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "foodplacee.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#f39c12", "backgroundColor": "#f39c1220", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "restaurants-world.net", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#9b59b6", "backgroundColor": "#9b59b620", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "goto-where.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#1abc9c", "backgroundColor": "#1abc9c20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menu-world.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#e67e22", "backgroundColor": "#e67e2220", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "grubbio.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#34495e", "backgroundColor": "#34495e20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menustic.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#16a085", "backgroundColor": "#16a08520", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "menufyy.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#c0392b", "backgroundColor": "#c0392b20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "wherevi.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#2980b9", "backgroundColor": "#2980b920", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "placejoys.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#27ae60", "backgroundColor": "#27ae6020", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}, {"label": "locallya.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "borderColor": "#8e44ad", "backgroundColor": "#8e44ad20", "tension": 0.1, "fill": false, "pointRadius": 0, "borderWidth": 2}], "domains": ["localoria.com", "wherebly.com", "res-menu.net", "foodplacee.com", "restaurants-world.net", "goto-where.com", "menu-world.com", "grubbio.com", "menustic.com", "menufyy.com", "wherevi.com", "placejoys.com", "locallya.com"]};
 
-        function createChart(canvasId, label, data, yAxisMin = undefined) {
-            const datasets = [];
-            let colorIdx = 0;
-
-            for (const [domain, values] of Object.entries(data)) {
-                datasets.push({
-                    label: domain,
-                    data: values,
-                    borderColor: domainColors[domain],
-                    backgroundColor: domainColors[domain] + '15',
-                    tension: 0.4,
-                    fill: false,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    pointHoverRadius: 4,
-                    animation: false
-                });
-                colorIdx++;
-            }
-
-            new Chart(document.getElementById(canvasId), {
-                type: 'line',
-                data: {
-                    labels: chartLabels,
-                    datasets: datasets
+        const chartConfig = {
+            type: 'line',
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: {
+                    legend: { display: false }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {{
-                        intersect: false,
-                        mode: 'index'
-                    }},
-                    plugins: {{
-                        legend: {{
-                            display: true,
-                            position: 'top',
-                            labels: {{
-                                color: '#f1f5f9',
-                                usePointStyle: true,
-                                padding: 15
-                            }}
-                        }}
-                    }},
-                    scales: {{
-                        y: {{
-                            title: {{
-                                display: true,
-                                text: label
-                            }},
-                            ticks: {{
-                                color: '#cbd5e1'
-                            }},
-                            grid: {{
-                                color: '#334155'
-                            }},
-                            min: yAxisMin,
-                            reverse: yAxisMin !== undefined && yAxisMin > 10
-                        }},
-                        x: {{
-                            ticks: {{
-                                color: '#cbd5e1'
-                            }},
-                            grid: {{
-                                color: '#334155'
-                            }}
-                        }}
-                    }}
-                }},
-                plugins: [{{
-                    id: 'customCanvasBackgroundColor',
-                    beforeDraw(chart) {{
-                        chart.canvas.style.backgroundColor = '#1e293b';
-                    }}
-                }}]
+                scales: {
+                    x: { type: 'category', grid: { color: 'rgba(100,100,100,0.1)' } },
+                    y: { beginAtZero: true, grid: { color: 'rgba(100,100,100,0.1)' } }
+                }
+            }
+        };
+
+        let charts = {};
+        let visibleDomains = new Set(CHART_DATA.domains);
+
+        function initCharts() {
+            charts.sessions = new Chart(document.getElementById('chart-sessions'), {
+                ...chartConfig,
+                data: { labels: CHART_DATA.dates, datasets: CHART_DATA.datasets_sessions }
+            });
+            charts.clicks = new Chart(document.getElementById('chart-clicks'), {
+                ...chartConfig,
+                data: { labels: CHART_DATA.dates, datasets: CHART_DATA.datasets_clicks }
+            });
+            charts.impressions = new Chart(document.getElementById('chart-impressions'), {
+                ...chartConfig,
+                data: { labels: CHART_DATA.dates, datasets: CHART_DATA.datasets_impressions }
+            });
+
+            const positionConfig = { ...chartConfig };
+            positionConfig.options.scales.y.reverse = true;
+            charts.position = new Chart(document.getElementById('chart-position'), {
+                ...positionConfig,
+                data: { labels: CHART_DATA.dates, datasets: CHART_DATA.datasets_position }
+            });
+
+            updateLegends();
+            updateCharts();
+        }
+
+        function updateLegends() {
+            const legends = ['sessions', 'clicks', 'impressions', 'position'];
+            legends.forEach(metric => {
+                const legend = document.getElementById(`legend-${metric}`);
+                legend.innerHTML = '';
+                CHART_DATA.domains.forEach(domain => {
+                    const color = {"localoria.com": "#e74c3c", "wherebly.com": "#3498db", "res-menu.net": "#2ecc71", "foodplacee.com": "#f39c12", "restaurants-world.net": "#9b59b6", "goto-where.com": "#1abc9c", "menu-world.com": "#e67e22", "grubbio.com": "#34495e", "menustic.com": "#16a085", "menufyy.com": "#c0392b", "wherevi.com": "#2980b9", "placejoys.com": "#27ae60", "locallya.com": "#8e44ad"};
+                    const item = document.createElement('div');
+                    item.className = 'legend-item';
+                    item.innerHTML = `<div class="legend-color" style="background: ${color[domain]}"></div><span>${domain}</span>`;
+                    legend.appendChild(item);
+                });
             });
         }
 
-        // Initialize charts
-        createChart('sessionsChart', 'Sessions', sessionsData);
-        createChart('clicksChart', 'Clicks', clicksData);
-        createChart('impressionsChart', 'Impressions', impressionsData);
-        createChart('positionChart', 'Position (Lower is Better)', positionData, 0);
+        function filterWebsites() {
+            const filter = document.getElementById('website-filter').value;
+            if (filter) {
+                visibleDomains = new Set([filter]);
+            } else {
+                visibleDomains = new Set(CHART_DATA.domains);
+            }
+            updateCharts();
+        }
 
-        // Theme toggle
-        function toggleTheme() {{
-            document.body.classList.toggle('light-mode');
-            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-            updateChartColors();
-        }}
+        function selectAllWebsites() {
+            visibleDomains = new Set(CHART_DATA.domains);
+            document.getElementById('website-filter').value = '';
+            updateCharts();
+        }
 
-        function updateChartColors() {{
-            // Recreate charts with new colors
-            location.reload();
-        }}
+        function deselectAllWebsites() {
+            visibleDomains = new Set();
+            document.getElementById('website-filter').value = '';
+            updateCharts();
+        }
 
-        if (localStorage.getItem('theme') === 'light') {{
-            document.body.classList.add('light-mode');
-        }}
+        function updateCharts() {
+            const metrics = ['sessions', 'clicks', 'impressions', 'position'];
+            metrics.forEach(metric => {
+                const chart = charts[metric];
+                if (!chart) return;
 
-        // Scroll to section
-        function scrollToSection(id) {{
-            event.preventDefault();
-            document.getElementById(id).scrollIntoView({{ behavior: 'smooth' }});
-        }}
+                chart.data.datasets.forEach((dataset, idx) => {
+                    const domain = CHART_DATA.domains[idx];
+                    dataset.hidden = !visibleDomains.has(domain);
+                });
+                chart.update();
+            });
+        }
 
-        // Simple table sort
-        function sortTable(columnIndex) {{
-            // Placeholder for sorting functionality
-        }}
+        initCharts();
+    </script>
+    <script>
+        makeTableSortable('comparison-table');
+        makeTableSortable('keywords-table');
+    </script>
+
+    <script>
+        let darkMode = false;
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            const html = document.documentElement;
+            if (darkMode) {
+                html.classList.add('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '☀️ Light Mode';
+            } else {
+                html.classList.remove('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '🌙 Dark Mode';
+            }
+        }
+
+        // TOC active section highlighting
+        const tocLinks = document.querySelectorAll('.toc-nav a');
+        const sections = document.querySelectorAll('.section');
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.href.endsWith('#' + id)) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => {
+            if (section.id) {
+                observer.observe(section);
+            }
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('.toc-nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Table sorting
+        function makeTableSortable(tableId) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const headers = table.querySelectorAll('th');
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => {
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                    const isNumeric = rows.every(row => {
+                        const text = row.cells[index].textContent.trim();
+                        return text === '' || !isNaN(parseFloat(text.replace(/,/g, '')));
+                    });
+
+                    rows.sort((a, b) => {
+                        let aVal = a.cells[index].textContent.trim();
+                        let bVal = b.cells[index].textContent.trim();
+
+                        if (isNumeric) {
+                            aVal = parseFloat(aVal.replace(/,/g, '')) || 0;
+                            bVal = parseFloat(bVal.replace(/,/g, '')) || 0;
+                            return aVal - bVal;
+                        } else {
+                            return aVal.localeCompare(bVal);
+                        }
+                    });
+
+                    rows.forEach(row => tbody.appendChild(row));
+                });
+            });
+        }
     </script>
 </body>
 </html>
