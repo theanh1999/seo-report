@@ -1115,32 +1115,32 @@
     <script>
         const DETAIL_CHART_DATA = {"dates": ["2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07"], "sessions": [157, 170, 145, 171, 236, 260, 219, 156, 174, 175, 138, 193, 261, 218, 200, 436, 451, 730, 923, 1279, 1217, 1158, 1465, 1463, 1717, 1863, 1803, 1568, 1568, 1521], "users": [146, 160, 135, 159, 211, 231, 194, 142, 159, 157, 129, 174, 233, 205, 175, 410, 418, 686, 883, 1167, 1114, 1074, 1372, 1375, 1607, 1733, 1669, 1469, 1459, 1408], "bounce": [33.76, 34.71, 35.86, 33.33, 35.589999999999996, 36.15, 41.099999999999994, 36.54, 32.18, 33.71, 29.709999999999997, 37.31, 37.16, 35.78, 39.0, 46.56, 44.79, 49.04, 45.72, 44.879999999999995, 46.01, 46.29, 43.89, 44.98, 44.9, 46.86, 45.31, 48.72, 47.260000000000005, 45.23], "engagement": [66.24, 65.29, 64.14, 66.67, 64.41, 63.849999999999994, 58.9, 63.46000000000001, 67.82000000000001, 66.29, 70.28999999999999, 62.69, 62.839999999999996, 64.22, 61.0, 53.44, 55.21, 50.96000000000001, 54.279999999999994, 55.120000000000005, 53.99, 53.71, 56.11000000000001, 55.02, 55.1, 53.14, 54.690000000000005, 51.28, 52.739999999999995, 54.769999999999996], "pageviews": [336, 339, 262, 344, 462, 499, 432, 277, 363, 358, 305, 377, 501, 454, 569, 731, 748, 1155, 1478, 2221, 2003, 1987, 2546, 2453, 2916, 3121, 3065, 2654, 2532, 2468], "duration": [119.4668, 65.1579, 120.191, 100.2027, 80.3733, 92.6844, 113.0406, 72.446, 99.9522, 107.4109, 103.7314, 88.2926, 102.5093, 98.8262, 115.2616, 78.3326, 79.3795, 94.2662, 79.6049, 87.5034, 87.7654, 85.1084, 88.5951, 95.3108, 87.6173, 79.93, 86.1227, 107.6033, 70.8944, 69.9841], "clicks": [25, 16, 14, 21, 33, 22, 6, 7, 7, 13, 19, 20, 34, 38, 26, 29, 38, 34, 34, 42, 31, 24, 41, 61, 58, 70, 76, 53, 37, 46], "impressions": [815, 790, 716, 834, 1126, 1176, 627, 375, 418, 764, 957, 2245, 3768, 4557, 4296, 4205, 4869, 4794, 5519, 5828, 5058, 4591, 4909, 5779, 6747, 8108, 8140, 7471, 6094, 6283], "ctr": [3.0700000000000003, 2.03, 1.96, 2.52, 2.93, 1.87, 0.96, 1.87, 1.67, 1.7000000000000002, 1.9900000000000002, 0.89, 0.8999999999999999, 0.83, 0.61, 0.69, 0.7799999999999999, 0.7100000000000001, 0.62, 0.72, 0.61, 0.52, 0.84, 1.06, 0.86, 0.86, 0.9299999999999999, 0.7100000000000001, 0.61, 0.73], "position": [5.589, 5.9519, 6.0559, 4.7374, 4.5595, 5.6088, 7.134, 6.9307, 8.4904, 6.3678, 6.5298, 7.3385, 8.1388, 8.582, 8.9169, 8.7239, 9.2707, 9.408, 9.2317, 9.3099, 9.397, 9.3969, 9.1023, 8.8353, 8.5457, 8.5962, 8.2004, 8.1434, 8.8293, 8.6436]};
 
-        const detailChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                tooltip: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false,
-                    callbacks: {
-                        label: function(ctx) {
-                            let val = ctx.parsed.y;
-                            if (val >= 1000000) val = (val/1000000).toFixed(1) + 'M';
-                            else if (val >= 1000) val = (val/1000).toFixed(1) + 'K';
-                            else if (typeof val === 'number') val = val.toFixed(val < 100 ? 2 : 0);
-                            return ctx.dataset.label + ': ' + val;
+        function makeOpts(scalesOverride) {
+            const base = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(ctx) {
+                                let val = ctx.parsed.y;
+                                if (val >= 1000000) val = (val/1000000).toFixed(1) + 'M';
+                                else if (val >= 1000) val = (val/1000).toFixed(1) + 'K';
+                                else if (typeof val === 'number') val = val.toFixed(val < 100 ? 2 : 0);
+                                return ctx.dataset.label + ': ' + val;
+                            }
                         }
                     }
-                }
-            },
-            scales: {
-                x: { type: 'category' },
-                y: { beginAtZero: true }
-            }
-        };
+                },
+                scales: scalesOverride || { x: { type: 'category' }, y: { beginAtZero: true } }
+            };
+            return base;
+        }
 
         function initDetailCharts() {
             new Chart(document.getElementById('chart-ga4-sessions'), {
@@ -1174,7 +1174,7 @@
                         }
                     ]
                 },
-                options: detailChartOptions
+                options: makeOpts()
             });
 
             new Chart(document.getElementById('chart-ga4-bounce'), {
@@ -1206,7 +1206,7 @@
                         }
                     ]
                 },
-                options: { ...detailChartOptions, scales: { x: { type: 'category' }, y: { min: 0, max: 100 } } }
+                options: makeOpts({ x: { type: 'category' }, y: { min: 0, max: 100 } })
             });
 
             new Chart(document.getElementById('chart-ga4-pageviews'), {
@@ -1219,7 +1219,7 @@
                         backgroundColor: '#3498db'
                     }]
                 },
-                options: detailChartOptions
+                options: makeOpts()
             });
 
             new Chart(document.getElementById('chart-ga4-duration'), {
@@ -1238,7 +1238,7 @@
                         pointHitRadius: 10
                     }]
                 },
-                options: detailChartOptions
+                options: makeOpts()
             });
 
             new Chart(document.getElementById('chart-gsc-clicks'), {
@@ -1272,14 +1272,7 @@
                         }
                     ]
                 },
-                options: {
-                    ...detailChartOptions,
-                    scales: {
-                        x: { type: 'category' },
-                        y: { beginAtZero: true, position: 'left' },
-                        y1: { beginAtZero: true, position: 'right', grid: { display: false } }
-                    }
-                }
+                options: makeOpts({ x: { type: 'category' }, y: { beginAtZero: true, position: 'left' }, y1: { beginAtZero: true, position: 'right', grid: { display: false } } })
             });
 
             new Chart(document.getElementById('chart-gsc-ctr'), {
@@ -1298,7 +1291,7 @@
                         pointHitRadius: 10
                     }]
                 },
-                options: detailChartOptions
+                options: makeOpts()
             });
 
             new Chart(document.getElementById('chart-gsc-position'), {
@@ -1317,13 +1310,7 @@
                         pointHitRadius: 10
                     }]
                 },
-                options: {
-                    ...detailChartOptions,
-                    scales: {
-                        x: { type: 'category' },
-                        y: { reverse: true }
-                    }
-                }
+                options: makeOpts({ x: { type: 'category' }, y: { reverse: true } })
             });
         }
 
