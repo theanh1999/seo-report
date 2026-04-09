@@ -209,9 +209,15 @@
             letter-spacing: 0.5px;
         }
 
-        .mini-chart {
-            height: 60px;
+        .mini-chart-wrapper {
+            position: relative;
+            height: 120px;
             margin-bottom: 10px;
+        }
+
+        .mini-chart-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
         .table-wrapper {
@@ -804,7 +810,7 @@
                                 <div class="domain-stat-label">Avg Change</div>
                             </div>
                         </div>
-                        <canvas id="${canvasId}" class="mini-chart"></canvas>
+                        <div class="mini-chart-wrapper"><canvas id="${canvasId}"></canvas></div>
                     </div>
                 `;
             }).join('');
@@ -813,13 +819,13 @@
                 domains.forEach(domain => {
                     const canvasId = sanitizeId(domain) + '-' + group;
                     const canvas = document.getElementById(canvasId);
-                    if (canvas) {
-                        const values = filteredData.map(d => d[group][domain] || 0);
-                        const ma7 = calculateMovingAverage(values, 7);
-                        const dates = filteredData.map((_, i) => i);
+                    if (!canvas || canvas.offsetParent === null) return; // Skip if not visible
+                    const values = filteredData.map(d => d[group][domain] || 0);
+                    const ma7 = calculateMovingAverage(values, 7);
+                    const dates = filteredData.map((_, i) => i);
 
-                        if (charts[canvasId]) charts[canvasId].destroy();
-                        charts[canvasId] = new Chart(canvas, {
+                    if (charts[canvasId]) { charts[canvasId].destroy(); delete charts[canvasId]; }
+                    charts[canvasId] = new Chart(canvas, {
                             type: 'line',
                             data: {
                                 labels: dates,
@@ -856,7 +862,7 @@
                         });
                     }
                 });
-            }, 0);
+            }, 50);
         }
 
         function renderGrowthTable() {
@@ -900,11 +906,14 @@
             filteredData = filterDataByGroup(filteredData, currentGroupFilter);
 
             renderOverviewChart();
-            ['nha_hang', 'hotel', 'doi_thu'].forEach(g => {
-                renderGroupChart(g);
-                renderGroupDoughnut(g);
-                renderGroupGrowth(g);
-            });
+            // Only render group charts when "All Groups" tab is active
+            if (currentGroupFilter === 'all') {
+                ['nha_hang', 'hotel', 'doi_thu'].forEach(g => {
+                    renderGroupChart(g);
+                    renderGroupDoughnut(g);
+                    renderGroupGrowth(g);
+                });
+            }
             renderGrowthTable();
         }
 
@@ -920,7 +929,10 @@
             if (tabContent) {
                 tabContent.classList.add('active');
                 if (currentGroupFilter !== 'all') {
-                    renderDomainDetails(currentGroupFilter);
+                    // Use requestAnimationFrame to ensure tab is visible before rendering charts
+                    requestAnimationFrame(() => {
+                        renderDomainDetails(currentGroupFilter);
+                    });
                 }
             }
         }
