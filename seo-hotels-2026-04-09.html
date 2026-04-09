@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Dashboard - Hotels</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+            transition: background-color 0.3s ease;
+        }
+
+        body.light-mode {
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            padding: 2rem;
+            border-bottom: 2px solid #3b82f6;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .header {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            color: #1e293b;
+        }
+
+        .header-top {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: #2563eb;
+        }
+
+        .cross-link {
+            background-color: #ec4899;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .cross-link:hover {
+            background-color: #db2777;
+        }
+
+        .nav-bar {
+            background-color: #1e293b;
+            padding: 1rem;
+            border-bottom: 1px solid #334155;
+            position: sticky;
+            top: 100px;
+            z-index: 99;
+        }
+
+        body.light-mode .nav-bar {
+            background-color: #e2e8f0;
+            border-bottom-color: #cbd5e1;
+        }
+
+        .nav-bar ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        body.light-mode .nav-bar a {
+            color: #475569;
+        }
+
+        .nav-bar a:hover {
+            color: #3b82f6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .kpi-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .kpi-card {
+            background-color: #1e293b;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border-left: 4px solid #3b82f6;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        body.light-mode .kpi-card {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .kpi-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        body.light-mode .kpi-label {
+            color: #64748b;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .section {
+            background-color: #1e293b;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .section {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th {
+            background-color: #0f172a;
+            color: #3b82f6;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #3b82f6;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        body.light-mode th {
+            background-color: #e2e8f0;
+            color: #3b82f6;
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        body.light-mode td {
+            border-bottom-color: #cbd5e1;
+        }
+
+        tr:hover {
+            background-color: #334155;
+        }
+
+        body.light-mode tr:hover {
+            background-color: #e2e8f0;
+        }
+
+        .anomaly-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .anomaly-critical {
+            background-color: #ef4444;
+        }
+
+        .anomaly-warning {
+            background-color: #f97316;
+        }
+
+        .anomaly-info {
+            background-color: #3b82f6;
+        }
+
+        .recommendation {
+            background-color: #0f172a;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        body.light-mode .recommendation {
+            background-color: #e2e8f0;
+        }
+
+        .recommendation.high {
+            border-left-color: #ef4444;
+        }
+
+        .recommendation.medium {
+            border-left-color: #f97316;
+        }
+
+        .recommendation.low {
+            border-left-color: #3b82f6;
+        }
+
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .priority-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .priority-medium {
+            background-color: #f97316;
+            color: white;
+        }
+
+        .priority-low {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .recommendation-description {
+            font-size: 0.875rem;
+            color: #cbd5e1;
+            margin-bottom: 0.5rem;
+        }
+
+        body.light-mode .recommendation-description {
+            color: #64748b;
+        }
+
+        .recommendation-category {
+            display: inline-block;
+            background-color: #334155;
+            color: #e2e8f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        body.light-mode .recommendation-category {
+            background-color: #cbd5e1;
+            color: #1e293b;
+        }
+
+        .domain-link {
+            color: #3b82f6;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .domain-link:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            padding: 2rem;
+            border-top: 1px solid #334155;
+            margin-top: 3rem;
+        }
+
+        body.light-mode .footer {
+            color: #94a3b8;
+            border-top-color: #cbd5e1;
+        }
+
+        @media (max-width: 768px) {
+            .kpi-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .nav-bar ul {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-top">
+            <div class="header-title">📊 SEO Dashboard - Hotels</div>
+            <div class="header-controls">
+                <a href="seo-index-tracker.html" class="cross-link">Index Tracker</a>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+            </div>
+        </div>
+        <div style="font-size: 0.875rem; color: #94a3b8;">Dữ liệu từ GA4 & GSC | Cập nhật: 2026-04-09 | GA4 loại trừ: 2026-04-08, 2026-04-09</div>
+    </div>
+
+    <div class="nav-bar">
+        <ul>
+            <li><a href="#kpi" onclick="scrollToSection('kpi')">📈 KPI</a></li>
+            <li><a href="#charts" onclick="scrollToSection('charts')">📊 Biểu đồ</a></li>
+            <li><a href="#comparison" onclick="scrollToSection('comparison')">⚖️ So sánh</a></li>
+            <li><a href="#keywords" onclick="scrollToSection('keywords')">🔍 Keywords</a></li>
+            <li><a href="#anomalies" onclick="scrollToSection('anomalies')">⚠️ Bất thường</a></li>
+            <li><a href="#recommendations" onclick="scrollToSection('recommendations')">💡 Đề xuất</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <section id="kpi">
+            <h2 class="section-title">📈 Chỉ số chính (30 ngày)</h2>
+            <div class="kpi-cards">
+                <div class="kpi-card">
+                    <div class="kpi-label">Sessions</div>
+                    <div class="kpi-value">23,431</div>
+                    <div class="kpi-change" style="color: #22c55e;">
+                        ↑ 18.7%
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Người dùng</div>
+                    <div class="kpi-value">22,086</div>
+                    <div class="kpi-change" style="color: #94a3b8;">vs 30 ngày trước</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Pageviews</div>
+                    <div class="kpi-value">26,528</div>
+                    <div class="kpi-change" style="color: #94a3b8;">Tổng lượt xem</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Clicks (GSC)</div>
+                    <div class="kpi-value">2,373</div>
+                    <div class="kpi-change" style="color: #22c55e;">
+                        ↑ 23.1%
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Impressions</div>
+                    <div class="kpi-value">254,452</div>
+                    <div class="kpi-change" style="color: #94a3b8;">Lượt hiển thị</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Bounce Rate</div>
+                    <div class="kpi-value">58.7%</div>
+                    <div class="kpi-change" style="color: #ef4444;">
+                        ↑ 0.05%
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Engagement Rate</div>
+                    <div class="kpi-value">41.3%</div>
+                    <div class="kpi-change" style="color: #ef4444;">
+                        ↓ 0.05%
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Avg Position</div>
+                    <div class="kpi-value">10.0</div>
+                    <div class="kpi-change" style="color: #ef4444;">
+                        ↓ 0.3
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="charts">
+            <h2 class="section-title">📊 Biểu đồ xu hướng</h2>
+
+            <div style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Sessions theo thời gian</h3>
+                <div class="chart-container">
+                    <canvas id="sessionsChart"></canvas>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Clicks theo thời gian</h3>
+                <div class="chart-container">
+                    <canvas id="clicksChart"></canvas>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Impressions theo thời gian</h3>
+                <div class="chart-container">
+                    <canvas id="impressionsChart"></canvas>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Average Position theo thời gian</h3>
+                <div class="chart-container">
+                    <canvas id="positionChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison">
+            <h2 class="section-title">⚖️ So sánh Website</h2>
+            <table id="comparisonTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Website</th>
+                        <th onclick="sortTable(1)">Sessions</th>
+                        <th onclick="sortTable(2)">Users</th>
+                        <th onclick="sortTable(3)">Pageviews</th>
+                        <th onclick="sortTable(4)">Clicks</th>
+                        <th onclick="sortTable(5)">Impressions</th>
+                        <th onclick="sortTable(6)">CTR</th>
+                        <th onclick="sortTable(7)">Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="seo-detail-gohotelly.com-2026-04-09.html" class="domain-link">gohotelly.com</a></td>
+                        <td>23,431</td>
+                        <td>22,086</td>
+                        <td>26,528</td>
+                        <td>2,373</td>
+                        <td>254,452</td>
+                        <td>0.93%</td>
+                        <td>10.0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="keywords">
+            <h2 class="section-title">🔍 Top 20 Keywords</h2>
+            <table id="keywordsTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Từ khóa</th>
+                        <th onclick="sortTable(1)">Clicks</th>
+                        <th onclick="sortTable(2)">Impressions</th>
+                        <th onclick="sortTable(3)">CTR</th>
+                        <th onclick="sortTable(4)">Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="anomalies">
+            <h2 class="section-title">⚠️ Bất thường phát hiện (0)</h2>
+            <div style="padding: 1.5rem; text-align: center; color: #64748b;">Không phát hiện bất thường 👍</div>
+        </section>
+
+        <section id="recommendations">
+            <h2 class="section-title">💡 Đề xuất tối ưu hóa</h2>
+            <div class="recommendation high">
+                <div class="recommendation-header">
+                    <div>
+                        <div class="recommendation-title">Improve Click-Through Rate</div>
+                        <div class="recommendation-category">Search Optimization</div>
+                    </div>
+                    <span class="priority-badge priority-high">High</span>
+                </div>
+                <div class="recommendation-description">CTR is 0.93%. Optimize title tags and meta descriptions for better appeal.</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Impact: Medium</div>
+            </div>
+            <div class="recommendation high">
+                <div class="recommendation-header">
+                    <div>
+                        <div class="recommendation-title">Improve Search Rankings</div>
+                        <div class="recommendation-category">SEO</div>
+                    </div>
+                    <span class="priority-badge priority-high">High</span>
+                </div>
+                <div class="recommendation-description">Average position is 10.0. Focus on building backlinks and improving content quality.</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Impact: Medium</div>
+            </div>
+            <div class="recommendation medium">
+                <div class="recommendation-header">
+                    <div>
+                        <div class="recommendation-title">Extend Session Duration</div>
+                        <div class="recommendation-category">Content & Engagement</div>
+                    </div>
+                    <span class="priority-badge priority-medium">Medium</span>
+                </div>
+                <div class="recommendation-description">Average session duration is 78s. Add more engaging content and internal links.</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Impact: Medium</div>
+            </div>
+            <div class="recommendation medium">
+                <div class="recommendation-header">
+                    <div>
+                        <div class="recommendation-title">Leverage High Impression Volume</div>
+                        <div class="recommendation-category">Search Optimization</div>
+                    </div>
+                    <span class="priority-badge priority-medium">Medium</span>
+                </div>
+                <div class="recommendation-description">With 254452 impressions, improving CTR could significantly boost traffic.</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Impact: Medium</div>
+            </div>
+            <div class="recommendation medium">
+                <div class="recommendation-header">
+                    <div>
+                        <div class="recommendation-title">Optimize Target Keywords</div>
+                        <div class="recommendation-category">SEO</div>
+                    </div>
+                    <span class="priority-badge priority-medium">Medium</span>
+                </div>
+                <div class="recommendation-description">Review keyword performance and focus on high-intent queries with conversion potential.</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Impact: Medium</div>
+            </div>
+
+        </section>
+
+        <div class="footer">
+            <p>SEO Analysis Dashboard | 2026-04-09</p>
+            <p style="font-size: 0.75rem; margin-top: 0.5rem;">Data: Google Analytics 4 & Google Search Console</p>
+        </div>
+    </div>
+
+    <script>
+        // Chart data
+        const chartLabels = ["2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07"];
+        const domainColors = {"gohotelly.com": "#3b82f6"};
+        const sessionsData = {"gohotelly.com": [626, 692, 629, 672, 661, 756, 767, 691, 736, 924, 795, 794, 751, 741, 816, 999, 1044, 1138, 791, 785, 806, 934, 828, 910, 858, 817, 771, 748, 951]};
+        const clicksData = {"gohotelly.com": [74, 93, 90, 93, 65, 71, 75, 82, 95, 79, 77, 67, 61, 50, 70, 68, 74, 68, 72, 73, 80, 83, 93, 103, 85, 98, 98, 116, 120]};
+        const impressionsData = {"gohotelly.com": [8345, 8140, 7737, 8556, 7776, 7189, 7174, 7587, 7772, 8083, 8521, 8589, 7815, 8600, 7990, 8345, 7694, 9086, 9480, 9514, 8989, 9455, 9357, 9894, 10911, 10965, 9658, 10635, 10595]};
+        const positionData = {"gohotelly.com": [11.4376, 9.7781, 9.6248, 9.6426, 9.7582, 10.1562, 10.048, 10.5045, 10.1414, 10.4078, 10.6205, 10.5455, 10.4631, 10.617, 9.3352, 9.6594, 9.7614, 9.9799, 10.4825, 11.2296, 9.9834, 9.9623, 9.8747, 9.8501, 9.3303, 8.8362, 9.4598, 9.9252, 9.379]};
+
+        function createChart(canvasId, label, data, yAxisMin = undefined) {
+            const datasets = [];
+            let colorIdx = 0;
+
+            for (const [domain, values] of Object.entries(data)) {
+                datasets.push({
+                    label: domain,
+                    data: values,
+                    borderColor: domainColors[domain],
+                    backgroundColor: domainColors[domain] + '15',
+                    tension: 0.4,
+                    fill: false,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    animation: false
+                });
+                colorIdx++;
+            }
+
+            new Chart(document.getElementById(canvasId), {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {{
+                        intersect: false,
+                        mode: 'index'
+                    }},
+                    plugins: {{
+                        legend: {{
+                            display: true,
+                            position: 'top',
+                            labels: {{
+                                color: '#f1f5f9',
+                                usePointStyle: true,
+                                padding: 15
+                            }}
+                        }}
+                    }},
+                    scales: {{
+                        y: {{
+                            title: {{
+                                display: true,
+                                text: label
+                            }},
+                            ticks: {{
+                                color: '#cbd5e1'
+                            }},
+                            grid: {{
+                                color: '#334155'
+                            }},
+                            min: yAxisMin,
+                            reverse: yAxisMin !== undefined && yAxisMin > 10
+                        }},
+                        x: {{
+                            ticks: {{
+                                color: '#cbd5e1'
+                            }},
+                            grid: {{
+                                color: '#334155'
+                            }}
+                        }}
+                    }}
+                }},
+                plugins: [{{
+                    id: 'customCanvasBackgroundColor',
+                    beforeDraw(chart) {{
+                        chart.canvas.style.backgroundColor = '#1e293b';
+                    }}
+                }}]
+            });
+        }
+
+        // Initialize charts
+        createChart('sessionsChart', 'Sessions', sessionsData);
+        createChart('clicksChart', 'Clicks', clicksData);
+        createChart('impressionsChart', 'Impressions', impressionsData);
+        createChart('positionChart', 'Position (Lower is Better)', positionData, 0);
+
+        // Theme toggle
+        function toggleTheme() {{
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            updateChartColors();
+        }}
+
+        function updateChartColors() {{
+            // Recreate charts with new colors
+            location.reload();
+        }}
+
+        if (localStorage.getItem('theme') === 'light') {{
+            document.body.classList.add('light-mode');
+        }}
+
+        // Scroll to section
+        function scrollToSection(id) {{
+            event.preventDefault();
+            document.getElementById(id).scrollIntoView({{ behavior: 'smooth' }});
+        }}
+
+        // Simple table sort
+        function sortTable(columnIndex) {{
+            // Placeholder for sorting functionality
+        }}
+    </script>
+</body>
+</html>
