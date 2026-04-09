@@ -1065,6 +1065,33 @@
     <script>
         const DETAIL_CHART_DATA = {"dates": ["2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07"], "sessions": [621, 626, 692, 629, 672, 661, 756, 767, 691, 736, 924, 795, 794, 751, 741, 816, 999, 1044, 1138, 791, 785, 806, 934, 828, 910, 858, 817, 771, 748, 951], "users": [579, 580, 650, 576, 630, 626, 705, 732, 642, 708, 876, 749, 748, 697, 697, 771, 960, 994, 1082, 755, 726, 758, 877, 764, 862, 805, 775, 719, 711, 911], "bounce": [50.080000000000005, 48.08, 51.449999999999996, 53.74, 55.95, 56.13, 58.330000000000005, 54.50000000000001, 51.66, 54.48, 63.739999999999995, 59.75, 63.1, 64.98, 58.3, 57.97, 61.160000000000004, 64.85, 70.04, 61.309999999999995, 58.34, 54.96, 59.099999999999994, 56.879999999999995, 60.11, 56.410000000000004, 63.65, 63.160000000000004, 59.760000000000005, 60.57], "engagement": [49.919999999999995, 51.92, 48.55, 46.26, 44.05, 43.87, 41.67, 45.5, 48.339999999999996, 45.519999999999996, 36.26, 40.25, 36.9, 35.02, 41.699999999999996, 42.03, 38.84, 35.15, 29.959999999999997, 38.690000000000005, 41.660000000000004, 45.04, 40.9, 43.120000000000005, 39.89, 43.59, 36.35, 36.84, 40.239999999999995, 39.43], "pageviews": [733, 724, 791, 697, 793, 754, 855, 875, 780, 837, 1036, 891, 875, 847, 878, 961, 1134, 1164, 1216, 952, 873, 952, 1041, 921, 1013, 997, 927, 858, 826, 1060], "duration": [109.4515, 90.9508, 91.8201, 72.7317, 101.2156, 81.6282, 86.8775, 112.5401, 104.9686, 83.0851, 68.8665, 62.075, 67.335, 65.9738, 79.2785, 92.4715, 65.6093, 63.1211, 43.7102, 69.0333, 71.2055, 91.3936, 81.5821, 85.2634, 70.7489, 76.4631, 79.0642, 56.2683, 79.3052, 77.1415], "clicks": [82, 74, 93, 90, 93, 65, 71, 75, 82, 95, 79, 77, 67, 61, 50, 70, 68, 74, 68, 72, 73, 80, 83, 93, 103, 85, 98, 98, 116, 120], "impressions": [7323, 8345, 8140, 7737, 8556, 7776, 7189, 7174, 7587, 7772, 8083, 8521, 8589, 7815, 8600, 7990, 8345, 7694, 9086, 9480, 9514, 8989, 9455, 9357, 9894, 10911, 10965, 9658, 10635, 10595], "ctr": [1.1199999999999999, 0.89, 1.1400000000000001, 1.16, 1.09, 0.84, 0.9900000000000001, 1.05, 1.08, 1.22, 0.98, 0.8999999999999999, 0.7799999999999999, 0.7799999999999999, 0.58, 0.88, 0.8099999999999999, 0.96, 0.75, 0.76, 0.77, 0.89, 0.88, 0.9900000000000001, 1.04, 0.7799999999999999, 0.89, 1.01, 1.09, 1.13], "position": [9.9507, 11.4376, 9.7781, 9.6248, 9.6426, 9.7582, 10.1562, 10.048, 10.5045, 10.1414, 10.4078, 10.6205, 10.5455, 10.4631, 10.617, 9.3352, 9.6594, 9.7614, 9.9799, 10.4825, 11.2296, 9.9834, 9.9623, 9.8747, 9.8501, 9.3303, 8.8362, 9.4598, 9.9252, 9.379]};
 
+        const detailChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(ctx) {
+                            let val = ctx.parsed.y;
+                            if (val >= 1000000) val = (val/1000000).toFixed(1) + 'M';
+                            else if (val >= 1000) val = (val/1000).toFixed(1) + 'K';
+                            else if (typeof val === 'number') val = val.toFixed(val < 100 ? 2 : 0);
+                            return ctx.dataset.label + ': ' + val;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { type: 'category' },
+                y: { beginAtZero: true }
+            }
+        };
+
         function initDetailCharts() {
             new Chart(document.getElementById('chart-ga4-sessions'), {
                 type: 'line',
@@ -1079,6 +1106,8 @@
                             tension: 0.1,
                             fill: false,
                             pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
                             yAxisID: 'y'
                         },
                         {
@@ -1089,19 +1118,13 @@
                             tension: 0.1,
                             fill: false,
                             pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
                             yAxisID: 'y'
                         }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    scales: {
-                        x: { type: 'category' },
-                        y: { beginAtZero: true }
-                    }
-                }
+                options: detailChartOptions
             });
 
             new Chart(document.getElementById('chart-ga4-bounce'), {
@@ -1116,7 +1139,9 @@
                             backgroundColor: '#e74c3c20',
                             tension: 0.1,
                             fill: false,
-                            pointRadius: 0
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10
                         },
                         {
                             label: 'Engagement Rate %',
@@ -1125,19 +1150,13 @@
                             backgroundColor: '#27ae6020',
                             tension: 0.1,
                             fill: false,
-                            pointRadius: 0
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10
                         }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    scales: {
-                        x: { type: 'category' },
-                        y: { min: 0, max: 100 }
-                    }
-                }
+                options: { ...detailChartOptions, scales: { x: { type: 'category' }, y: { min: 0, max: 100 } } }
             });
 
             new Chart(document.getElementById('chart-ga4-pageviews'), {
@@ -1150,15 +1169,7 @@
                         backgroundColor: '#3498db'
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    scales: {
-                        x: { type: 'category' },
-                        y: { beginAtZero: true }
-                    }
-                }
+                options: detailChartOptions
             });
 
             new Chart(document.getElementById('chart-ga4-duration'), {
@@ -1166,24 +1177,18 @@
                 data: {
                     labels: DETAIL_CHART_DATA.dates,
                     datasets: [{
-                        label: 'Session Duration (seconds)',
+                        label: 'Session Duration (s)',
                         data: DETAIL_CHART_DATA.duration,
                         borderColor: '#f39c12',
                         backgroundColor: '#f39c1220',
                         tension: 0.1,
                         fill: false,
-                        pointRadius: 0
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHitRadius: 10
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    scales: {
-                        x: { type: 'category' },
-                        y: { beginAtZero: true }
-                    }
-                }
+                options: detailChartOptions
             });
 
             new Chart(document.getElementById('chart-gsc-clicks'), {
@@ -1199,6 +1204,8 @@
                             tension: 0.1,
                             fill: false,
                             pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
                             yAxisID: 'y'
                         },
                         {
@@ -1209,18 +1216,18 @@
                             tension: 0.1,
                             fill: false,
                             pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
                             yAxisID: 'y1'
                         }
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
+                    ...detailChartOptions,
                     scales: {
                         x: { type: 'category' },
                         y: { beginAtZero: true, position: 'left' },
-                        y1: { beginAtZero: true, position: 'right' }
+                        y1: { beginAtZero: true, position: 'right', grid: { display: false } }
                     }
                 }
             });
@@ -1236,18 +1243,12 @@
                         backgroundColor: '#2ecc7120',
                         tension: 0.1,
                         fill: false,
-                        pointRadius: 0
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHitRadius: 10
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    scales: {
-                        x: { type: 'category' },
-                        y: { beginAtZero: true }
-                    }
-                }
+                options: detailChartOptions
             });
 
             new Chart(document.getElementById('chart-gsc-position'), {
@@ -1255,22 +1256,22 @@
                 data: {
                     labels: DETAIL_CHART_DATA.dates,
                     datasets: [{
-                        label: 'Position',
+                        label: 'Vị trí',
                         data: DETAIL_CHART_DATA.position,
                         borderColor: '#f39c12',
                         backgroundColor: '#f39c1220',
                         tension: 0.1,
                         fill: false,
-                        pointRadius: 0
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHitRadius: 10
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
+                    ...detailChartOptions,
                     scales: {
                         x: { type: 'category' },
-                        y: { reverse: true, beginAtZero: true }
+                        y: { reverse: true }
                     }
                 }
             });
