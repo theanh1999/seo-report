@@ -93,7 +93,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="card">
 <div class="card-title">Growth Ranking</div>
 <div style="overflow-x:auto">
-<table><thead><tr><th>#</th><th>Domain</th><th>Group</th><th>Current</th><th>Start</th><th>Growth %</th><th>Change</th></tr></thead><tbody id="growthBody"></tbody></table>
+<table><thead><tr><th>#</th><th>Domain</th><th>Group</th><th>Current</th><th>vs Yesterday</th><th>vs 7d</th><th>vs 14d</th><th>vs 30d</th></tr></thead><tbody id="growthBody"></tbody></table>
 </div>
 </div>
 </div>
@@ -411,24 +411,65 @@ function renderDetailPanel(group) {
 }
 
 // ===== GROWTH TABLE =====
+function findEntryDaysAgo(daysAgo) {
+    // Find the data entry closest to N days ago from the latest entry
+    if (allData.length === 0) return null;
+    var latest = new Date(allData[allData.length-1].date);
+    var target = new Date(latest);
+    target.setDate(target.getDate() - daysAgo);
+    var targetStr = target.toISOString().slice(0,10);
+    // Find exact match or closest before
+    var best = null;
+    for (var i = allData.length-1; i >= 0; i--) {
+        if (allData[i].date <= targetStr) { best = allData[i]; break; }
+    }
+    return best;
+}
+
+function calcChange(current, previous) {
+    if (previous === 0 || previous == null) return {pct:0, abs:0, hasData:false};
+    var abs = current - previous;
+    var pct = ((current - previous) / previous) * 100;
+    return {pct:pct, abs:abs, hasData:true};
+}
+
+function fmtChange(c) {
+    if (!c.hasData) return '<span style="color:#475569">—</span>';
+    var cls = c.pct >= 0 ? "pos" : "neg";
+    var sign = c.pct >= 0 ? "+" : "";
+    return '<span class="'+cls+'">' + sign + c.pct.toFixed(1) + '%</span><br><span style="font-size:11px;color:#94a3b8">' + (c.abs>=0?"+":"") + fmtNum(c.abs) + '</span>';
+}
+
 function renderGrowthTable() {
-    var first = filtered[0]||{};
-    var last = filtered[filtered.length-1]||{};
+    var last = allData[allData.length-1]||{};
+    var d1 = findEntryDaysAgo(1);
+    var d7 = findEntryDaysAgo(7);
+    var d14 = findEntryDaysAgo(14);
+    var d30 = findEntryDaysAgo(30);
     var rows = [];
     ["nha_hang","hotel","doi_thu"].forEach(function(g){
         getDomains(g).forEach(function(dom){
-            var fv = (first[g]||{})[dom]||0;
-            var lv = (last[g]||{})[dom]||0;
-            var growth = fv===0 ? 0 : ((lv-fv)/fv)*100;
-            if (fv>0||lv>0) rows.push({dom:dom,group:GROUP_LABELS[g],lv:lv,fv:fv,growth:growth,change:lv-fv});
+            var current = (last[g]||{})[dom]||0;
+            var v1 = d1 ? ((d1[g]||{})[dom]||0) : 0;
+            var v7 = d7 ? ((d7[g]||{})[dom]||0) : 0;
+            var v14 = d14 ? ((d14[g]||{})[dom]||0) : 0;
+            var v30 = d30 ? ((d30[g]||{})[dom]||0) : 0;
+            if (current > 0 || v7 > 0) {
+                rows.push({
+                    dom:dom, group:GROUP_LABELS[g], current:current,
+                    c1: calcChange(current, v1),
+                    c7: calcChange(current, v7),
+                    c14: calcChange(current, v14),
+                    c30: calcChange(current, v30)
+                });
+            }
         });
     });
-    rows.sort(function(a,b){return b.growth-a.growth;});
+    // Sort by 7-day growth descending
+    rows.sort(function(a,b){ return b.c7.pct - a.c7.pct; });
     var tbody = document.getElementById("growthBody");
     tbody.innerHTML = rows.slice(0,50).map(function(r,i){
-        var gc = r.growth>=0?"pos":"neg";
-        var cc = r.change>=0?"pos":"neg";
-        return "<tr><td>"+(i+1)+"</td><td>"+r.dom+"</td><td>"+r.group+"</td><td>"+fmtNum(r.lv)+"</td><td>"+fmtNum(r.fv)+"</td><td class=\""+gc+"\">"+(r.growth>=0?"+":"")+r.growth.toFixed(2)+"%</td><td class=\""+cc+"\">"+(r.change>=0?"+":"")+fmtNum(r.change)+"</td></tr>";
+        return "<tr><td>"+(i+1)+"</td><td>"+r.dom+"</td><td>"+r.group+"</td><td><strong>"+fmtNum(r.current)+"</strong></td><td>"+fmtChange(r.c1)+"</td><td>"+fmtChange(r.c7)+"</td><td>"+fmtChange(r.c14)+"</td><td>"+fmtChange(r.c30)+"</td></tr>";
     }).join("");
 }
 
