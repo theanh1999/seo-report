@@ -1,648 +1,367 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BÁO CÁO GOOGLE INDEX</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #0f172a;
-            color: #f1f5f9;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header {
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: #94a3b8;
-            font-size: 14px;
-        }
-
-        .kpi-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 40px;
-        }
-
-        .kpi-card {
-            background-color: #1e293b;
-            border-radius: 8px;
-            padding: 20px;
-            border: 1px solid #334155;
-        }
-
-        .kpi-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #94a3b8;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-
-        .kpi-value {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .kpi-change {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        .kpi-card.nha-hang .kpi-value {
-            color: #22c55e;
-        }
-
-        .kpi-card.hotel .kpi-value {
-            color: #a855f7;
-        }
-
-        .kpi-card.doi-thu .kpi-value {
-            color: #ef4444;
-        }
-
-        .kpi-card.total .kpi-value {
-            color: #60a5fa;
-        }
-
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #f1f5f9;
-        }
-
-        .chart-container {
-            background-color: #1e293b;
-            border-radius: 8px;
-            padding: 20px;
-            border: 1px solid #334155;
-            position: relative;
-            height: 400px;
-        }
-
-        .tables-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-        }
-
-        .table-card {
-            background-color: #1e293b;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            overflow: hidden;
-        }
-
-        .table-header {
-            padding: 16px;
-            background-color: #0f172a;
-            border-bottom: 1px solid #334155;
-        }
-
-        .table-header h3 {
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .table-header .legend-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-        }
-
-        .table-content {
-            padding: 0;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .table-row {
-            padding: 12px 16px;
-            border-bottom: 1px solid #334155;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .table-row:last-child {
-            border-bottom: none;
-        }
-
-        .table-row:hover {
-            background-color: #0f172a;
-        }
-
-        .table-domain {
-            flex: 1;
-            min-width: 0;
-            font-size: 13px;
-            font-family: 'Monaco', 'Courier New', monospace;
-            word-break: break-all;
-        }
-
-        .table-count {
-            font-weight: 600;
-            font-size: 13px;
-            min-width: 80px;
-            text-align: right;
-            white-space: nowrap;
-        }
-
-        .progress-bar {
-            width: 60px;
-            height: 4px;
-            background-color: #334155;
-            border-radius: 2px;
-            margin: 0 8px;
-            flex-shrink: 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 2px;
-        }
-
-        .nha-hang .progress-fill {
-            background-color: #22c55e;
-        }
-
-        .hotel .progress-fill {
-            background-color: #a855f7;
-        }
-
-        .doi-thu .progress-fill {
-            background-color: #ef4444;
-        }
-
-        .footer {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #1e293b;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            text-align: center;
-            color: #94a3b8;
-            font-size: 13px;
-        }
-
-        .footer a {
-            color: #60a5fa;
-            text-decoration: none;
-            margin: 0 8px;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            .kpi-row {
-                grid-template-columns: 1fr;
-            }
-
-            .tables-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .chart-container {
-                height: 300px;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Index Report - 2026-04-10</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f172a;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:20px}
+.container{max-width:1200px;margin:0 auto}
+h1{text-align:center;margin-bottom:8px;font-size:28px}
+.subtitle{text-align:center;color:#94a3b8;margin-bottom:24px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:32px}
+.kpi{background:#1e293b;border-radius:12px;padding:20px;text-align:center}
+.kpi-value{font-size:28px;font-weight:700;margin:8px 0}
+.kpi-label{color:#94a3b8;font-size:14px}
+.section{background:#1e293b;border-radius:12px;padding:24px;margin-bottom:24px}
+.section h2{margin-bottom:16px;font-size:20px}
+.chart-container{height:360px;position:relative}
+a{color:#3b82f6}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>BÁO CÁO GOOGLE INDEX</h1>
-            <p>Cập nhật lúc 09/04/2026</p>
-        </div>
+<div class="container">
+<h1>📊 Google Index Report</h1>
+<p class="subtitle">2026-04-10 | <a href="index-analysis.html">Phân tích chi tiết →</a></p>
 
-        <div class="kpi-row">
-            <div class="kpi-card total">
-                <div class="kpi-label">Tổng số trang Index</div>
-                <div class="kpi-value">12,445,292</div>
-            </div>
-            <div class="kpi-card nha-hang">
-                <div class="kpi-label">Nhà Hàng</div>
-                <div class="kpi-value">1,376,583</div>
-            </div>
-            <div class="kpi-card hotel">
-                <div class="kpi-label">Khách Sạn</div>
-                <div class="kpi-value">2,460</div>
-            </div>
-            <div class="kpi-card doi-thu">
-                <div class="kpi-label">Đối Thủ Cạnh Tranh</div>
-                <div class="kpi-value">11,066,249</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Tỷ Lệ (NH+KS / ĐT)</div>
-                <div class="kpi-value" style="color: #60a5fa;">12.46%</div>
-                <div class="kpi-change">Chúng ta vs Đối thủ</div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">Biến Động Số Trang Index Theo Thời Gian</h2>
-            <div class="chart-container">
-                <canvas id="trendChart"></canvas>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">Chi Tiết Theo Nhóm Domain</h2>
-            <div class="tables-grid">
-                <div class="table-card nha-hang">
-                    <div class="table-header">
-                        <h3>
-                            <span class="legend-dot" style="background-color: #22c55e;"></span>
-                            Nhà Hàng (13 domains)
-                        </h3>
-                    </div>
-                    <div class="table-content">
-                        <div class="table-row">
-                            <div class="table-domain">menu-world.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
-                            <div class="table-count">327K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">res-menu.net</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 91%;"></div></div>
-                            <div class="table-count">298K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">goto-where.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 85%;"></div></div>
-                            <div class="table-count">277K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">restaurants-world.net</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 54%;"></div></div>
-                            <div class="table-count">178K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">menufyy.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 45%;"></div></div>
-                            <div class="table-count">147K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">menustic.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 14%;"></div></div>
-                            <div class="table-count">45,900</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">placejoys.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 10%;"></div></div>
-                            <div class="table-count">32,700</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">wherevi.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 8%;"></div></div>
-                            <div class="table-count">25,900</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">grubbio.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 7%;"></div></div>
-                            <div class="table-count">23,300</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">localoria.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 6%;"></div></div>
-                            <div class="table-count">18,200</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">foodplacee.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 1%;"></div></div>
-                            <div class="table-count">1,860</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">wherebly.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
-                            <div class="table-count">1,150</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">locallya.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
-                            <div class="table-count">573</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-card hotel">
-                    <div class="table-header">
-                        <h3>
-                            <span class="legend-dot" style="background-color: #a855f7;"></span>
-                            Khách Sạn (1 domain)
-                        </h3>
-                    </div>
-                    <div class="table-content">
-                        <div class="table-row">
-                            <div class="table-domain">gohotelly.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
-                            <div class="table-count">2,460</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-card doi-thu">
-                    <div class="table-header">
-                        <h3>
-                            <span class="legend-dot" style="background-color: #ef4444;"></span>
-                            Đối Thủ Cạnh Tranh (16 domains)
-                        </h3>
-                    </div>
-                    <div class="table-content">
-                        <div class="table-row">
-                            <div class="table-domain">wanderlog.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
-                            <div class="table-count">5,470K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">wheree.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 89%;"></div></div>
-                            <div class="table-count">4,860K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">weeblyte.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 3%;"></div></div>
-                            <div class="table-count">185K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">com-hotel.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 2%;"></div></div>
-                            <div class="table-count">122K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">com-place.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 2%;"></div></div>
-                            <div class="table-count">122K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">goto-restaurants.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 2%;"></div></div>
-                            <div class="table-count">82,800</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">menu-res.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 1%;"></div></div>
-                            <div class="table-count">69,900</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">restaurants-info.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 1%;"></div></div>
-                            <div class="table-count">48,300</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">hey-restaurants.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 1%;"></div></div>
-                            <div class="table-count">30K</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">gotoeat.net</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
-                            <div class="table-count">20,200</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">com-fnb.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
-                            <div class="table-count">17,800</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">res-pick.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
-                            <div class="table-count">16,100</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">uk-restaurants.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
-                            <div class="table-count">15,800</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">nearby-res.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
-                            <div class="table-count">5,350</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">restaurantmenu.us.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
-                            <div class="table-count">961</div>
-                        </div>
-                        <div class="table-row">
-                            <div class="table-domain">com-bistro.com</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
-                            <div class="table-count">38</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer">
-            Báo cáo chi tiết: <a href="index-analysis.html">Xem phân tích chuyên sâu</a>
-        </div>
+<div class="kpi-grid">
+    <div class="kpi">
+        <div class="kpi-label">🍽️ Nhà hàng (13 sites)</div>
+        <div class="kpi-value" style="color:#22c55e">1,396,585</div>
+        <span style="color:#22c55e;font-size:14px">↑ 1.5%</span>
     </div>
+    <div class="kpi">
+        <div class="kpi-label">🏨 Hotel (1 sites)</div>
+        <div class="kpi-value" style="color:#a855f7">3,220</div>
+        <span style="color:#22c55e;font-size:14px">↑ 30.9%</span>
+    </div>
+    <div class="kpi">
+        <div class="kpi-label">📊 Tổng của bạn</div>
+        <div class="kpi-value" style="color:#3b82f6">1,399,805</div>
+        <span style="color:#22c55e;font-size:14px">↑ 1.5%</span>
+    </div>
+    <div class="kpi">
+        <div class="kpi-label">🔴 Đối thủ (13 sites)</div>
+        <div class="kpi-value" style="color:#ef4444">11,308,070</div>
+        <span style="color:#22c55e;font-size:14px">↑ 2.2%</span>
+    </div>
+    <div class="kpi">
+        <div class="kpi-label">⚡ Tỉ lệ vs Đối thủ</div>
+        <div class="kpi-value">12.4%</div>
+    </div>
+</div>
 
-    <script>
-        // Embedded data
-        const historyData = {
-            dates: ["2026-01-02", "2026-01-07", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-08", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-14", "2026-03-15", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09"],
-            nha_hang: [703566, 737296, 1093090, 1111655, 1116731, 1151002, 1157108, 1167403, 1175308, 1185500, 1194187, 1211871, 1211918, 1225193, 1226708, 1230613, 1239029, 1238583, 1241443, 1239763, 1258276, 1274706, 1279362, 1284859, 1298430, 1313415, 1328278, 1333201, 1338516, 1352412, 1356067, 1354774, 1373081, 1376583],
-            hotel: [345, 231, 1690, 1690, 2040, 1750, 1880, 2070, 1770, 1790, 1960, 2000, 1920, 1830, 2230, 2000, 1870, 1870, 2270, 1890, 1950, 2020, 2130, 2110, 2150, 2340, 2270, 2280, 2730, 2500, 2310, 2310, 2330, 2460],
-            doi_thu: [13592283, 6516137, 7989221, 8207323, 8215084, 8602785, 8350540, 13792851, 13776068, 13667808, 13547758, 13481658, 13566659, 13618261, 13636808, 13677720, 13571990, 13575062, 13437500, 13305162, 13232880, 13267402, 13342760, 13393905, 13507008, 13530284, 13495050, 13504595, 13508110, 13119922, 11244890, 11523918, 11375753, 11066249]
-        };
+<div class="section">
+    <h2>📈 Xu hướng tổng quan (30 ngày)</h2>
+    <div class="chart-container"><canvas id="trendChart"></canvas></div>
+</div>
 
-        // Format labels - show every 3rd date to avoid crowding
-        const labels = historyData.dates.map((date, index) => {
-            if (index % 3 === 0) {
-                const d = new Date(date);
-                return d.toLocaleDateString('vi-VN', { month: 'short', day: 'numeric' });
-            }
-            return '';
-        });
+<div class="section">
+    <h2>🍽️ Nhà hàng - Bảng xếp hạng</h2>
+    <table style="width:100%;border-collapse:collapse;color:#f1f5f9">
+            <thead><tr style="border-bottom:2px solid #475569">
+                <th style="padding:8px 12px;text-align:left">#</th>
+                <th style="padding:8px 12px;text-align:left">Domain</th>
+                <th style="padding:8px 12px;text-align:right">Pages</th>
+                <th style="padding:8px 12px;text-align:left">Bar</th>
+            </tr></thead>
+            <tbody><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">1</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">menu-world.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">324,000 <span style="color:#ef4444;font-size:12px">↓0.9%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:100.0%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">2</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">res-menu.net</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">303,000 <span style="color:#22c55e;font-size:12px">↑1.7%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:93.51851851851852%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">3</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">goto-where.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">278,000 <span style="color:#22c55e;font-size:12px">↑0.4%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:85.80246913580247%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">4</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">restaurants-world.net</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">180,000 <span style="color:#22c55e;font-size:12px">↑1.1%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:55.55555555555556%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">5</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">menufyy.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">158,000 <span style="color:#22c55e;font-size:12px">↑7.5%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:48.76543209876543%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">6</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">menustic.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">47,400 <span style="color:#22c55e;font-size:12px">↑3.3%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:14.629629629629628%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">7</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">placejoys.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">34,100 <span style="color:#22c55e;font-size:12px">↑4.3%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:10.524691358024691%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">8</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">wherevi.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">26,500 <span style="color:#22c55e;font-size:12px">↑2.3%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:8.179012345679013%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">9</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">grubbio.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">23,600 <span style="color:#22c55e;font-size:12px">↑1.3%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:7.28395061728395%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">10</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">localoria.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">18,500 <span style="color:#22c55e;font-size:12px">↑1.6%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:5.709876543209877%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">11</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">foodplacee.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">2,040 <span style="color:#22c55e;font-size:12px">↑9.7%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:0.6296296296296297%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">12</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">wherebly.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">831 <span style="color:#ef4444;font-size:12px">↓27.7%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:0.2564814814814815%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">13</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">locallya.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">614 <span style="color:#22c55e;font-size:12px">↑7.2%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#22c55e;height:100%;width:0.18950617283950616%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr></tbody>
+        </table>
+</div>
 
-        // Create trend chart
-        const ctx = document.getElementById('trendChart').getContext('2d');
-        const trendChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Nhà Hàng',
-                        data: historyData.nha_hang,
-                        borderColor: '#22c55e',
-                        backgroundColor: 'rgba(34, 197, 94, 0.05)',
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Khách Sạn',
-                        data: historyData.hotel,
-                        borderColor: '#a855f7',
-                        backgroundColor: 'rgba(168, 85, 247, 0.05)',
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Đối Thủ Cạnh Tranh',
-                        data: historyData.doi_thu,
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.05)',
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        tension: 0.4,
-                        fill: true,
-                        yAxisID: 'y1'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            color: '#f1f5f9',
-                            font: { size: 12 },
-                            padding: 16,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        titleColor: '#f1f5f9',
-                        bodyColor: '#f1f5f9',
-                        borderColor: '#334155',
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: true,
-                        callbacks: {
-                            label: function(context) {
-                                const value = context.parsed.y || context.parsed;
-                                return context.dataset.label + ': ' + value.toLocaleString('en-US');
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        type: 'category',
-                        grid: {
-                            color: '#334155',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#94a3b8',
-                            font: { size: 11 }
-                        }
-                    },
-                    y: {
-                        type: 'linear',
-                        position: 'left',
-                        grid: {
-                            color: '#334155',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#94a3b8',
-                            font: { size: 11 },
-                            callback: function(value) {
-                                if (value >= 1000000) {
-                                    return (value / 1000000).toFixed(1) + 'M';
-                                } else if (value >= 1000) {
-                                    return (value / 1000).toFixed(0) + 'K';
-                                }
-                                return value;
-                            }
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        position: 'right',
-                        grid: {
-                            drawOnChartArea: false
-                        },
-                        ticks: {
-                            color: '#94a3b8',
-                            font: { size: 11 },
-                            callback: function(value) {
-                                if (value >= 1000000) {
-                                    return (value / 1000000).toFixed(1) + 'M';
-                                } else if (value >= 1000) {
-                                    return (value / 1000).toFixed(0) + 'K';
-                                }
-                                return value;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+<div class="section">
+    <h2>🏨 Hotel</h2>
+    <table style="width:100%;border-collapse:collapse;color:#f1f5f9">
+            <thead><tr style="border-bottom:2px solid #475569">
+                <th style="padding:8px 12px;text-align:left">#</th>
+                <th style="padding:8px 12px;text-align:left">Domain</th>
+                <th style="padding:8px 12px;text-align:right">Pages</th>
+                <th style="padding:8px 12px;text-align:left">Bar</th>
+            </tr></thead>
+            <tbody><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">1</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">gohotelly.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">3,220 <span style="color:#22c55e;font-size:12px">↑30.9%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#a855f7;height:100%;width:100.0%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr></tbody>
+        </table>
+</div>
+
+<div class="section">
+    <h2>🔴 Đối thủ - Bảng xếp hạng</h2>
+    <table style="width:100%;border-collapse:collapse;color:#f1f5f9">
+            <thead><tr style="border-bottom:2px solid #475569">
+                <th style="padding:8px 12px;text-align:left">#</th>
+                <th style="padding:8px 12px;text-align:left">Domain</th>
+                <th style="padding:8px 12px;text-align:right">Pages</th>
+                <th style="padding:8px 12px;text-align:left">Bar</th>
+            </tr></thead>
+            <tbody><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">1</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">wanderlog.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">5,480,000 <span style="color:#22c55e;font-size:12px">↑0.2%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:100.0%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">2</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">wheree.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">4,680,000 <span style="color:#ef4444;font-size:12px">↓3.7%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:85.40145985401459%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">3</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">www.wheree.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">639,000 </td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:11.66058394160584%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">4</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">com-hotel.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">126,000 <span style="color:#22c55e;font-size:12px">↑3.3%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:2.2992700729927007%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">5</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">com-place.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">118,000 <span style="color:#ef4444;font-size:12px">↓3.3%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:2.153284671532847%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">6</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">goto-restaurants.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">83,600 <span style="color:#22c55e;font-size:12px">↑1.0%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:1.5255474452554745%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">7</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">menu-res.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">68,800 <span style="color:#ef4444;font-size:12px">↓1.6%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:1.2554744525547445%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">8</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">restaurants-info.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">47,900 <span style="color:#ef4444;font-size:12px">↓0.8%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:0.8740875912408759%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">9</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">hey-restaurants.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">28,400 <span style="color:#ef4444;font-size:12px">↓5.3%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:0.5182481751824818%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">10</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">gotoeat.net</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">20,500 <span style="color:#22c55e;font-size:12px">↑1.5%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:0.3740875912408759%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">11</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">com-fnb.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">15,000 <span style="color:#ef4444;font-size:12px">↓15.7%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:0.2737226277372263%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">12</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">restaurantmenu.us.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">845 <span style="color:#ef4444;font-size:12px">↓12.1%</span></td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:0.015419708029197081%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr><tr>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">13</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155">com-cuisine.com</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;text-align:right">25 </td>
+                <td style="padding:8px 12px;border-bottom:1px solid #334155;width:40%">
+                    <div style="background:#1e293b;border-radius:4px;height:20px;overflow:hidden">
+                        <div style="background:#ef4444;height:100%;width:0.00045620437956204383%;border-radius:4px;transition:width 0.5s"></div>
+                    </div>
+                </td>
+            </tr></tbody>
+        </table>
+</div>
+
+</div>
+
+<script>
+var ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ["08/03", "10/03", "11/03", "12/03", "14/03", "15/03", "17/03", "18/03", "19/03", "20/03", "21/03", "22/03", "23/03", "24/03", "25/03", "26/03", "28/03", "29/03", "30/03", "31/03", "01/04", "02/04", "03/04", "04/04", "05/04", "06/04", "07/04", "08/04", "09/04", "10/04"],
+        datasets: [
+            {label:'Nhà hàng', data:[1151002, 1157108, 1167403, 1175308, 1185500, 1194187, 1211871, 1211918, 1225193, 1226708, 1230613, 1239029, 1238583, 1241443, 1239763, 1258276, 1274706, 1279362, 1284859, 1298430, 1313415, 1328278, 1333201, 1338516, 1352412, 1356067, 1354774, 1373081, 1376583, 1396585], borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,0.1)', fill:true, tension:0.3, pointRadius:0},
+            {label:'Hotel', data:[1750, 1880, 2070, 1770, 1790, 1960, 2000, 1920, 1830, 2230, 2000, 1870, 1870, 2270, 1890, 1950, 2020, 2130, 2110, 2150, 2340, 2270, 2280, 2730, 2500, 2310, 2310, 2330, 2460, 3220], borderColor:'#a855f7', backgroundColor:'rgba(168,85,247,0.1)', fill:true, tension:0.3, pointRadius:0},
+            {label:'Đối thủ', data:[8602785, 8350540, 13792851, 13776068, 13667808, 13547758, 13481658, 13566659, 13618261, 13636808, 13677720, 13571990, 13575062, 13437500, 13305162, 13232880, 13267402, 13342760, 13393905, 13507008, 13530284, 13495050, 13504595, 13508110, 13119922, 11244890, 11523918, 11375753, 11066249, 11308070], borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,0.1)', fill:true, tension:0.3, pointRadius:0}
+        ]
+    },
+    options: {
+        responsive:true, maintainAspectRatio:false, animation:false,
+        plugins:{legend:{labels:{color:'#f1f5f9'}}},
+        scales:{
+            x:{ticks:{color:'#94a3b8',maxRotation:45},grid:{color:'rgba(148,163,184,0.1)'}},
+            y:{ticks:{color:'#94a3b8',callback:function(v){return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v}},grid:{color:'rgba(148,163,184,0.1)'}}
+        }
+    }
+});
+</script>
+</body></html>
