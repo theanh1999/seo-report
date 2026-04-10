@@ -43,7 +43,7 @@ h1{font-size:28px;font-weight:700;margin-bottom:6px}
 .d-stat-lbl{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
 .mini-wrap{position:relative;height:100px;margin-bottom:4px}
 .mini-wrap canvas{width:100%!important;height:100%!important}
-.pos{color:#22c55e}.neg{color:#ef4444}
+.pos{color:#22c55e}.neg{color:#ef4444}.muted{color:#64748b}
 .doughnut-wrap{position:relative;height:260px;max-width:380px;margin:0 auto}
 .doughnut-wrap canvas{width:100%!important;height:100%!important}
 .growth-wrap{position:relative;height:280px}
@@ -93,7 +93,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="card">
 <div class="card-title">Growth Ranking</div>
 <div style="overflow-x:auto">
-<table><thead><tr><th>#</th><th>Domain</th><th>Group</th><th>Current</th><th>Start</th><th>Growth %</th><th>Change</th></tr></thead><tbody id="growthBody"></tbody></table>
+<table><thead><tr><th>#</th><th>Domain</th><th>Group</th><th>Current</th><th>vs Hôm qua</th><th>vs 7 ngày</th><th>vs 14 ngày</th><th>vs 30 ngày</th></tr></thead><tbody id="growthBody"></tbody></table>
 </div>
 </div>
 </div>
@@ -455,24 +455,75 @@ function renderDetailPanel(group) {
 }
 
 // ===== GROWTH TABLE =====
+// Find entry in allData at (or before) latest.date - daysAgo.
+// Returns null if no data that old.
+function findEntryDaysAgo(daysAgo) {
+    if (allData.length === 0) return null;
+    var latest = new Date(allData[allData.length-1].date);
+    var target = new Date(latest);
+    target.setDate(target.getDate() - daysAgo);
+    var targetStr = target.toISOString().slice(0,10);
+    var best = null;
+    for (var i = allData.length-1; i >= 0; i--) {
+        if (allData[i].date <= targetStr) { best = allData[i]; break; }
+    }
+    return best;
+}
+
+function fmtDelta(curr, prev) {
+    if (prev === null || prev === 0) {
+        if (curr > 0 && (prev === null || prev === 0)) return '<span class="muted">—</span>';
+        return '<span class="muted">—</span>';
+    }
+    var diff = curr - prev;
+    var pct = (diff / prev) * 100;
+    var cls = diff >= 0 ? "pos" : "neg";
+    var sign = diff >= 0 ? "+" : "";
+    return '<span class="'+cls+'">'+sign+fmtNum(diff)+' ('+sign+pct.toFixed(2)+'%)</span>';
+}
+
 function renderGrowthTable() {
-    var first = firstReal();
-    var last = lastReal();
+    // Use allData (not filtered) so lookback isn't limited by time filter
+    var last = (function(){
+        for (var i = allData.length-1; i >= 0; i--) {
+            if (!allData[i]._missing) return allData[i];
+        }
+        return {};
+    })();
+    var e1 = findEntryDaysAgo(1);
+    var e7 = findEntryDaysAgo(7);
+    var e14 = findEntryDaysAgo(14);
+    var e30 = findEntryDaysAgo(30);
+
     var rows = [];
     ["nha_hang","hotel","doi_thu"].forEach(function(g){
         getDomains(g).forEach(function(dom){
-            var fv = (first[g]||{})[dom]||0;
             var lv = (last[g]||{})[dom]||0;
-            var growth = fv===0 ? 0 : ((lv-fv)/fv)*100;
-            if (fv>0||lv>0) rows.push({dom:dom,group:GROUP_LABELS[g],lv:lv,fv:fv,growth:growth,change:lv-fv});
+            var v1 = e1 ? ((e1[g]||{})[dom]||0) : null;
+            var v7 = e7 ? ((e7[g]||{})[dom]||0) : null;
+            var v14 = e14 ? ((e14[g]||{})[dom]||0) : null;
+            var v30 = e30 ? ((e30[g]||{})[dom]||0) : null;
+            // sort key: 7-day % growth (fallback to raw current)
+            var sortPct = (v7 && v7 > 0) ? ((lv - v7) / v7) * 100 : -Infinity;
+            if (lv > 0 || v1 > 0 || v7 > 0 || v14 > 0 || v30 > 0) {
+                rows.push({dom:dom,group:GROUP_LABELS[g],lv:lv,v1:v1,v7:v7,v14:v14,v30:v30,sortPct:sortPct});
+            }
         });
     });
-    rows.sort(function(a,b){return b.growth-a.growth;});
+    rows.sort(function(a,b){return b.sortPct - a.sortPct;});
+
     var tbody = document.getElementById("growthBody");
     tbody.innerHTML = rows.slice(0,50).map(function(r,i){
-        var gc = r.growth>=0?"pos":"neg";
-        var cc = r.change>=0?"pos":"neg";
-        return "<tr><td>"+(i+1)+"</td><td>"+r.dom+"</td><td>"+r.group+"</td><td>"+fmtNum(r.lv)+"</td><td>"+fmtNum(r.fv)+"</td><td class=\""+gc+"\">"+(r.growth>=0?"+":"")+r.growth.toFixed(2)+"%</td><td class=\""+cc+"\">"+(r.change>=0?"+":"")+fmtNum(r.change)+"</td></tr>";
+        return "<tr>"+
+            "<td>"+(i+1)+"</td>"+
+            "<td>"+r.dom+"</td>"+
+            "<td>"+r.group+"</td>"+
+            "<td><b>"+fmtNum(r.lv)+"</b></td>"+
+            "<td>"+fmtDelta(r.lv, r.v1)+"</td>"+
+            "<td>"+fmtDelta(r.lv, r.v7)+"</td>"+
+            "<td>"+fmtDelta(r.lv, r.v14)+"</td>"+
+            "<td>"+fmtDelta(r.lv, r.v30)+"</td>"+
+            "</tr>";
     }).join("");
 }
 
