@@ -112,7 +112,7 @@ var EMBEDDED_DATA = ''' + embedded_data + ''';
 var SITE_GROUPS = {
     nha_hang: ["goto-where.com","menu-world.com","grubbio.com","menustic.com","menufyy.com","res-menu.net","restaurants-world.net","wherevi.com","localoria.com","placejoys.com","wherebly.com","foodplacee.com","locallya.com"],
     hotel: ["gohotelly.com"],
-    doi_thu: ["wheree.com","www.wheree.com","com-cuisine.com","com-fnb.com","com-place.com","goto-restaurants.com","wanderlog.com","menu-res.com","restaurantmenu.us.com","com-hotel.com","gotoeat.net","restaurants-info.com","hey-restaurants.com","nearby-res.com","res-pick.com","uk-restaurants.com","weeblyte.com","com-bistro.com"]
+    doi_thu: ["wheree.com","www.wheree.com","com-cuisine.com","com-fnb.com","com-place.com","goto-restaurants.com","wanderlog.com","menu-res.com","restaurantmenu.us.com","com-hotel.com","gotoeat.net","restaurants-info.com","hey-restaurants.com","nearby-res.com","res-pick.com","uk-restaurants.com","weeblyte.com","com-bistro.com","eaterygrid.com","taste-pick.com","pressupeats.com"]
 };
 var GROUP_LABELS = {nha_hang:"Nhà Hàng",hotel:"Hotel",doi_thu:"Đối Thủ"};
 var GROUP_COLORS = {nha_hang:"#22c55e",hotel:"#a855f7",doi_thu:"#ef4444"};
