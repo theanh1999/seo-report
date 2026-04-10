@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Dashboard - Mảng Restaurants</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border-color: #ddd;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --chart-grid: #e0e0e0;
+            --good-color: #27ae60;
+            --bad-color: #e74c3c;
+            --neutral-color: #3498db;
+        }
+
+        html.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --border-color: #444;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            --chart-grid: #444444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+        }
+
+        .cross-link {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .cross-link a {
+            color: var(--neutral-color);
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        .cross-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dark mode toggle */
+        .dark-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .dark-toggle:hover {
+            box-shadow: var(--card-shadow);
+        }
+
+        /* TOC */
+        .toc-nav {
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            z-index: 100;
+            margin-bottom: 30px;
+        }
+
+        .toc-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .toc-nav a.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--neutral-color);
+        }
+
+        .toc-nav a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+        }
+
+        .kpi-card-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .kpi-card-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .kpi-card-change {
+            font-size: 13px;
+        }
+
+        .good {
+            color: var(--good-color);
+        }
+
+        .bad {
+            color: var(--bad-color);
+        }
+
+        .neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Filter */
+        .filter-section {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .filter-select {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .filter-button {
+            background: var(--neutral-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .filter-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Chart */
+        .chart-wrapper {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-wrapper h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .chart-container {
+            height: 350px;
+            margin-bottom: 10px;
+        }
+
+        .chart-legend {
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--border-color);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: var(--text-secondary);
+        }
+
+        th::after {
+            content: " ⇅";
+            opacity: 0.3;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--bg-primary);
+        }
+
+        .numeric {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        .site-name {
+            color: var(--neutral-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .site-name:hover {
+            text-decoration: underline;
+        }
+
+        /* Anomaly cards */
+        .anomaly-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .anomaly-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .anomaly-card.critical {
+            border-left-color: var(--bad-color);
+        }
+
+        .anomaly-card.warning {
+            border-left-color: #f39c12;
+        }
+
+        .anomaly-card.info {
+            border-left-color: var(--neutral-color);
+        }
+
+        .anomaly-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .anomaly-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Recommendations */
+        .recommendation-table {
+            width: 100%;
+        }
+
+        .priority-high {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .priority-medium {
+            background: rgba(243, 156, 18, 0.1);
+        }
+
+        .priority-low {
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        /* Period Toggle */
+        .period-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .period-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .period-btn:hover {
+            border-color: var(--neutral-color);
+            color: var(--text-primary);
+        }
+
+        .period-btn.active {
+            background: var(--neutral-color);
+            color: #ffffff;
+            border-color: var(--neutral-color);
+        }
+
+        /* Period comparison table */
+        .period-compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .period-compare-table thead {
+            background: var(--border-color);
+        }
+
+        .period-compare-table th {
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .period-compare-table th:first-child {
+            text-align: left;
+        }
+
+        .period-compare-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .period-compare-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .period-compare-table .sub {
+            font-size: 11px;
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .toc-nav {
+                font-size: 12px;
+                gap: 10px;
+            }
+
+            .toc-nav a {
+                padding: 6px 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 0 10px 30px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .toc-nav {
+                flex-direction: column;
+                gap: 5px;
+                padding: 10px;
+            }
+
+            .toc-nav a {
+                padding: 5px 0;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                padding-left: 10px;
+            }
+
+            .toc-nav a.active {
+                border-left-color: var(--neutral-color);
+                border-bottom: none;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+    <div class="header">
+        <h1>SEO Dashboard - Restaurants (13 websites)</h1>
+        <div class="cross-link">
+            Bạn đang xem: Mảng Restaurants (13 websites) — 2026-04-10
+            | <a href="seo-hotels-2026-04-10.html">→ Xem Mảng Khách sạn</a>            | <a href="index-2026-04-10.html">→ Tất cả báo cáo</a>
+        </div>
+    </div>
+    <div class="toc-nav">
+        <a href="#kpis">KPI</a>
+        <a href="#filter">Website</a>
+        <a href="#charts">Biểu đồ</a>
+        <a href="#comparison">So sánh</a>
+        <a href="#keywords">Từ khóa</a>
+        <a href="#anomalies">Bất thường</a>
+        <a href="#trends">Xu hướng</a>
+        <a href="#recommendations">Kiến nghị</a>
+    </div>
+    <div class="container">
+        <div class="section" id="kpis">
+            <h2>📊 KPI Tổng hợp</h2>
+            <div class="period-toggle">
+                <button class="period-btn" data-period="7d" onclick="switchPeriod('7d')">7 ngày</button>
+                <button class="period-btn" data-period="14d" onclick="switchPeriod('14d')">14 ngày</button>
+                <button class="period-btn active" data-period="30d" onclick="switchPeriod('30d')">30 ngày</button>
+            </div>
+            <div class="kpi-grid" id="kpi-cards">
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Sessions</div>
+                    <div class="kpi-card-value" id="kpi-sessions-val">6.5M</div>
+                    <div class="kpi-card-change" id="kpi-sessions-pct"><span class="good">+5.6%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Users</div>
+                    <div class="kpi-card-value" id="kpi-users-val">6.0M</div>
+                    <div class="kpi-card-change" id="kpi-users-pct"><span class="good">+5.1%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Pageviews</div>
+                    <div class="kpi-card-value" id="kpi-pageviews-val">10.0M</div>
+                    <div class="kpi-card-change" id="kpi-pageviews-pct"><span class="good">+3.3%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">GSC Clicks</div>
+                    <div class="kpi-card-value" id="kpi-clicks-val">2.6M</div>
+                    <div class="kpi-card-change" id="kpi-clicks-pct"><span class="good">+13.6%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">GSC Impressions</div>
+                    <div class="kpi-card-value" id="kpi-impressions-val">261.4M</div>
+                    <div class="kpi-card-change" id="kpi-impressions-pct"><span class="good">+22.5%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">TB Bounce Rate</div>
+                    <div class="kpi-card-value" id="kpi-bounce_rate-val">47.0%</div>
+                    <div class="kpi-card-change" id="kpi-bounce_rate-pct"><span class="good">-2.7%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">TB Engagement Rate</div>
+                    <div class="kpi-card-value" id="kpi-engagement_rate-val">53.0%</div>
+                    <div class="kpi-card-change" id="kpi-engagement_rate-pct"><span class="good">+2.6%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">TB Vị trí</div>
+                    <div class="kpi-card-value" id="kpi-position-val">8.6</div>
+                    <div class="kpi-card-change" id="kpi-position-pct"><span class="bad">+1.7%</span></div>
+                </div>
+            </div>
+
+            <h3 style="margin-top:25px;margin-bottom:10px;">📊 So sánh 3 mốc thời gian (vs kỳ trước)</h3>
+            <table class="period-compare-table">
+                <thead>
+                    <tr>
+                        <th>Chỉ số</th>
+                        <th>7 ngày<br><span class="sub" style="font-weight:normal;opacity:0.7">vs 7d trước</span></th>
+                        <th>14 ngày<br><span class="sub" style="font-weight:normal;opacity:0.7">vs 14d trước</span></th>
+                        <th>30 ngày<br><span class="sub" style="font-weight:normal;opacity:0.7">vs 30d trước</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sessions</td>
+                        <td>1.4M<br><span class="sub"><span class="bad">-10.2%</span></span></td>
+                        <td>3.0M<br><span class="sub"><span class="bad">-0.1%</span></span></td>
+                        <td>6.5M<br><span class="sub"><span class="good">+5.6%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Users</td>
+                        <td>1.3M<br><span class="sub"><span class="bad">-10.1%</span></span></td>
+                        <td>2.8M<br><span class="sub"><span class="bad">-0.5%</span></span></td>
+                        <td>6.0M<br><span class="sub"><span class="good">+5.1%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Pageviews</td>
+                        <td>2.2M<br><span class="sub"><span class="bad">-11.0%</span></span></td>
+                        <td>4.7M<br><span class="sub"><span class="bad">-0.8%</span></span></td>
+                        <td>10.0M<br><span class="sub"><span class="good">+3.3%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>GSC Clicks</td>
+                        <td>565.8K<br><span class="sub"><span class="bad">-12.1%</span></span></td>
+                        <td>1.2M<br><span class="sub"><span class="bad">-3.2%</span></span></td>
+                        <td>2.6M<br><span class="sub"><span class="good">+13.6%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>GSC Impressions</td>
+                        <td>58.2M<br><span class="sub"><span class="bad">-8.8%</span></span></td>
+                        <td>121.9M<br><span class="sub"><span class="bad">-2.4%</span></span></td>
+                        <td>261.4M<br><span class="sub"><span class="good">+22.5%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>TB Bounce Rate</td>
+                        <td>52.3%<br><span class="sub"><span class="bad">+12.6%</span></span></td>
+                        <td>49.4%<br><span class="sub"><span class="bad">+9.5%</span></span></td>
+                        <td>47.0%<br><span class="sub"><span class="good">-2.7%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>TB Engagement Rate</td>
+                        <td>47.7%<br><span class="sub"><span class="bad">-10.9%</span></span></td>
+                        <td>50.6%<br><span class="sub"><span class="bad">-7.8%</span></span></td>
+                        <td>53.0%<br><span class="sub"><span class="good">+2.6%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>TB CTR</td>
+                        <td>0.93%<br><span class="sub"><span class="bad">-10.3%</span></span></td>
+                        <td>0.98%<br><span class="sub"><span class="bad">-3.0%</span></span></td>
+                        <td>1.01%<br><span class="sub"><span class="bad">-38.9%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>TB Vị trí</td>
+                        <td>8.5<br><span class="sub"><span class="good">-6.1%</span></span></td>
+                        <td>8.8<br><span class="sub"><span class="bad">+5.0%</span></span></td>
+                        <td>8.6<br><span class="sub"><span class="bad">+1.7%</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    <script>
+        var KPI_PERIOD_DATA = {"7d": {"sessions": {"value": "1.4M", "pct": -10.2}, "users": {"value": "1.3M", "pct": -10.1}, "pageviews": {"value": "2.2M", "pct": -11.0}, "clicks": {"value": "565.8K", "pct": -12.1}, "impressions": {"value": "58.2M", "pct": -8.8}, "bounce_rate": {"value": "52.3%", "pct": 12.6, "reverse": true}, "engagement_rate": {"value": "47.7%", "pct": -10.9}, "position": {"value": "8.5", "pct": -6.1, "reverse": true}}, "14d": {"sessions": {"value": "3.0M", "pct": -0.1}, "users": {"value": "2.8M", "pct": -0.5}, "pageviews": {"value": "4.7M", "pct": -0.8}, "clicks": {"value": "1.2M", "pct": -3.2}, "impressions": {"value": "121.9M", "pct": -2.4}, "bounce_rate": {"value": "49.4%", "pct": 9.5, "reverse": true}, "engagement_rate": {"value": "50.6%", "pct": -7.8}, "position": {"value": "8.8", "pct": 5.0, "reverse": true}}, "30d": {"sessions": {"value": "6.5M", "pct": 5.6}, "users": {"value": "6.0M", "pct": 5.1}, "pageviews": {"value": "10.0M", "pct": 3.3}, "clicks": {"value": "2.6M", "pct": 13.6}, "impressions": {"value": "261.4M", "pct": 22.5}, "bounce_rate": {"value": "47.0%", "pct": -2.7, "reverse": true}, "engagement_rate": {"value": "53.0%", "pct": 2.6}, "position": {"value": "8.6", "pct": 1.7, "reverse": true}}};
+        function switchPeriod(period) {
+            document.querySelectorAll('.period-btn').forEach(function(btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-period') === period);
+            });
+            var data = KPI_PERIOD_DATA[period];
+            if (!data) return;
+            var metrics = ['sessions','users','pageviews','clicks','impressions','bounce_rate','engagement_rate','position'];
+            var reverseMetrics = ['bounce_rate','position'];
+            metrics.forEach(function(m) {
+                var valEl = document.getElementById('kpi-' + m + '-val');
+                var pctEl = document.getElementById('kpi-' + m + '-pct');
+                if (valEl) valEl.textContent = data[m].value;
+                if (pctEl) {
+                    var pct = data[m].pct;
+                    var sign = pct > 0 ? '+' : '';
+                    var isReverse = reverseMetrics.indexOf(m) >= 0;
+                    var cls = (pct > 0 && isReverse) || (pct < 0 && !isReverse) ? 'bad' : 'good';
+                    pctEl.innerHTML = '<span class="' + cls + '">' + sign + pct.toFixed(1) + '%</span>';
+                }
+            });
+        }
+    </script>
+
+        <div class="section" id="filter">
+            <h2>🔍 Chọn Website</h2>
+            <div class="filter-section">
+                <select id="website-filter" class="filter-select" onchange="filterWebsites()">
+                    <option value="">-- Tất cả --</option>
+                    <option value="localoria.com">localoria.com</option>
+                    <option value="wherebly.com">wherebly.com</option>
+                    <option value="res-menu.net">res-menu.net</option>
+                    <option value="foodplacee.com">foodplacee.com</option>
+                    <option value="restaurants-world.net">restaurants-world.net</option>
+                    <option value="goto-where.com">goto-where.com</option>
+                    <option value="menu-world.com">menu-world.com</option>
+                    <option value="grubbio.com">grubbio.com</option>
+                    <option value="menustic.com">menustic.com</option>
+                    <option value="menufyy.com">menufyy.com</option>
+                    <option value="wherevi.com">wherevi.com</option>
+                    <option value="placejoys.com">placejoys.com</option>
+                    <option value="locallya.com">locallya.com</option>
+                </select>
+                <button class="filter-button" onclick="selectAllWebsites()">Chọn tất cả</button>
+                <button class="filter-button" onclick="deselectAllWebsites()">Bỏ chọn tất cả</button>
+            </div>
+        </div>
+
+        <div class="section" id="charts">
+            <h2>📈 Biểu đồ Trend</h2>
+            <div class="chart-wrapper">
+                <h3>Sessions theo ngày (mỗi website 1 đường)</h3>
+                <div class="chart-container">
+                    <canvas id="chart-sessions"></canvas>
+                </div>
+                <div class="chart-legend" id="legend-sessions"></div>
+            </div>
+
+            <div class="chart-wrapper">
+                <h3>Clicks GSC theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-clicks"></canvas>
+                </div>
+                <div class="chart-legend" id="legend-clicks"></div>
+            </div>
+
+            <div class="chart-wrapper">
+                <h3>Impressions theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-impressions"></canvas>
+                </div>
+                <div class="chart-legend" id="legend-impressions"></div>
+            </div>
+
+            <div class="chart-wrapper">
+                <h3>Vị trí TB theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-position"></canvas>
+                </div>
+                <div class="chart-legend" id="legend-position"></div>
+            </div>
+        </div>
+
+        <div class="section" id="comparison">
+            <h2>📊 So sánh Website</h2>
+            <div class="period-toggle">
+                <button class="period-btn" data-cperiod="7d" onclick="switchCompPeriod('7d')">7 ngày</button>
+                <button class="period-btn" data-cperiod="14d" onclick="switchCompPeriod('14d')">14 ngày</button>
+                <button class="period-btn active" data-cperiod="30d" onclick="switchCompPeriod('30d')">30 ngày</button>
+            </div>
+            <table id="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Website</th>
+                        <th class="numeric">Sessions</th>
+                        <th class="numeric">Users</th>
+                        <th class="numeric">Pageviews</th>
+                        <th class="numeric">Clicks</th>
+                        <th class="numeric">Impressions</th>
+                        <th class="numeric">CTR</th>
+                        <th class="numeric">Vị trí</th>
+                        <th class="numeric">% Sessions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-domain="localoria.com">
+                        <td><a class="site-name" href="seo-detail-localoria.com-2026-04-10.html" title="Xem chi tiết localoria.com">localoria.com</a></td>
+                        <td class="numeric" data-col="sessions">170.2K</td>
+                        <td class="numeric" data-col="users">159.6K</td>
+                        <td class="numeric" data-col="pageviews">240.7K</td>
+                        <td class="numeric" data-col="clicks">10.8K</td>
+                        <td class="numeric" data-col="impressions">1.4M</td>
+                        <td class="numeric" data-col="ctr">0.83%</td>
+                        <td class="numeric" data-col="position">9.1</td>
+                        <td class="numeric good" data-col="pct">+52.6%</td>
+                    </tr>
+                    <tr data-domain="wherebly.com">
+                        <td><a class="site-name" href="seo-detail-wherebly.com-2026-04-10.html" title="Xem chi tiết wherebly.com">wherebly.com</a></td>
+                        <td class="numeric" data-col="sessions">16.0K</td>
+                        <td class="numeric" data-col="users">15.1K</td>
+                        <td class="numeric" data-col="pageviews">22.2K</td>
+                        <td class="numeric" data-col="clicks">733</td>
+                        <td class="numeric" data-col="impressions">52.3K</td>
+                        <td class="numeric" data-col="ctr">1.81%</td>
+                        <td class="numeric" data-col="position">7.0</td>
+                        <td class="numeric good" data-col="pct">+618.5%</td>
+                    </tr>
+                    <tr data-domain="res-menu.net">
+                        <td><a class="site-name" href="seo-detail-res-menu.net-2026-04-10.html" title="Xem chi tiết res-menu.net">res-menu.net</a></td>
+                        <td class="numeric" data-col="sessions">1.8M</td>
+                        <td class="numeric" data-col="users">1.6M</td>
+                        <td class="numeric" data-col="pageviews">2.7M</td>
+                        <td class="numeric" data-col="clicks">829.5K</td>
+                        <td class="numeric" data-col="impressions">54.8M</td>
+                        <td class="numeric" data-col="ctr">1.51%</td>
+                        <td class="numeric" data-col="position">9.3</td>
+                        <td class="numeric good" data-col="pct">+31.9%</td>
+                    </tr>
+                    <tr data-domain="foodplacee.com">
+                        <td><a class="site-name" href="seo-detail-foodplacee.com-2026-04-10.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></td>
+                        <td class="numeric" data-col="sessions">23,184</td>
+                        <td class="numeric" data-col="users">21,549</td>
+                        <td class="numeric" data-col="pageviews">39,630</td>
+                        <td class="numeric" data-col="clicks">950</td>
+                        <td class="numeric" data-col="impressions">111,044</td>
+                        <td class="numeric" data-col="ctr">1.17%</td>
+                        <td class="numeric" data-col="position">7.9</td>
+                        <td class="numeric good" data-col="pct">+971.3%</td>
+                    </tr>
+                    <tr data-domain="restaurants-world.net">
+                        <td><a class="site-name" href="seo-detail-restaurants-world.net-2026-04-10.html" title="Xem chi tiết restaurants-world.net">restaurants-world.net</a></td>
+                        <td class="numeric" data-col="sessions">643.9K</td>
+                        <td class="numeric" data-col="users">596.2K</td>
+                        <td class="numeric" data-col="pageviews">882.1K</td>
+                        <td class="numeric" data-col="clicks">298.0K</td>
+                        <td class="numeric" data-col="impressions">32.6M</td>
+                        <td class="numeric" data-col="ctr">0.92%</td>
+                        <td class="numeric" data-col="position">9.5</td>
+                        <td class="numeric good" data-col="pct">+2.1%</td>
+                    </tr>
+                    <tr data-domain="goto-where.com">
+                        <td><a class="site-name" href="seo-detail-goto-where.com-2026-04-10.html" title="Xem chi tiết goto-where.com">goto-where.com</a></td>
+                        <td class="numeric" data-col="sessions">782.3K</td>
+                        <td class="numeric" data-col="users">726.6K</td>
+                        <td class="numeric" data-col="pageviews">1.1M</td>
+                        <td class="numeric" data-col="clicks">253.2K</td>
+                        <td class="numeric" data-col="impressions">57.7M</td>
+                        <td class="numeric" data-col="ctr">0.44%</td>
+                        <td class="numeric" data-col="position">8.5</td>
+                        <td class="numeric bad" data-col="pct">-24.9%</td>
+                    </tr>
+                    <tr data-domain="menu-world.com">
+                        <td><a class="site-name" href="seo-detail-menu-world.com-2026-04-10.html" title="Xem chi tiết menu-world.com">menu-world.com</a></td>
+                        <td class="numeric" data-col="sessions">1.5M</td>
+                        <td class="numeric" data-col="users">1.3M</td>
+                        <td class="numeric" data-col="pageviews">2.6M</td>
+                        <td class="numeric" data-col="clicks">796.1K</td>
+                        <td class="numeric" data-col="impressions">71.3M</td>
+                        <td class="numeric" data-col="ctr">1.12%</td>
+                        <td class="numeric" data-col="position">8.6</td>
+                        <td class="numeric bad" data-col="pct">-5.3%</td>
+                    </tr>
+                    <tr data-domain="grubbio.com">
+                        <td><a class="site-name" href="seo-detail-grubbio.com-2026-04-10.html" title="Xem chi tiết grubbio.com">grubbio.com</a></td>
+                        <td class="numeric" data-col="sessions">136.5K</td>
+                        <td class="numeric" data-col="users">129.3K</td>
+                        <td class="numeric" data-col="pageviews">193.1K</td>
+                        <td class="numeric" data-col="clicks">24.7K</td>
+                        <td class="numeric" data-col="impressions">3.1M</td>
+                        <td class="numeric" data-col="ctr">0.79%</td>
+                        <td class="numeric" data-col="position">8.6</td>
+                        <td class="numeric bad" data-col="pct">-18.8%</td>
+                    </tr>
+                    <tr data-domain="menustic.com">
+                        <td><a class="site-name" href="seo-detail-menustic.com-2026-04-10.html" title="Xem chi tiết menustic.com">menustic.com</a></td>
+                        <td class="numeric" data-col="sessions">199.4K</td>
+                        <td class="numeric" data-col="users">185.4K</td>
+                        <td class="numeric" data-col="pageviews">292.5K</td>
+                        <td class="numeric" data-col="clicks">70.7K</td>
+                        <td class="numeric" data-col="impressions">8.8M</td>
+                        <td class="numeric" data-col="ctr">0.80%</td>
+                        <td class="numeric" data-col="position">7.3</td>
+                        <td class="numeric good" data-col="pct">+6.2%</td>
+                    </tr>
+                    <tr data-domain="menufyy.com">
+                        <td><a class="site-name" href="seo-detail-menufyy.com-2026-04-10.html" title="Xem chi tiết menufyy.com">menufyy.com</a></td>
+                        <td class="numeric" data-col="sessions">464.5K</td>
+                        <td class="numeric" data-col="users">437.4K</td>
+                        <td class="numeric" data-col="pageviews">637.0K</td>
+                        <td class="numeric" data-col="clicks">177.3K</td>
+                        <td class="numeric" data-col="impressions">19.0M</td>
+                        <td class="numeric" data-col="ctr">0.94%</td>
+                        <td class="numeric" data-col="position">7.8</td>
+                        <td class="numeric good" data-col="pct">+82.6%</td>
+                    </tr>
+                    <tr data-domain="wherevi.com">
+                        <td><a class="site-name" href="seo-detail-wherevi.com-2026-04-10.html" title="Xem chi tiết wherevi.com">wherevi.com</a></td>
+                        <td class="numeric" data-col="sessions">220.0K</td>
+                        <td class="numeric" data-col="users">213.2K</td>
+                        <td class="numeric" data-col="pageviews">283.5K</td>
+                        <td class="numeric" data-col="clicks">17.7K</td>
+                        <td class="numeric" data-col="impressions">1.7M</td>
+                        <td class="numeric" data-col="ctr">1.31%</td>
+                        <td class="numeric" data-col="position">11.0</td>
+                        <td class="numeric good" data-col="pct">+18.3%</td>
+                    </tr>
+                    <tr data-domain="placejoys.com">
+                        <td><a class="site-name" href="seo-detail-placejoys.com-2026-04-10.html" title="Xem chi tiết placejoys.com">placejoys.com</a></td>
+                        <td class="numeric" data-col="sessions">654.0K</td>
+                        <td class="numeric" data-col="users">603.4K</td>
+                        <td class="numeric" data-col="pageviews">1.1M</td>
+                        <td class="numeric" data-col="clicks">129.2K</td>
+                        <td class="numeric" data-col="impressions">10.7M</td>
+                        <td class="numeric" data-col="ctr">1.21%</td>
+                        <td class="numeric" data-col="position">7.9</td>
+                        <td class="numeric bad" data-col="pct">-9.6%</td>
+                    </tr>
+                    <tr data-domain="locallya.com">
+                        <td><a class="site-name" href="seo-detail-locallya.com-2026-04-10.html" title="Xem chi tiết locallya.com">locallya.com</a></td>
+                        <td class="numeric" data-col="sessions">6,628</td>
+                        <td class="numeric" data-col="users">6,279</td>
+                        <td class="numeric" data-col="pageviews">8,628</td>
+                        <td class="numeric" data-col="clicks">231</td>
+                        <td class="numeric" data-col="impressions">32,373</td>
+                        <td class="numeric" data-col="ctr">0.27%</td>
+                        <td class="numeric" data-col="position">8.8</td>
+                        <td class="numeric good" data-col="pct">+30027.3%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    <script>
+        var COMP_PERIOD_DATA = {"7d": {"localoria.com": {"sessions": "29.9K", "users": "27.6K", "pageviews": "46.8K", "clicks": "3.0K", "impressions": "465.6K", "ctr": "0.65%", "position": "8.2", "pct_sessions": -28.5}, "wherebly.com": {"sessions": "9.3K", "users": "8.8K", "pageviews": "12.3K", "clicks": "201", "impressions": "22.3K", "ctr": "0.89%", "position": "8.1", "pct_sessions": 176.6}, "res-menu.net": {"sessions": "382.4K", "users": "346.6K", "pageviews": "569.8K", "clicks": "181.8K", "impressions": "12.3M", "ctr": "1.46%", "position": "8.9", "pct_sessions": -22.0}, "foodplacee.com": {"sessions": "11,346", "users": "10,586", "pageviews": "18,766", "clicks": "340", "impressions": "42,843", "ctr": "0.78%", "position": "8.5", "pct_sessions": 37.8}, "restaurants-world.net": {"sessions": "146.8K", "users": "135.3K", "pageviews": "200.2K", "clicks": "68.9K", "impressions": "7.8M", "ctr": "0.88%", "position": "9.1", "pct_sessions": -0.4}, "goto-where.com": {"sessions": "165.4K", "users": "154.5K", "pageviews": "225.4K", "clicks": "50.1K", "impressions": "11.7M", "ctr": "0.42%", "position": "8.5", "pct_sessions": -13.5}, "menu-world.com": {"sessions": "326.3K", "users": "296.2K", "pageviews": "579.8K", "clicks": "166.3K", "impressions": "15.2M", "ctr": "1.09%", "position": "8.4", "pct_sessions": -8.7}, "grubbio.com": {"sessions": "34.9K", "users": "33.2K", "pageviews": "48.1K", "clicks": "5.6K", "impressions": "731.0K", "ctr": "0.76%", "position": "8.3", "pct_sessions": 20.3}, "menustic.com": {"sessions": "48.2K", "users": "44.6K", "pageviews": "68.1K", "clicks": "17.1K", "impressions": "2.2M", "ctr": "0.78%", "position": "7.1", "pct_sessions": -0.4}, "menufyy.com": {"sessions": "105.2K", "users": "97.6K", "pageviews": "149.5K", "clicks": "47.5K", "impressions": "5.2M", "ctr": "0.92%", "position": "7.7", "pct_sessions": 9.5}, "wherevi.com": {"sessions": "32.1K", "users": "30.6K", "pageviews": "43.6K", "clicks": "1.3K", "impressions": "74.6K", "ctr": "1.72%", "position": "12.0", "pct_sessions": -0.9}, "placejoys.com": {"sessions": "141.7K", "users": "129.6K", "pageviews": "228.4K", "clicks": "23.4K", "impressions": "2.3M", "ctr": "0.99%", "position": "7.8", "pct_sessions": -8.4}, "locallya.com": {"sessions": "5,203", "users": "4,953", "pageviews": "6,648", "clicks": "192", "impressions": "27,616", "ctr": "0.70%", "position": "7.9", "pct_sessions": 308.7}}, "14d": {"localoria.com": {"sessions": "71.7K", "users": "66.8K", "pageviews": "107.3K", "clicks": "6.2K", "impressions": "900.0K", "ctr": "0.69%", "position": "8.7", "pct_sessions": -22.6}, "wherebly.com": {"sessions": "12.7K", "users": "12.0K", "pageviews": "17.0K", "clicks": "394", "impressions": "32.6K", "ctr": "1.53%", "position": "7.6", "pct_sessions": 335.9}, "res-menu.net": {"sessions": "872.8K", "users": "790.1K", "pageviews": "1.3M", "clicks": "389.4K", "impressions": "26.1M", "ctr": "1.49%", "position": "9.1", "pct_sessions": 11.2}, "foodplacee.com": {"sessions": "19,581", "users": "18,257", "pageviews": "32,609", "clicks": "607", "impressions": "79,321", "ctr": "0.75%", "position": "8.9", "pct_sessions": 495.5}, "restaurants-world.net": {"sessions": "294.2K", "users": "270.9K", "pageviews": "403.9K", "clicks": "143.4K", "impressions": "16.0M", "ctr": "0.89%", "position": "9.4", "pct_sessions": -5.6}, "goto-where.com": {"sessions": "356.6K", "users": "333.0K", "pageviews": "491.5K", "clicks": "109.0K", "impressions": "25.3M", "ctr": "0.43%", "position": "8.6", "pct_sessions": -3.2}, "menu-world.com": {"sessions": "683.7K", "users": "621.1K", "pageviews": "1.2M", "clicks": "359.5K", "impressions": "32.3M", "ctr": "1.11%", "position": "8.6", "pct_sessions": -2.5}, "grubbio.com": {"sessions": "63.9K", "users": "60.3K", "pageviews": "90.3K", "clicks": "11.7K", "impressions": "1.5M", "ctr": "0.79%", "position": "8.5", "pct_sessions": -0.0}, "menustic.com": {"sessions": "96.7K", "users": "89.6K", "pageviews": "138.2K", "clicks": "34.6K", "impressions": "4.3M", "ctr": "0.80%", "position": "7.2", "pct_sessions": 7.0}, "menufyy.com": {"sessions": "201.2K", "users": "186.6K", "pageviews": "288.1K", "clicks": "93.5K", "impressions": "10.0M", "ctr": "0.93%", "position": "7.7", "pct_sessions": 15.7}, "wherevi.com": {"sessions": "64.5K", "users": "61.4K", "pageviews": "89.1K", "clicks": "2.8K", "impressions": "172.0K", "ctr": "1.65%", "position": "13.5", "pct_sessions": -50.3}, "placejoys.com": {"sessions": "296.4K", "users": "272.7K", "pageviews": "486.0K", "clicks": "58.4K", "impressions": "5.2M", "ctr": "1.13%", "position": "7.9", "pct_sessions": -7.5}, "locallya.com": {"sessions": "6,476", "users": "6,140", "pageviews": "8,377", "clicks": "231", "impressions": "32,273", "ctr": "0.60%", "position": "8.6", "pct_sessions": 4217.3}}, "30d": {"localoria.com": {"sessions": "170.2K", "users": "159.6K", "pageviews": "240.7K", "clicks": "10.8K", "impressions": "1.4M", "ctr": "0.83%", "position": "9.1", "pct_sessions": 52.6}, "wherebly.com": {"sessions": "16.0K", "users": "15.1K", "pageviews": "22.2K", "clicks": "733", "impressions": "52.3K", "ctr": "1.81%", "position": "7.0", "pct_sessions": 618.5}, "res-menu.net": {"sessions": "1.8M", "users": "1.6M", "pageviews": "2.7M", "clicks": "829.5K", "impressions": "54.8M", "ctr": "1.51%", "position": "9.3", "pct_sessions": 31.9}, "foodplacee.com": {"sessions": "23,184", "users": "21,549", "pageviews": "39,630", "clicks": "950", "impressions": "111,044", "ctr": "1.17%", "position": "7.9", "pct_sessions": 971.3}, "restaurants-world.net": {"sessions": "643.9K", "users": "596.2K", "pageviews": "882.1K", "clicks": "298.0K", "impressions": "32.6M", "ctr": "0.92%", "position": "9.5", "pct_sessions": 2.1}, "goto-where.com": {"sessions": "782.3K", "users": "726.6K", "pageviews": "1.1M", "clicks": "253.2K", "impressions": "57.7M", "ctr": "0.44%", "position": "8.5", "pct_sessions": -24.9}, "menu-world.com": {"sessions": "1.5M", "users": "1.3M", "pageviews": "2.6M", "clicks": "796.1K", "impressions": "71.3M", "ctr": "1.12%", "position": "8.6", "pct_sessions": -5.3}, "grubbio.com": {"sessions": "136.5K", "users": "129.3K", "pageviews": "193.1K", "clicks": "24.7K", "impressions": "3.1M", "ctr": "0.79%", "position": "8.6", "pct_sessions": -18.8}, "menustic.com": {"sessions": "199.4K", "users": "185.4K", "pageviews": "292.5K", "clicks": "70.7K", "impressions": "8.8M", "ctr": "0.80%", "position": "7.3", "pct_sessions": 6.2}, "menufyy.com": {"sessions": "464.5K", "users": "437.4K", "pageviews": "637.0K", "clicks": "177.3K", "impressions": "19.0M", "ctr": "0.94%", "position": "7.8", "pct_sessions": 82.6}, "wherevi.com": {"sessions": "220.0K", "users": "213.2K", "pageviews": "283.5K", "clicks": "17.7K", "impressions": "1.7M", "ctr": "1.31%", "position": "11.0", "pct_sessions": 18.3}, "placejoys.com": {"sessions": "654.0K", "users": "603.4K", "pageviews": "1.1M", "clicks": "129.2K", "impressions": "10.7M", "ctr": "1.21%", "position": "7.9", "pct_sessions": -9.6}, "locallya.com": {"sessions": "6,628", "users": "6,279", "pageviews": "8,628", "clicks": "231", "impressions": "32,373", "ctr": "0.27%", "position": "8.8", "pct_sessions": 30027.3}}};
+        function switchCompPeriod(period) {
+            document.querySelectorAll('[data-cperiod]').forEach(function(btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-cperiod') === period);
+            });
+            var data = COMP_PERIOD_DATA[period];
+            if (!data) return;
+            document.querySelectorAll('#comparison-table tbody tr').forEach(function(row) {
+                var domain = row.getAttribute('data-domain');
+                var d = data[domain];
+                if (!d) return;
+                row.querySelector('[data-col="sessions"]').textContent = d.sessions;
+                row.querySelector('[data-col="users"]').textContent = d.users;
+                row.querySelector('[data-col="pageviews"]').textContent = d.pageviews;
+                row.querySelector('[data-col="clicks"]').textContent = d.clicks;
+                row.querySelector('[data-col="impressions"]').textContent = d.impressions;
+                row.querySelector('[data-col="ctr"]').textContent = d.ctr;
+                row.querySelector('[data-col="position"]').textContent = d.position;
+                var pctCell = row.querySelector('[data-col="pct"]');
+                var pct = d.pct_sessions;
+                pctCell.className = 'numeric ' + (pct > 0 ? 'good' : 'bad');
+                pctCell.textContent = (pct > 0 ? '+' : '') + pct.toFixed(1) + '%';
+            });
+        }
+    </script>
+        <div class="section" id="keywords">
+            <h2>🔑 Top Từ khóa</h2>
+            <table id="keywords-table">
+                <thead>
+                    <tr>
+                        <th>Từ khóa</th>
+                        <th class="numeric">Clicks</th>
+                        <th class="numeric">Impressions</th>
+                        <th class="numeric">CTR</th>
+                        <th class="numeric">Vị trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>los betos menu</td>
+                        <td class="numeric">2,348</td>
+                        <td class="numeric">11,880</td>
+                        <td class="numeric">28.29%</td>
+                        <td class="numeric">4.5</td>
+                    </tr>
+                    <tr>
+                        <td>chez lucien</td>
+                        <td class="numeric">2,017</td>
+                        <td class="numeric">10,639</td>
+                        <td class="numeric">18.96%</td>
+                        <td class="numeric">2.7</td>
+                    </tr>
+                    <tr>
+                        <td>pjs oyster bar</td>
+                        <td class="numeric">1,799</td>
+                        <td class="numeric">5,020</td>
+                        <td class="numeric">35.84%</td>
+                        <td class="numeric">1.4</td>
+                    </tr>
+                    <tr>
+                        <td>osteria santo spirito</td>
+                        <td class="numeric">1,531</td>
+                        <td class="numeric">14,501</td>
+                        <td class="numeric">10.56%</td>
+                        <td class="numeric">4.9</td>
+                    </tr>
+                    <tr>
+                        <td>kawa revolving sushi menu</td>
+                        <td class="numeric">1,413</td>
+                        <td class="numeric">3,650</td>
+                        <td class="numeric">38.71%</td>
+                        <td class="numeric">2.0</td>
+                    </tr>
+                    <tr>
+                        <td>bistrot paul bert menu</td>
+                        <td class="numeric">1,382</td>
+                        <td class="numeric">5,525</td>
+                        <td class="numeric">25.01%</td>
+                        <td class="numeric">2.3</td>
+                    </tr>
+                    <tr>
+                        <td>keens steakhouse menu</td>
+                        <td class="numeric">1,145</td>
+                        <td class="numeric">16,380</td>
+                        <td class="numeric">6.99%</td>
+                        <td class="numeric">3.7</td>
+                    </tr>
+                    <tr>
+                        <td>panoramic 34 menu</td>
+                        <td class="numeric">1,129</td>
+                        <td class="numeric">3,129</td>
+                        <td class="numeric">36.08%</td>
+                        <td class="numeric">2.2</td>
+                    </tr>
+                    <tr>
+                        <td>cafe continental menu</td>
+                        <td class="numeric">1,122</td>
+                        <td class="numeric">8,082</td>
+                        <td class="numeric">13.88%</td>
+                        <td class="numeric">4.1</td>
+                    </tr>
+                    <tr>
+                        <td>sofia's pizza & roast beef menu</td>
+                        <td class="numeric">1,109</td>
+                        <td class="numeric">2,648</td>
+                        <td class="numeric">41.88%</td>
+                        <td class="numeric">2.5</td>
+                    </tr>
+                    <tr>
+                        <td>johnny longboats menu</td>
+                        <td class="numeric">1,068</td>
+                        <td class="numeric">4,443</td>
+                        <td class="numeric">24.04%</td>
+                        <td class="numeric">2.1</td>
+                    </tr>
+                    <tr>
+                        <td>shukette menu</td>
+                        <td class="numeric">1,068</td>
+                        <td class="numeric">5,522</td>
+                        <td class="numeric">19.34%</td>
+                        <td class="numeric">1.9</td>
+                    </tr>
+                    <tr>
+                        <td>meat me liverpool</td>
+                        <td class="numeric">1,063</td>
+                        <td class="numeric">7,237</td>
+                        <td class="numeric">14.69%</td>
+                        <td class="numeric">2.9</td>
+                    </tr>
+                    <tr>
+                        <td>bell city diner menu</td>
+                        <td class="numeric">1,021</td>
+                        <td class="numeric">4,056</td>
+                        <td class="numeric">25.17%</td>
+                        <td class="numeric">2.0</td>
+                    </tr>
+                    <tr>
+                        <td>sushi kushi</td>
+                        <td class="numeric">1,021</td>
+                        <td class="numeric">8,975</td>
+                        <td class="numeric">11.38%</td>
+                        <td class="numeric">2.5</td>
+                    </tr>
+                    <tr>
+                        <td>terra madre dublin</td>
+                        <td class="numeric">1,014</td>
+                        <td class="numeric">4,552</td>
+                        <td class="numeric">22.28%</td>
+                        <td class="numeric">2.8</td>
+                    </tr>
+                    <tr>
+                        <td>donut hole menu</td>
+                        <td class="numeric">977</td>
+                        <td class="numeric">4,347</td>
+                        <td class="numeric">22.48%</td>
+                        <td class="numeric">3.5</td>
+                    </tr>
+                    <tr>
+                        <td>the hive waterfront restaurant & tiki menu</td>
+                        <td class="numeric">977</td>
+                        <td class="numeric">5,294</td>
+                        <td class="numeric">18.45%</td>
+                        <td class="numeric">2.0</td>
+                    </tr>
+                    <tr>
+                        <td>donut hole bakery cafe menu</td>
+                        <td class="numeric">944</td>
+                        <td class="numeric">5,230</td>
+                        <td class="numeric">18.05%</td>
+                        <td class="numeric">2.9</td>
+                    </tr>
+                    <tr>
+                        <td>ok cafe menu</td>
+                        <td class="numeric">925</td>
+                        <td class="numeric">4,823</td>
+                        <td class="numeric">19.18%</td>
+                        <td class="numeric">3.3</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="anomalies">
+            <h2>⚠️ Phát hiện Bất thường</h2>
+            <div class="anomaly-cards">
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title">High Bounce Rate — 2026-04-08</div>
+                    <div class="anomaly-description">Bounce rate cao: 99.8% với 3,805 sessions <a class="site-name" href="seo-detail-localoria.com-2026-04-10.html" title="Xem chi tiết localoria.com">localoria.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-02</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,515 (TB: 202) <a class="site-name" href="seo-detail-wherebly.com-2026-04-10.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-03</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,560 (TB: 202) <a class="site-name" href="seo-detail-wherebly.com-2026-04-10.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-04</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,159 (TB: 202) <a class="site-name" href="seo-detail-wherebly.com-2026-04-10.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-05</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,266 (TB: 202) <a class="site-name" href="seo-detail-wherebly.com-2026-04-10.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-06</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,385 (TB: 202) <a class="site-name" href="seo-detail-wherebly.com-2026-04-10.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-07</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,249 (TB: 202) <a class="site-name" href="seo-detail-wherebly.com-2026-04-10.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-08</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,208 (TB: 202) <a class="site-name" href="seo-detail-wherebly.com-2026-04-10.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title">High Bounce Rate — 2026-04-08</div>
+                    <div class="anomaly-description">Bounce rate cao: 99.9% với 1,208 sessions <a class="site-name" href="seo-detail-wherebly.com-2026-04-10.html" title="Xem chi tiết wherebly.com">wherebly.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title">High Bounce Rate — 2026-04-08</div>
+                    <div class="anomaly-description">Bounce rate cao: 99.5% với 50,444 sessions <a class="site-name" href="seo-detail-res-menu.net-2026-04-10.html" title="Xem chi tiết res-menu.net">res-menu.net</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-02</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,717 (TB: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-10.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-03</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,863 (TB: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-10.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-04</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,803 (TB: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-10.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-05</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,568 (TB: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-10.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-06</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,568 (TB: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-10.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-07</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,521 (TB: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-10.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-08</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,306 (TB: 333) <a class="site-name" href="seo-detail-foodplacee.com-2026-04-10.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title">High Bounce Rate — 2026-04-08</div>
+                    <div class="anomaly-description">Bounce rate cao: 99.7% với 1,306 sessions <a class="site-name" href="seo-detail-foodplacee.com-2026-04-10.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title">High Bounce Rate — 2026-04-08</div>
+                    <div class="anomaly-description">Bounce rate cao: 99.6% với 18,210 sessions <a class="site-name" href="seo-detail-restaurants-world.net-2026-04-10.html" title="Xem chi tiết restaurants-world.net">restaurants-world.net</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title">High Bounce Rate — 2026-04-08</div>
+                    <div class="anomaly-description">Bounce rate cao: 99.6% với 4,850 sessions <a class="site-name" href="seo-detail-wherevi.com-2026-04-10.html" title="Xem chi tiết wherevi.com">wherevi.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title">Position Drop — 2026-04-01</div>
+                    <div class="anomaly-description">Vị trí trung bình giảm: 14.4 (TB: 9.4) <a class="site-name" href="seo-detail-wherevi.com-2026-04-10.html" title="Xem chi tiết wherevi.com">wherevi.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title">High Bounce Rate — 2026-04-08</div>
+                    <div class="anomaly-description">Bounce rate cao: 98.7% với 18,585 sessions <a class="site-name" href="seo-detail-placejoys.com-2026-04-10.html" title="Xem chi tiết placejoys.com">placejoys.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-02</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 590 (TB: 51) <a class="site-name" href="seo-detail-locallya.com-2026-04-10.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-03</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 547 (TB: 51) <a class="site-name" href="seo-detail-locallya.com-2026-04-10.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-04</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 552 (TB: 51) <a class="site-name" href="seo-detail-locallya.com-2026-04-10.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-05</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 652 (TB: 51) <a class="site-name" href="seo-detail-locallya.com-2026-04-10.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-06</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 945 (TB: 51) <a class="site-name" href="seo-detail-locallya.com-2026-04-10.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-07</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 917 (TB: 51) <a class="site-name" href="seo-detail-locallya.com-2026-04-10.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-08</div>
+                    <div class="anomaly-description">Sessions tăng đột biến: 1,000 (TB: 51) <a class="site-name" href="seo-detail-locallya.com-2026-04-10.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title">High Bounce Rate — 2026-04-08</div>
+                    <div class="anomaly-description">Bounce rate cao: 99.3% với 1,000 sessions <a class="site-name" href="seo-detail-locallya.com-2026-04-10.html" title="Xem chi tiết locallya.com">locallya.com</a></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="trends">
+            <h2>⭐ Phân tích Xu hướng</h2>
+            <h3>⭐ Tăng trưởng tốt nhất</h3>
+            <ul>
+                <li><a class="site-name" href="seo-detail-locallya.com-2026-04-10.html" title="Xem chi tiết locallya.com">locallya.com</a> — Sessions: 6,628, tăng <span class="good">+30027.3%</span></li>
+                <li><a class="site-name" href="seo-detail-foodplacee.com-2026-04-10.html" title="Xem chi tiết foodplacee.com">foodplacee.com</a> — Sessions: 23,184, tăng <span class="good">+971.3%</span></li>
+                <li><a class="site-name" href="seo-detail-wherebly.com-2026-04-10.html" title="Xem chi tiết wherebly.com">wherebly.com</a> — Sessions: 16.0K, tăng <span class="good">+618.5%</span></li>
+                <li><a class="site-name" href="seo-detail-menufyy.com-2026-04-10.html" title="Xem chi tiết menufyy.com">menufyy.com</a> — Sessions: 464.5K, tăng <span class="good">+82.6%</span></li>
+                <li><a class="site-name" href="seo-detail-localoria.com-2026-04-10.html" title="Xem chi tiết localoria.com">localoria.com</a> — Sessions: 170.2K, tăng <span class="good">+52.6%</span></li>
+            </ul>
+            <h3>⚠️ Cần chú ý (giảm mạnh)</h3>
+            <ul>
+                <li><a class="site-name" href="seo-detail-goto-where.com-2026-04-10.html" title="Xem chi tiết goto-where.com">goto-where.com</a> — Sessions: 782.3K, giảm <span class="bad">-24.9%</span></li>
+                <li><a class="site-name" href="seo-detail-grubbio.com-2026-04-10.html" title="Xem chi tiết grubbio.com">grubbio.com</a> — Sessions: 136.5K, giảm <span class="bad">-18.8%</span></li>
+                <li><a class="site-name" href="seo-detail-placejoys.com-2026-04-10.html" title="Xem chi tiết placejoys.com">placejoys.com</a> — Sessions: 654.0K, giảm <span class="bad">-9.6%</span></li>
+                <li><a class="site-name" href="seo-detail-menu-world.com-2026-04-10.html" title="Xem chi tiết menu-world.com">menu-world.com</a> — Sessions: 1.5M, giảm <span class="bad">-5.3%</span></li>
+            </ul>
+        </div>
+
+        <div class="section" id="recommendations">
+            <h2>💡 Kiến nghị Tối ưu</h2>
+            <table class="recommendation-table">
+                <thead>
+                    <tr>
+                        <th>Mức độ</th>
+                        <th>Kiến nghị</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="priority-high">
+                        <td><strong>HIGH</strong></td>
+                        <td>Xem xét 4 website đang giảm traffic</td>
+                        <td>Kiểm tra nội dung, backlinks, và kỹ thuật SEO cho các website có xu hướng giảm mạnh.</td>
+                    </tr>
+                    <tr class="priority-medium">
+                        <td><strong>MEDIUM</strong></td>
+                        <td>Cải thiện trải nghiệm trang có bounce rate cao (8 cảnh báo)</td>
+                        <td>Tối ưu tốc độ tải, cải thiện nội dung landing page, kiểm tra responsive.</td>
+                    </tr>
+                    <tr class="priority-medium">
+                        <td><strong>MEDIUM</strong></td>
+                        <td>Kiểm tra SEO on-page cho 1 cảnh báo vị trí giảm</td>
+                        <td>Rà soát meta tags, internal linking, content freshness và cạnh tranh từ khóa.</td>
+                    </tr>
+                    <tr class="priority-low">
+                        <td><strong>LOW</strong></td>
+                        <td>Nhân rộng chiến lược của 5 website đang tăng trưởng tốt</td>
+                        <td>Phân tích các yếu tố đóng góp vào tăng trưởng và áp dụng cho các website khác.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const CHART_DATA = {"dates": ["2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07", "2026-04-08"], "datasets_sessions": [{"label": "localoria.com", "data": [2826.0, 2975.0, 3019.0, 42753.0, 3699.0, 3455.0, 3596.0, 3778.0, 3731.0, 3811.0, 4436.0, 4503.0, 4594.0, 3518.0, 3758.0, 4032.0, 4470.0, 15321.0, 4914.0, 4627.0, 4284.0, 4052.0, 4132.0, 4210.0, 4840.0, 4736.0, 4323.0, 4047.0, 3933.0, 3805.0], "borderColor": "#e74c3c", "backgroundColor": "#e74c3c20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "wherebly.com", "data": [159.0, 212.0, 209.0, 237.0, 268.0, 267.0, 165.0, 195.0, 185.0, 181.0, 235.0, 266.0, 198.0, 150.0, 175.0, 187.0, 202.0, 225.0, 533.0, 465.0, 394.0, 677.0, 881.0, 1515.0, 1560.0, 1159.0, 1266.0, 1385.0, 1249.0, 1208.0], "borderColor": "#3498db", "backgroundColor": "#3498db20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "res-menu.net", "data": [47451.0, 46853.0, 50898.0, 63313.0, 99269.0, 51793.0, 43592.0, 51054.0, 50854.0, 54088.0, 64927.0, 63780.0, 51125.0, 43830.0, 47827.0, 48897.0, 51467.0, 64226.0, 163507.0, 53381.0, 51697.0, 53087.0, 53084.0, 60138.0, 66946.0, 62774.0, 44534.0, 46070.0, 51472.0, 50444.0], "borderColor": "#2ecc71", "backgroundColor": "#2ecc7120", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "foodplacee.com", "data": [170, 145, 171, 236, 260, 219, 156, 174, 175, 138, 193, 261, 218, 200, 436, 451, 730, 923, 1279, 1217, 1158, 1465, 1463, 1717, 1863, 1803, 1568, 1568, 1521, 1306], "borderColor": "#f39c12", "backgroundColor": "#f39c1220", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "restaurants-world.net", "data": [19935.0, 18331.0, 18285.0, 22355.0, 24789.0, 23655.0, 19130.0, 23463.0, 18201.0, 20037.0, 27158.0, 40359.0, 20308.0, 17500.0, 18399.0, 17864.0, 18405.0, 23009.0, 25278.0, 21449.0, 18443.0, 18714.0, 22059.0, 24564.0, 26835.0, 23633.0, 17788.0, 17380.0, 18391.0, 18210.0], "borderColor": "#9b59b6", "backgroundColor": "#9b59b620", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "goto-where.com", "data": [31624.0, 25432.0, 23628.0, 29654.0, 31992.0, 29249.0, 25313.0, 25513.0, 24767.0, 25344.0, 28682.0, 28727.0, 26065.0, 22682.0, 23136.0, 23856.0, 24082.0, 27769.0, 29655.0, 26044.0, 26009.0, 26936.0, 30696.0, 29832.0, 28946.0, 26189.0, 21939.0, 18632.0, 19308.0, 20599.0], "borderColor": "#1abc9c", "backgroundColor": "#1abc9c20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menu-world.com", "data": [45604.0, 49507.0, 50230.0, 56591.0, 83349.0, 49257.0, 42716.0, 47224.0, 45095.0, 45726.0, 52899.0, 54466.0, 44286.0, 40882.0, 44242.0, 44303.0, 47064.0, 61127.0, 65609.0, 45247.0, 43263.0, 46854.0, 48253.0, 50859.0, 58319.0, 52817.0, 39651.0, 36150.0, 43170.0, 45292.0], "borderColor": "#e67e22", "backgroundColor": "#e67e2220", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "grubbio.com", "data": [4296.0, 4300.0, 4706.0, 4961.0, 5075.0, 4810.0, 4386.0, 4745.0, 4566.0, 4611.0, 4731.0, 4739.0, 4718.0, 3905.0, 3923.0, 4076.0, 4134.0, 4199.0, 4281.0, 4357.0, 3880.0, 4073.0, 4085.0, 4209.0, 10442.0, 4490.0, 4066.0, 3979.0, 3891.0, 3835.0], "borderColor": "#34495e", "backgroundColor": "#34495e20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menustic.com", "data": [6259.0, 6082.0, 6364.0, 6943.0, 7385.0, 6788.0, 6036.0, 6401.0, 6144.0, 6320.0, 7068.0, 7287.0, 6390.0, 5588.0, 5846.0, 5787.0, 6376.0, 6803.0, 7171.0, 6179.0, 6840.0, 7190.0, 7883.0, 7466.0, 7849.0, 7178.0, 6306.0, 6247.0, 6535.0, 6668.0], "borderColor": "#16a085", "backgroundColor": "#16a08520", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menufyy.com", "data": [10234.0, 79260.0, 11336.0, 12699.0, 13943.0, 12465.0, 11261.0, 12278.0, 11799.0, 11969.0, 13463.0, 14003.0, 13128.0, 11261.0, 12030.0, 12222.0, 12813.0, 14333.0, 15735.0, 13907.0, 12453.0, 12897.0, 13899.0, 15459.0, 18266.0, 16011.0, 14023.0, 13814.0, 13185.0, 14400.0], "borderColor": "#c0392b", "backgroundColor": "#c0392b20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "wherevi.com", "data": [20330.0, 5324.0, 5442.0, 5924.0, 6455.0, 5512.0, 4883.0, 5521.0, 5269.0, 5179.0, 6057.0, 5366.0, 5035.0, 4514.0, 60260.0, 4413.0, 4457.0, 5268.0, 4771.0, 4817.0, 4244.0, 4634.0, 4197.0, 4786.0, 4639.0, 4511.0, 4027.0, 4646.0, 4629.0, 4850.0], "borderColor": "#2980b9", "backgroundColor": "#2980b920", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "placejoys.com", "data": [18423.0, 18987.0, 21678.0, 24153.0, 26451.0, 22989.0, 20573.0, 21432.0, 21309.0, 22292.0, 26295.0, 27312.0, 24316.0, 19595.0, 21126.0, 20705.0, 20794.0, 24526.0, 25913.0, 23691.0, 19880.0, 20137.0, 19713.0, 21194.0, 23624.0, 23028.0, 18637.0, 18009.0, 18638.0, 18585.0], "borderColor": "#27ae60", "backgroundColor": "#27ae6020", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "locallya.com", "data": [1, 1, 0, 2, 2, 2, 2, 0, 3, 3, 2, 1, 0, 0, 65, 68, 76, 94, 190, 173, 151, 256, 333, 590, 547, 552, 652, 945, 917, 1000], "borderColor": "#8e44ad", "backgroundColor": "#8e44ad20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}], "datasets_clicks": [{"label": "localoria.com", "data": [188.0, 193.0, 198.0, 267.0, 246.0, 233.0, 239.0, 299.0, 270.0, 322.0, 398.0, 364.0, 359.0, 332.0, 376.0, 373.0, 402.0, 444.0, 502.0, 468.0, 467.0, 463.0, 433.0, 455.0, 542.0, 566.0, 461.0, 487.0, 493.0, 0], "borderColor": "#e74c3c", "backgroundColor": "#e74c3c20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "wherebly.com", "data": [25.0, 28.0, 10.0, 27.0, 26.0, 16.0, 11.0, 24.0, 17.0, 17.0, 24.0, 25.0, 27.0, 20.0, 21.0, 21.0, 21.0, 25.0, 33.0, 22.0, 26.0, 30.0, 36.0, 36.0, 49.0, 42.0, 27.0, 24.0, 23.0, 0], "borderColor": "#3498db", "backgroundColor": "#3498db20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "res-menu.net", "data": [20078.0, 22742.0, 26436.0, 34415.0, 35708.0, 26909.0, 22713.0, 26767.0, 26833.0, 28515.0, 35090.0, 35179.0, 27157.0, 21878.0, 23944.0, 25721.0, 27317.0, 35407.0, 37183.0, 28948.0, 24301.0, 26740.0, 27704.0, 30689.0, 38497.0, 35850.0, 23142.0, 25102.0, 28514.0, 0], "borderColor": "#2ecc71", "backgroundColor": "#2ecc7120", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "foodplacee.com", "data": [16, 14, 21, 33, 22, 6, 7, 7, 13, 19, 20, 34, 38, 26, 29, 38, 34, 34, 42, 31, 24, 41, 61, 58, 70, 76, 53, 37, 46, 0], "borderColor": "#f39c12", "backgroundColor": "#f39c1220", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "restaurants-world.net", "data": [8233.0, 8285.0, 9025.0, 11808.0, 12356.0, 9240.0, 8299.0, 9099.0, 9156.0, 9929.0, 11881.0, 11918.0, 9349.0, 8086.0, 8932.0, 8998.0, 9489.0, 12334.0, 13037.0, 10508.0, 8574.0, 9515.0, 11039.0, 12405.0, 14725.0, 13670.0, 8937.0, 9303.0, 9868.0, 0], "borderColor": "#9b59b6", "backgroundColor": "#9b59b620", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "goto-where.com", "data": [8326.0, 8472.0, 9249.0, 10877.0, 10672.0, 9074.0, 8510.0, 8519.0, 8548.0, 8944.0, 10128.0, 10098.0, 8631.0, 7672.0, 7937.0, 8513.0, 8736.0, 10429.0, 9759.0, 7976.0, 7022.0, 7234.0, 7761.0, 8815.0, 9888.0, 9327.0, 7073.0, 7545.0, 7443.0, 0], "borderColor": "#1abc9c", "backgroundColor": "#1abc9c20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menu-world.com", "data": [24418.0, 25349.0, 28334.0, 34230.0, 33281.0, 26349.0, 23412.0, 25566.0, 25589.0, 27270.0, 32896.0, 31899.0, 25555.0, 22539.0, 24295.0, 25604.0, 27694.0, 34564.0, 32688.0, 25072.0, 22619.0, 24373.0, 26143.0, 29046.0, 34483.0, 31264.0, 21209.0, 24573.0, 25753.0, 0], "borderColor": "#e67e22", "backgroundColor": "#e67e2220", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "grubbio.com", "data": [731.0, 701.0, 789.0, 958.0, 954.0, 807.0, 785.0, 788.0, 813.0, 866.0, 883.0, 904.0, 815.0, 682.0, 746.0, 745.0, 830.0, 952.0, 950.0, 880.0, 766.0, 849.0, 892.0, 976.0, 1160.0, 1009.0, 809.0, 833.0, 817.0, 0], "borderColor": "#34495e", "backgroundColor": "#34495e20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menustic.com", "data": [2149.0, 2173.0, 2295.0, 2599.0, 2607.0, 2361.0, 2160.0, 2098.0, 2112.0, 2212.0, 2443.0, 2492.0, 2203.0, 1906.0, 2156.0, 2153.0, 2369.0, 2644.0, 2719.0, 2429.0, 2305.0, 2364.0, 2579.0, 2929.0, 3321.0, 3147.0, 2639.0, 2519.0, 2595.0, 0], "borderColor": "#16a085", "backgroundColor": "#16a08520", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menufyy.com", "data": [4122.0, 4323.0, 4858.0, 5636.0, 6162.0, 5365.0, 4621.0, 4877.0, 5040.0, 5267.0, 6054.0, 6421.0, 5689.0, 4766.0, 5155.0, 5498.0, 5964.0, 7169.0, 7532.0, 6519.0, 5629.0, 6262.0, 6878.0, 7997.0, 9085.0, 9011.0, 7387.0, 7179.0, 6877.0, 0], "borderColor": "#c0392b", "backgroundColor": "#c0392b20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "wherevi.com", "data": [1210.0, 1107.0, 1246.0, 1470.0, 1516.0, 1000.0, 899.0, 830.0, 801.0, 788.0, 990.0, 911.0, 716.0, 615.0, 570.0, 211.0, 234.0, 264.0, 281.0, 214.0, 190.0, 165.0, 201.0, 238.0, 278.0, 252.0, 172.0, 158.0, 192.0, 0], "borderColor": "#2980b9", "backgroundColor": "#2980b920", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "placejoys.com", "data": [3017.0, 3472.0, 4032.0, 4911.0, 4870.0, 4340.0, 3581.0, 4202.0, 4211.0, 4564.0, 5636.0, 5799.0, 4873.0, 4196.0, 4441.0, 4638.0, 4800.0, 5876.0, 6101.0, 5210.0, 4410.0, 4541.0, 4091.0, 4363.0, 4762.0, 4384.0, 3054.0, 3215.0, 3588.0, 0], "borderColor": "#27ae60", "backgroundColor": "#27ae6020", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "locallya.com", "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 4, 9, 22, 21, 18, 38, 35, 47, 33, 0], "borderColor": "#8e44ad", "backgroundColor": "#8e44ad20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}], "datasets_impressions": [{"label": "localoria.com", "data": [13762.0, 14655.0, 15724.0, 22003.0, 23719.0, 21339.0, 23733.0, 32858.0, 36498.0, 39979.0, 51362.0, 55569.0, 54085.0, 46173.0, 46442.0, 48271.0, 52203.0, 61550.0, 65616.0, 62930.0, 61033.0, 65412.0, 65658.0, 71666.0, 80673.0, 89296.0, 80408.0, 71045.0, 72469.0, 0], "borderColor": "#e74c3c", "backgroundColor": "#e74c3c20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "wherebly.com", "data": [1369.0, 1530.0, 1774.0, 2093.0, 2015.0, 1763.0, 1535.0, 1195.0, 719.0, 786.0, 1019.0, 1097.0, 792.0, 566.0, 672.0, 740.0, 826.0, 1022.0, 1290.0, 1108.0, 1110.0, 2067.0, 2933.0, 3771.0, 4121.0, 4156.0, 3308.0, 3057.0, 3848.0, 0], "borderColor": "#3498db", "backgroundColor": "#3498db20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "res-menu.net", "data": [1258885.0, 1452296.0, 1607530.0, 2035676.0, 2144067.0, 1795835.0, 1502900.0, 1749217.0, 1812792.0, 1894266.0, 2307567.0, 2375670.0, 1968940.0, 1556607.0, 1622073.0, 1690854.0, 1780330.0, 2227602.0, 2402894.0, 1996239.0, 1652572.0, 1812888.0, 1857803.0, 1988873.0, 2387793.0, 2336669.0, 1875976.0, 1815131.0, 1924178.0, 0], "borderColor": "#2ecc71", "backgroundColor": "#2ecc7120", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "foodplacee.com", "data": [790, 716, 834, 1126, 1176, 627, 375, 418, 764, 957, 2245, 3768, 4557, 4296, 4205, 4869, 4794, 5519, 5828, 5058, 4591, 4909, 5779, 6747, 8108, 8140, 7471, 6094, 6283, 0], "borderColor": "#f39c12", "backgroundColor": "#f39c1220", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "restaurants-world.net", "data": [829056.0, 873211.0, 949987.0, 1178796.0, 1216973.0, 1023044.0, 892833.0, 977846.0, 1011099.0, 1063880.0, 1291670.0, 1310065.0, 1114022.0, 907059.0, 944297.0, 989752.0, 1038623.0, 1303456.0, 1389842.0, 1173906.0, 985131.0, 1082514.0, 1200262.0, 1318093.0, 1544715.0, 1490478.0, 1207577.0, 1098719.0, 1148430.0, 0], "borderColor": "#9b59b6", "backgroundColor": "#9b59b620", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "goto-where.com", "data": [1743066.0, 1849489.0, 1961916.0, 2364553.0, 2439982.0, 2103379.0, 1797734.0, 1916441.0, 1929541.0, 2029705.0, 2375304.0, 2411395.0, 2081964.0, 1751451.0, 1785239.0, 1834401.0, 1908389.0, 2322774.0, 2354623.0, 1916528.0, 1602019.0, 1709034.0, 1792340.0, 1983075.0, 2235549.0, 2189470.0, 1834066.0, 1742695.0, 1753804.0, 0], "borderColor": "#1abc9c", "backgroundColor": "#1abc9c20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menu-world.com", "data": [2076535.0, 2233040.0, 2343762.0, 2869603.0, 2920476.0, 2453627.0, 2108450.0, 2315180.0, 2333606.0, 2447244.0, 2962688.0, 2997426.0, 2501787.0, 2085883.0, 2150593.0, 2229267.0, 2336768.0, 2895762.0, 2952032.0, 2380798.0, 2006468.0, 2172053.0, 2304500.0, 2506003.0, 2935439.0, 2818143.0, 2303598.0, 2271232.0, 2394884.0, 0], "borderColor": "#e67e22", "backgroundColor": "#e67e2220", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "grubbio.com", "data": [91154.0, 95807.0, 99567.0, 115827.0, 122026.0, 108916.0, 90652.0, 96142.0, 98352.0, 106485.0, 117988.0, 123772.0, 112293.0, 92916.0, 93583.0, 95142.0, 98080.0, 115136.0, 124481.0, 109856.0, 93595.0, 101992.0, 107089.0, 123160.0, 134209.0, 134626.0, 121762.0, 106971.0, 110272.0, 0], "borderColor": "#34495e", "backgroundColor": "#34495e20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menustic.com", "data": [244061.0, 249975.0, 261926.0, 307478.0, 326834.0, 298186.0, 245925.0, 257824.0, 257600.0, 277988.0, 323887.0, 339891.0, 311453.0, 259234.0, 260887.0, 264226.0, 274554.0, 325987.0, 349244.0, 313578.0, 269659.0, 290188.0, 311748.0, 359304.0, 405484.0, 409120.0, 374380.0, 329678.0, 320188.0, 0], "borderColor": "#16a085", "backgroundColor": "#16a08520", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menufyy.com", "data": [412406.0, 439510.0, 480376.0, 575004.0, 630389.0, 591051.0, 475508.0, 507256.0, 539553.0, 576537.0, 673800.0, 718825.0, 656828.0, 543354.0, 566166.0, 581918.0, 614381.0, 743379.0, 804144.0, 716892.0, 620536.0, 669693.0, 725642.0, 835195.0, 953488.0, 974355.0, 853205.0, 778487.0, 760449.0, 0], "borderColor": "#c0392b", "backgroundColor": "#c0392b20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "wherevi.com", "data": [85830.0, 88332.0, 97283.0, 118304.0, 122667.0, 99910.0, 84354.0, 91681.0, 93620.0, 98313.0, 119471.0, 124235.0, 103676.0, 82594.0, 63607.0, 13350.0, 12882.0, 15773.0, 17412.0, 14039.0, 11735.0, 12709.0, 12893.0, 13539.0, 15496.0, 13802.0, 11609.0, 9740.0, 10420.0, 0], "borderColor": "#2980b9", "backgroundColor": "#2980b920", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "placejoys.com", "data": [233016.0, 277674.0, 301846.0, 368239.0, 391583.0, 327050.0, 269907.0, 330576.0, 341172.0, 369324.0, 451840.0, 464806.0, 400732.0, 330852.0, 345478.0, 358834.0, 378353.0, 463915.0, 488616.0, 411845.0, 355252.0, 376088.0, 349575.0, 375471.0, 445119.0, 435981.0, 359832.0, 348567.0, 376415.0, 0], "borderColor": "#27ae60", "backgroundColor": "#27ae6020", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "locallya.com", "data": [1, 4, 2, 3, 1, 5, 4, 3, 9, 3, 4, 2, 5, 4, 16, 34, 98, 206, 326, 513, 793, 1076, 1645, 2715, 4112, 4770, 5257, 4929, 5833, 0], "borderColor": "#8e44ad", "backgroundColor": "#8e44ad20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}], "datasets_position": [{"label": "localoria.com", "data": [9.0496, 9.6377, 8.9654, 9.4803, 9.2092, 9.5084, 9.8669, 10.2483, 9.9604, 9.8295, 9.5619, 9.113, 8.9609, 9.067, 8.6619, 9.4419, 9.4235, 9.2736, 9.4996, 9.1184, 8.9369, 8.6918, 8.5633, 8.6906, 8.5386, 7.913, 8.0495, 8.3143, 7.9888, 0], "borderColor": "#e74c3c", "backgroundColor": "#e74c3c20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "wherebly.com", "data": [8.1351, 7.332, 6.9301, 6.5308, 7.5385, 7.6398, 7.3075, 7.79, 6.0195, 6.4898, 5.946, 5.443, 6.173, 6.0512, 4.8095, 5.8297, 5.1332, 5.8757, 5.9643, 8.1525, 7.9694, 8.3111, 8.1732, 7.7887, 8.4009, 8.1607, 8.3177, 8.3356, 7.8604, 0], "borderColor": "#3498db", "backgroundColor": "#3498db20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "res-menu.net", "data": [10.0518, 10.0549, 9.5393, 9.2181, 8.8629, 9.1671, 9.4495, 9.466, 9.4778, 9.3204, 9.4809, 9.1331, 9.3361, 9.2975, 8.9338, 9.2382, 9.3537, 9.197, 9.2585, 9.1916, 9.566, 9.4043, 9.2394, 9.2172, 8.8146, 8.4815, 8.9721, 9.0202, 8.9254, 0], "borderColor": "#2ecc71", "backgroundColor": "#2ecc7120", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "foodplacee.com", "data": [5.9519, 6.0559, 4.7374, 4.5595, 5.6088, 7.134, 6.9307, 8.4904, 6.3678, 6.5298, 7.3385, 8.1388, 8.582, 8.9169, 8.7239, 9.2707, 9.408, 9.2317, 9.3099, 9.397, 9.3969, 9.1023, 8.8353, 8.5457, 8.5962, 8.2004, 8.1434, 8.8293, 8.6436, 0], "borderColor": "#f39c12", "backgroundColor": "#f39c1220", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "restaurants-world.net", "data": [9.8656, 10.2052, 9.7375, 9.4445, 9.0517, 9.3876, 9.5878, 9.8448, 9.7877, 9.5199, 9.8066, 9.4667, 9.6479, 9.552, 9.1821, 9.5461, 9.7579, 9.5549, 9.6752, 9.52, 10.017, 9.8458, 9.3472, 9.2068, 8.8944, 8.5735, 9.1714, 9.3607, 9.2893, 0], "borderColor": "#9b59b6", "backgroundColor": "#9b59b620", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "goto-where.com", "data": [8.4602, 8.6151, 8.3818, 8.3663, 8.2647, 8.4065, 8.4316, 8.6081, 8.634, 8.5885, 8.69, 8.5372, 8.5941, 8.4553, 8.2382, 8.48, 8.5367, 8.4496, 8.6013, 8.6664, 8.8386, 8.7891, 8.6312, 8.6704, 8.4979, 8.2087, 8.4174, 8.4997, 8.4579, 0], "borderColor": "#1abc9c", "backgroundColor": "#1abc9c20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menu-world.com", "data": [8.7714, 8.9361, 8.4674, 8.3721, 8.1566, 8.497, 8.6846, 8.8462, 8.8681, 8.7245, 8.8062, 8.5617, 8.7729, 8.6511, 8.2707, 8.6332, 8.6952, 8.508, 8.6766, 8.7444, 9.0611, 8.9345, 8.6855, 8.7134, 8.3467, 7.9679, 8.4481, 8.4184, 8.315, 0], "borderColor": "#e67e22", "backgroundColor": "#e67e2220", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "grubbio.com", "data": [8.8728, 8.8985, 8.5495, 8.6169, 8.5696, 8.8515, 8.7858, 8.9206, 8.8988, 8.8255, 9.0241, 8.8498, 8.7953, 8.6575, 8.3136, 8.7325, 8.7494, 8.655, 8.6902, 8.5893, 8.7869, 8.6916, 8.5642, 8.371, 8.4598, 8.167, 8.1169, 8.3549, 8.0514, 0], "borderColor": "#34495e", "backgroundColor": "#34495e20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menustic.com", "data": [7.234, 7.4057, 7.2474, 7.3253, 7.3348, 7.4635, 7.3488, 7.4878, 7.521, 7.4793, 7.5135, 7.4601, 7.4622, 7.3169, 7.1788, 7.3859, 7.4089, 7.3816, 7.446, 7.3981, 7.4488, 7.3449, 7.2839, 7.1552, 7.2343, 6.9848, 6.9958, 7.1472, 6.9819, 0], "borderColor": "#16a085", "backgroundColor": "#16a08520", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "menufyy.com", "data": [7.9561, 7.9462, 7.6879, 7.7635, 7.7412, 7.7906, 7.8852, 7.9414, 7.8533, 7.9074, 7.9267, 7.8733, 7.8585, 7.7515, 7.5483, 7.7402, 7.7418, 7.6913, 7.7656, 7.7542, 7.8613, 7.8002, 7.7394, 7.7015, 7.8251, 7.5547, 7.6017, 7.7324, 7.5594, 0], "borderColor": "#c0392b", "backgroundColor": "#c0392b20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "wherevi.com", "data": [8.8614, 9.2969, 8.9397, 8.6305, 8.2011, 8.3929, 8.593, 8.9453, 8.8088, 8.4458, 8.731, 8.5004, 8.5896, 8.494, 8.2789, 12.689, 13.9731, 14.0859, 15.0344, 13.8286, 16.3952, 15.8904, 14.4181, 13.1491, 11.2068, 10.2325, 11.3511, 13.6215, 12.4512, 0], "borderColor": "#2980b9", "backgroundColor": "#2980b920", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "placejoys.com", "data": [8.3646, 8.2244, 7.8342, 7.8677, 7.6255, 7.6823, 8.0022, 7.9466, 7.812, 7.6807, 7.9067, 7.6418, 7.716, 7.5242, 7.3189, 7.7656, 7.853, 7.7701, 7.9634, 7.8011, 8.1244, 8.0251, 8.2709, 8.1809, 7.9242, 7.6141, 7.8799, 7.8928, 7.5221, 0], "borderColor": "#27ae60", "backgroundColor": "#27ae6020", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}, {"label": "locallya.com", "data": [8, 3.25, 5, 3, 56, 2.4, 3, 30, 4.6667, 1, 3.5, 2, 4.4, 2.5, 5.3125, 7.3824, 10.2041, 10.5437, 8.3834, 9.4288, 8.9105, 8.8959, 8.5678, 8.0214, 8.0109, 7.6122, 7.8547, 8.0674, 7.9119, 0], "borderColor": "#8e44ad", "backgroundColor": "#8e44ad20", "tension": 0.1, "fill": false, "pointRadius": 0, "pointHoverRadius": 5, "pointHitRadius": 10, "borderWidth": 2}], "domains": ["localoria.com", "wherebly.com", "res-menu.net", "foodplacee.com", "restaurants-world.net", "goto-where.com", "menu-world.com", "grubbio.com", "menustic.com", "menufyy.com", "wherevi.com", "placejoys.com", "locallya.com"]};
+
+        function makeChartOpts(reverseY) {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(ctx) {
+                                let val = ctx.parsed.y;
+                                if (val >= 1000000) val = (val/1000000).toFixed(1) + 'M';
+                                else if (val >= 1000) val = (val/1000).toFixed(1) + 'K';
+                                else if (typeof val === 'number') val = val.toFixed(val < 100 ? 2 : 0);
+                                return ctx.dataset.label + ': ' + val;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { type: 'category', grid: { color: 'rgba(100,100,100,0.1)' } },
+                    y: { beginAtZero: !reverseY, reverse: !!reverseY, grid: { color: 'rgba(100,100,100,0.1)' } }
+                }
+            };
+        }
+
+        let charts = {};
+        let visibleDomains = new Set(CHART_DATA.domains);
+
+        function initCharts() {
+            charts.sessions = new Chart(document.getElementById('chart-sessions'), {
+                type: 'line',
+                data: { labels: CHART_DATA.dates, datasets: CHART_DATA.datasets_sessions },
+                options: makeChartOpts(false)
+            });
+            charts.clicks = new Chart(document.getElementById('chart-clicks'), {
+                type: 'line',
+                data: { labels: CHART_DATA.dates, datasets: CHART_DATA.datasets_clicks },
+                options: makeChartOpts(false)
+            });
+            charts.impressions = new Chart(document.getElementById('chart-impressions'), {
+                type: 'line',
+                data: { labels: CHART_DATA.dates, datasets: CHART_DATA.datasets_impressions },
+                options: makeChartOpts(false)
+            });
+            charts.position = new Chart(document.getElementById('chart-position'), {
+                type: 'line',
+                data: { labels: CHART_DATA.dates, datasets: CHART_DATA.datasets_position },
+                options: makeChartOpts(true)
+            });
+
+            updateLegends();
+            updateCharts();
+        }
+
+        function updateLegends() {
+            const legends = ['sessions', 'clicks', 'impressions', 'position'];
+            legends.forEach(metric => {
+                const legend = document.getElementById(`legend-${metric}`);
+                legend.innerHTML = '';
+                CHART_DATA.domains.forEach(domain => {
+                    const color = {"localoria.com": "#e74c3c", "wherebly.com": "#3498db", "res-menu.net": "#2ecc71", "foodplacee.com": "#f39c12", "restaurants-world.net": "#9b59b6", "goto-where.com": "#1abc9c", "menu-world.com": "#e67e22", "grubbio.com": "#34495e", "menustic.com": "#16a085", "menufyy.com": "#c0392b", "wherevi.com": "#2980b9", "placejoys.com": "#27ae60", "locallya.com": "#8e44ad"};
+                    const item = document.createElement('div');
+                    item.className = 'legend-item';
+                    item.innerHTML = `<div class="legend-color" style="background: ${color[domain]}"></div><span>${domain}</span>`;
+                    legend.appendChild(item);
+                });
+            });
+        }
+
+        function filterWebsites() {
+            const filter = document.getElementById('website-filter').value;
+            if (filter) {
+                visibleDomains = new Set([filter]);
+            } else {
+                visibleDomains = new Set(CHART_DATA.domains);
+            }
+            updateCharts();
+        }
+
+        function selectAllWebsites() {
+            visibleDomains = new Set(CHART_DATA.domains);
+            document.getElementById('website-filter').value = '';
+            updateCharts();
+        }
+
+        function deselectAllWebsites() {
+            visibleDomains = new Set();
+            document.getElementById('website-filter').value = '';
+            updateCharts();
+        }
+
+        function updateCharts() {
+            const metrics = ['sessions', 'clicks', 'impressions', 'position'];
+            metrics.forEach(metric => {
+                const chart = charts[metric];
+                if (!chart) return;
+
+                chart.data.datasets.forEach((dataset, idx) => {
+                    const domain = CHART_DATA.domains[idx];
+                    dataset.hidden = !visibleDomains.has(domain);
+                });
+                chart.update();
+            });
+        }
+
+        initCharts();
+    </script>
+    <script>
+        makeTableSortable('comparison-table');
+        makeTableSortable('keywords-table');
+    </script>
+
+    <script>
+        let darkMode = false;
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            const html = document.documentElement;
+            if (darkMode) {
+                html.classList.add('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '☀️ Light Mode';
+            } else {
+                html.classList.remove('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '🌙 Dark Mode';
+            }
+        }
+
+        // TOC active section highlighting
+        const tocLinks = document.querySelectorAll('.toc-nav a');
+        const sections = document.querySelectorAll('.section');
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.href.endsWith('#' + id)) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => {
+            if (section.id) {
+                observer.observe(section);
+            }
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('.toc-nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Table sorting
+        function makeTableSortable(tableId) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const headers = table.querySelectorAll('th');
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => {
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                    const isNumeric = rows.every(row => {
+                        const text = row.cells[index].textContent.trim();
+                        return text === '' || !isNaN(parseFloat(text.replace(/,/g, '')));
+                    });
+
+                    rows.sort((a, b) => {
+                        let aVal = a.cells[index].textContent.trim();
+                        let bVal = b.cells[index].textContent.trim();
+
+                        if (isNumeric) {
+                            aVal = parseFloat(aVal.replace(/,/g, '')) || 0;
+                            bVal = parseFloat(bVal.replace(/,/g, '')) || 0;
+                            return aVal - bVal;
+                        } else {
+                            return aVal.localeCompare(bVal);
+                        }
+                    });
+
+                    rows.forEach(row => tbody.appendChild(row));
+                });
+            });
+        }
+    </script>
+</body>
+</html>
