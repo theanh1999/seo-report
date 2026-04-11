@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Detail - localoria.com</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border-color: #ddd;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --chart-grid: #e0e0e0;
+            --good-color: #27ae60;
+            --bad-color: #e74c3c;
+            --neutral-color: #3498db;
+        }
+
+        html.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --border-color: #444;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            --chart-grid: #444444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+        }
+
+        .cross-link {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .cross-link a {
+            color: var(--neutral-color);
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        .cross-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dark mode toggle */
+        .dark-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .dark-toggle:hover {
+            box-shadow: var(--card-shadow);
+        }
+
+        /* TOC */
+        .toc-nav {
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            z-index: 100;
+            margin-bottom: 30px;
+        }
+
+        .toc-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .toc-nav a.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--neutral-color);
+        }
+
+        .toc-nav a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+        }
+
+        .kpi-card-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .kpi-card-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .kpi-card-change {
+            font-size: 13px;
+        }
+
+        .good {
+            color: var(--good-color);
+        }
+
+        .bad {
+            color: var(--bad-color);
+        }
+
+        .neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Filter */
+        .filter-section {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .filter-select {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .filter-button {
+            background: var(--neutral-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .filter-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Chart */
+        .chart-wrapper {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-wrapper h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .chart-container {
+            height: 350px;
+            margin-bottom: 10px;
+        }
+
+        .chart-legend {
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--border-color);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: var(--text-secondary);
+        }
+
+        th::after {
+            content: " ⇅";
+            opacity: 0.3;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--bg-primary);
+        }
+
+        .numeric {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        .site-name {
+            color: var(--neutral-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .site-name:hover {
+            text-decoration: underline;
+        }
+
+        /* Anomaly cards */
+        .anomaly-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .anomaly-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .anomaly-card.critical {
+            border-left-color: var(--bad-color);
+        }
+
+        .anomaly-card.warning {
+            border-left-color: #f39c12;
+        }
+
+        .anomaly-card.info {
+            border-left-color: var(--neutral-color);
+        }
+
+        .anomaly-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .anomaly-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Recommendations */
+        .recommendation-table {
+            width: 100%;
+        }
+
+        .priority-high {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .priority-medium {
+            background: rgba(243, 156, 18, 0.1);
+        }
+
+        .priority-low {
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        /* Period Toggle */
+        .period-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .period-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .period-btn:hover {
+            border-color: var(--neutral-color);
+            color: var(--text-primary);
+        }
+
+        .period-btn.active {
+            background: var(--neutral-color);
+            color: #ffffff;
+            border-color: var(--neutral-color);
+        }
+
+        /* Period comparison table */
+        .period-compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .period-compare-table thead {
+            background: var(--border-color);
+        }
+
+        .period-compare-table th {
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .period-compare-table th:first-child {
+            text-align: left;
+        }
+
+        .period-compare-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .period-compare-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .period-compare-table .sub {
+            font-size: 11px;
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .toc-nav {
+                font-size: 12px;
+                gap: 10px;
+            }
+
+            .toc-nav a {
+                padding: 6px 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 0 10px 30px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .toc-nav {
+                flex-direction: column;
+                gap: 5px;
+                padding: 10px;
+            }
+
+            .toc-nav a {
+                padding: 5px 0;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                padding-left: 10px;
+            }
+
+            .toc-nav a.active {
+                border-left-color: var(--neutral-color);
+                border-bottom: none;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+    <div class="header">
+        <h1>SEO Detail - localoria.com</h1>
+        <div class="cross-link">
+            <a href="seo-restaurants-2026-04-11.html">← Quay lại Restaurants</a>
+            | <a href="seo-detail-wherebly.com-2026-04-11.html">wherebly.com →</a>
+        </div>
+    </div>
+    <div class="toc-nav">
+        <a href="#kpis">KPI</a>
+        <a href="#ga4">GA4</a>
+        <a href="#gsc">GSC</a>
+        <a href="#daily">Hàng ngày</a>
+        <a href="#keywords">Từ khóa</a>
+        <a href="#pages">Trang</a>
+        <a href="#anomalies">Bất thường</a>
+        <a href="#comparison">So sánh</a>
+        <a href="#recommendations">Kiến nghị</a>
+    </div>
+    <div class="container">
+        <div class="section" id="kpis">
+            <h2>📊 KPI Trang chi tiết</h2>
+            <div class="period-toggle">
+                <button class="period-btn" data-period="7d" onclick="switchPeriod('7d')">7 ngày</button>
+                <button class="period-btn" data-period="14d" onclick="switchPeriod('14d')">14 ngày</button>
+                <button class="period-btn active" data-period="30d" onclick="switchPeriod('30d')">30 ngày</button>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Sessions</div>
+                    <div class="kpi-card-value" id="kpi-sessions-val">167.6K</div>
+                    <div class="kpi-card-change" id="kpi-sessions-pct"><span class="good">+51.8%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Users</div>
+                    <div class="kpi-card-value" id="kpi-users-val">157.1K</div>
+                    <div class="kpi-card-change" id="kpi-users-pct"><span class="good">+55.3%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Pageviews</div>
+                    <div class="kpi-card-value" id="kpi-pageviews-val">236.4K</div>
+                    <div class="kpi-card-change" id="kpi-pageviews-pct"><span class="good">+34.1%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Clicks</div>
+                    <div class="kpi-card-value" id="kpi-clicks-val">10.7K</div>
+                    <div class="kpi-card-change" id="kpi-clicks-pct"><span class="good">+51.1%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Bounce Rate</div>
+                    <div class="kpi-card-value" id="kpi-bounce_rate-val">47.9%</div>
+                    <div class="kpi-card-change" id="kpi-bounce_rate-pct"><span class="bad">+10.9%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Engagement Rate</div>
+                    <div class="kpi-card-value" id="kpi-engagement_rate-val">52.1%</div>
+                    <div class="kpi-card-change" id="kpi-engagement_rate-pct"><span class="bad">-8.3%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Impressions</div>
+                    <div class="kpi-card-value" id="kpi-impressions-val">1.4M</div>
+                    <div class="kpi-card-change" id="kpi-impressions-pct"><span class="good">+161.7%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Vị trí</div>
+                    <div class="kpi-card-value" id="kpi-position-val">9.1</div>
+                    <div class="kpi-card-change" id="kpi-position-pct"><span class="bad">+16.3%</span></div>
+                </div>
+            </div>
+        </div>
+    <script>
+        var KPI_PERIOD_DATA = {"7d": {"sessions": {"value": "25.9K", "pct": -37.7}, "users": {"value": "23.8K", "pct": -38.9}, "pageviews": {"value": "39.5K", "pct": -35.4}, "clicks": {"value": "2.5K", "pct": -21.1}, "impressions": {"value": "393.9K", "pct": -13.2}, "bounce_rate": {"value": "60.8%", "pct": 45.4, "reverse": true}, "engagement_rate": {"value": "39.2%", "pct": -32.6}, "position": {"value": "8.2", "pct": -9.0, "reverse": true}}, "14d": {"sessions": {"value": "67.4K", "pct": -28.4}, "users": {"value": "62.8K", "pct": -29.4}, "pageviews": {"value": "100.6K", "pct": -20.2}, "clicks": {"value": "5.8K", "pct": 29.0}, "impressions": {"value": "847.8K", "pct": 53.0}, "bounce_rate": {"value": "51.3%", "pct": 13.7, "reverse": true}, "engagement_rate": {"value": "48.7%", "pct": -11.3}, "position": {"value": "8.6", "pct": -8.7, "reverse": true}}, "30d": {"sessions": {"value": "167.6K", "pct": 51.8}, "users": {"value": "157.1K", "pct": 55.3}, "pageviews": {"value": "236.4K", "pct": 34.1}, "clicks": {"value": "10.7K", "pct": 51.1}, "impressions": {"value": "1.4M", "pct": 161.7}, "bounce_rate": {"value": "47.9%", "pct": 10.9, "reverse": true}, "engagement_rate": {"value": "52.1%", "pct": -8.3}, "position": {"value": "9.1", "pct": 16.3, "reverse": true}}};
+        function switchPeriod(period) {
+            document.querySelectorAll('[data-period]').forEach(function(btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-period') === period);
+            });
+            var data = KPI_PERIOD_DATA[period];
+            if (!data) return;
+            var metrics = ['sessions','users','pageviews','clicks','impressions','bounce_rate','engagement_rate','position'];
+            var reverseMetrics = ['bounce_rate','position'];
+            metrics.forEach(function(m) {
+                var valEl = document.getElementById('kpi-' + m + '-val');
+                var pctEl = document.getElementById('kpi-' + m + '-pct');
+                if (valEl) valEl.textContent = data[m].value;
+                if (pctEl) {
+                    var pct = data[m].pct;
+                    var sign = pct > 0 ? '+' : '';
+                    var isReverse = reverseMetrics.indexOf(m) >= 0;
+                    var cls = (pct > 0 && isReverse) || (pct < 0 && !isReverse) ? 'bad' : 'good';
+                    pctEl.innerHTML = '<span class="' + cls + '">' + sign + pct.toFixed(1) + '%</span>';
+                }
+            });
+        }
+    </script>
+
+        <div class="section" id="ga4">
+            <h2>📊 GA4 Analytics</h2>
+            <div class="chart-wrapper">
+                <h3>Sessions & Users theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-ga4-sessions"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Bounce Rate & Engagement</h3>
+                <div class="chart-container">
+                    <canvas id="chart-ga4-bounce"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Pageviews theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-ga4-pageviews"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Session Duration theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-ga4-duration"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="gsc">
+            <h2>🔍 Google Search Console</h2>
+            <div class="chart-wrapper">
+                <h3>Clicks & Impressions theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-gsc-clicks"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3>CTR theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-gsc-ctr"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Vị trí TB theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-gsc-position"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="daily">
+            <h2>📅 Bảng dữ liệu hàng ngày</h2>
+            <table id="daily-table">
+                <thead>
+                    <tr>
+                        <th>Ngày</th>
+                        <th class="numeric">Sessions</th>
+                        <th class="numeric">Users</th>
+                        <th class="numeric">Pageviews</th>
+                        <th class="numeric">Bounce %</th>
+                        <th class="numeric">Duration</th>
+                        <th class="numeric">Clicks</th>
+                        <th class="numeric">Impressions</th>
+                        <th class="numeric">CTR</th>
+                        <th class="numeric">Vị trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-03-11</td>
+                        <td class="numeric">2975</td>
+                        <td class="numeric">2669</td>
+                        <td class="numeric">4776</td>
+                        <td class="numeric">43.9%</td>
+                        <td class="numeric">95s</td>
+                        <td class="numeric">193</td>
+                        <td class="numeric">14655</td>
+                        <td class="numeric">1.32%</td>
+                        <td class="numeric">9.6</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-12</td>
+                        <td class="numeric">3019</td>
+                        <td class="numeric">2808</td>
+                        <td class="numeric">4909</td>
+                        <td class="numeric">43.2%</td>
+                        <td class="numeric">93s</td>
+                        <td class="numeric">198</td>
+                        <td class="numeric">15724</td>
+                        <td class="numeric">1.26%</td>
+                        <td class="numeric">9.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-13</td>
+                        <td class="numeric">42753</td>
+                        <td class="numeric">41381</td>
+                        <td class="numeric">45058</td>
+                        <td class="numeric">31.2%</td>
+                        <td class="numeric">34s</td>
+                        <td class="numeric">267</td>
+                        <td class="numeric">22003</td>
+                        <td class="numeric">1.21%</td>
+                        <td class="numeric">9.5</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-14</td>
+                        <td class="numeric">3699</td>
+                        <td class="numeric">3424</td>
+                        <td class="numeric">6132</td>
+                        <td class="numeric">42.6%</td>
+                        <td class="numeric">85s</td>
+                        <td class="numeric">246</td>
+                        <td class="numeric">23719</td>
+                        <td class="numeric">1.04%</td>
+                        <td class="numeric">9.2</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-15</td>
+                        <td class="numeric">3455</td>
+                        <td class="numeric">3189</td>
+                        <td class="numeric">5665</td>
+                        <td class="numeric">45.4%</td>
+                        <td class="numeric">84s</td>
+                        <td class="numeric">233</td>
+                        <td class="numeric">21339</td>
+                        <td class="numeric">1.09%</td>
+                        <td class="numeric">9.5</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-16</td>
+                        <td class="numeric">3596</td>
+                        <td class="numeric">3254</td>
+                        <td class="numeric">5447</td>
+                        <td class="numeric">47.8%</td>
+                        <td class="numeric">83s</td>
+                        <td class="numeric">239</td>
+                        <td class="numeric">23733</td>
+                        <td class="numeric">1.01%</td>
+                        <td class="numeric">9.9</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-17</td>
+                        <td class="numeric">3778</td>
+                        <td class="numeric">3577</td>
+                        <td class="numeric">6034</td>
+                        <td class="numeric">47.8%</td>
+                        <td class="numeric">79s</td>
+                        <td class="numeric">299</td>
+                        <td class="numeric">32858</td>
+                        <td class="numeric">0.91%</td>
+                        <td class="numeric">10.2</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-18</td>
+                        <td class="numeric">3731</td>
+                        <td class="numeric">3427</td>
+                        <td class="numeric">5873</td>
+                        <td class="numeric">46.2%</td>
+                        <td class="numeric">81s</td>
+                        <td class="numeric">270</td>
+                        <td class="numeric">36498</td>
+                        <td class="numeric">0.74%</td>
+                        <td class="numeric">10.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-19</td>
+                        <td class="numeric">3811</td>
+                        <td class="numeric">3533</td>
+                        <td class="numeric">6032</td>
+                        <td class="numeric">46.5%</td>
+                        <td class="numeric">85s</td>
+                        <td class="numeric">322</td>
+                        <td class="numeric">39979</td>
+                        <td class="numeric">0.81%</td>
+                        <td class="numeric">9.8</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-20</td>
+                        <td class="numeric">4436</td>
+                        <td class="numeric">4065</td>
+                        <td class="numeric">7144</td>
+                        <td class="numeric">44.9%</td>
+                        <td class="numeric">101s</td>
+                        <td class="numeric">398</td>
+                        <td class="numeric">51362</td>
+                        <td class="numeric">0.77%</td>
+                        <td class="numeric">9.6</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-21</td>
+                        <td class="numeric">4503</td>
+                        <td class="numeric">4117</td>
+                        <td class="numeric">6949</td>
+                        <td class="numeric">46.8%</td>
+                        <td class="numeric">85s</td>
+                        <td class="numeric">364</td>
+                        <td class="numeric">55569</td>
+                        <td class="numeric">0.66%</td>
+                        <td class="numeric">9.1</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-22</td>
+                        <td class="numeric">4594</td>
+                        <td class="numeric">4172</td>
+                        <td class="numeric">6945</td>
+                        <td class="numeric">49.8%</td>
+                        <td class="numeric">76s</td>
+                        <td class="numeric">359</td>
+                        <td class="numeric">54085</td>
+                        <td class="numeric">0.66%</td>
+                        <td class="numeric">9.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-23</td>
+                        <td class="numeric">3518</td>
+                        <td class="numeric">3361</td>
+                        <td class="numeric">5665</td>
+                        <td class="numeric">44.0%</td>
+                        <td class="numeric">89s</td>
+                        <td class="numeric">332</td>
+                        <td class="numeric">46173</td>
+                        <td class="numeric">0.72%</td>
+                        <td class="numeric">9.1</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-24</td>
+                        <td class="numeric">3758</td>
+                        <td class="numeric">3492</td>
+                        <td class="numeric">5932</td>
+                        <td class="numeric">44.9%</td>
+                        <td class="numeric">86s</td>
+                        <td class="numeric">376</td>
+                        <td class="numeric">46442</td>
+                        <td class="numeric">0.81%</td>
+                        <td class="numeric">8.7</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-25</td>
+                        <td class="numeric">4032</td>
+                        <td class="numeric">3700</td>
+                        <td class="numeric">6287</td>
+                        <td class="numeric">46.1%</td>
+                        <td class="numeric">82s</td>
+                        <td class="numeric">373</td>
+                        <td class="numeric">48271</td>
+                        <td class="numeric">0.77%</td>
+                        <td class="numeric">9.4</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-26</td>
+                        <td class="numeric">4470</td>
+                        <td class="numeric">4208</td>
+                        <td class="numeric">6924</td>
+                        <td class="numeric">47.8%</td>
+                        <td class="numeric">80s</td>
+                        <td class="numeric">402</td>
+                        <td class="numeric">52203</td>
+                        <td class="numeric">0.77%</td>
+                        <td class="numeric">9.4</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-27</td>
+                        <td class="numeric">15321</td>
+                        <td class="numeric">14851</td>
+                        <td class="numeric">18099</td>
+                        <td class="numeric">34.0%</td>
+                        <td class="numeric">51s</td>
+                        <td class="numeric">444</td>
+                        <td class="numeric">61550</td>
+                        <td class="numeric">0.72%</td>
+                        <td class="numeric">9.3</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-28</td>
+                        <td class="numeric">4914</td>
+                        <td class="numeric">4467</td>
+                        <td class="numeric">7850</td>
+                        <td class="numeric">44.2%</td>
+                        <td class="numeric">84s</td>
+                        <td class="numeric">502</td>
+                        <td class="numeric">65616</td>
+                        <td class="numeric">0.77%</td>
+                        <td class="numeric">9.5</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-29</td>
+                        <td class="numeric">4627</td>
+                        <td class="numeric">4288</td>
+                        <td class="numeric">7555</td>
+                        <td class="numeric">43.3%</td>
+                        <td class="numeric">91s</td>
+                        <td class="numeric">468</td>
+                        <td class="numeric">62930</td>
+                        <td class="numeric">0.74%</td>
+                        <td class="numeric">9.1</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-30</td>
+                        <td class="numeric">4284</td>
+                        <td class="numeric">3858</td>
+                        <td class="numeric">6754</td>
+                        <td class="numeric">45.0%</td>
+                        <td class="numeric">94s</td>
+                        <td class="numeric">467</td>
+                        <td class="numeric">61033</td>
+                        <td class="numeric">0.77%</td>
+                        <td class="numeric">8.9</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-31</td>
+                        <td class="numeric">4052</td>
+                        <td class="numeric">3718</td>
+                        <td class="numeric">6389</td>
+                        <td class="numeric">43.4%</td>
+                        <td class="numeric">86s</td>
+                        <td class="numeric">463</td>
+                        <td class="numeric">65412</td>
+                        <td class="numeric">0.71%</td>
+                        <td class="numeric">8.7</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-01</td>
+                        <td class="numeric">4132</td>
+                        <td class="numeric">3807</td>
+                        <td class="numeric">6892</td>
+                        <td class="numeric">41.7%</td>
+                        <td class="numeric">85s</td>
+                        <td class="numeric">433</td>
+                        <td class="numeric">65658</td>
+                        <td class="numeric">0.66%</td>
+                        <td class="numeric">8.6</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-02</td>
+                        <td class="numeric">4210</td>
+                        <td class="numeric">3973</td>
+                        <td class="numeric">7565</td>
+                        <td class="numeric">41.2%</td>
+                        <td class="numeric">93s</td>
+                        <td class="numeric">455</td>
+                        <td class="numeric">71666</td>
+                        <td class="numeric">0.63%</td>
+                        <td class="numeric">8.7</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-03</td>
+                        <td class="numeric">4840</td>
+                        <td class="numeric">4438</td>
+                        <td class="numeric">7802</td>
+                        <td class="numeric">42.7%</td>
+                        <td class="numeric">88s</td>
+                        <td class="numeric">542</td>
+                        <td class="numeric">80673</td>
+                        <td class="numeric">0.67%</td>
+                        <td class="numeric">8.5</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-04</td>
+                        <td class="numeric">4736</td>
+                        <td class="numeric">4373</td>
+                        <td class="numeric">7305</td>
+                        <td class="numeric">46.4%</td>
+                        <td class="numeric">73s</td>
+                        <td class="numeric">566</td>
+                        <td class="numeric">89296</td>
+                        <td class="numeric">0.63%</td>
+                        <td class="numeric">7.9</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-05</td>
+                        <td class="numeric">4323</td>
+                        <td class="numeric">3887</td>
+                        <td class="numeric">6635</td>
+                        <td class="numeric">46.7%</td>
+                        <td class="numeric">81s</td>
+                        <td class="numeric">461</td>
+                        <td class="numeric">80408</td>
+                        <td class="numeric">0.57%</td>
+                        <td class="numeric">8.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-06</td>
+                        <td class="numeric">4047</td>
+                        <td class="numeric">3733</td>
+                        <td class="numeric">6335</td>
+                        <td class="numeric">45.2%</td>
+                        <td class="numeric">88s</td>
+                        <td class="numeric">487</td>
+                        <td class="numeric">71045</td>
+                        <td class="numeric">0.69%</td>
+                        <td class="numeric">8.3</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-07</td>
+                        <td class="numeric">3933</td>
+                        <td class="numeric">3595</td>
+                        <td class="numeric">6139</td>
+                        <td class="numeric">44.9%</td>
+                        <td class="numeric">92s</td>
+                        <td class="numeric">493</td>
+                        <td class="numeric">72469</td>
+                        <td class="numeric">0.68%</td>
+                        <td class="numeric">8.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-08</td>
+                        <td class="numeric">3805</td>
+                        <td class="numeric">3585</td>
+                        <td class="numeric">5027</td>
+                        <td class="numeric">99.8%</td>
+                        <td class="numeric">76s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">0.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-09</td>
+                        <td class="numeric">202</td>
+                        <td class="numeric">195</td>
+                        <td class="numeric">233</td>
+                        <td class="numeric">100.0%</td>
+                        <td class="numeric">44s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">0.0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="keywords">
+            <h2>🔑 Top 50 Từ khóa</h2>
+            <table id="keywords-table">
+                <thead>
+                    <tr>
+                        <th>Từ khóa</th>
+                        <th class="numeric">Clicks</th>
+                        <th class="numeric">Impressions</th>
+                        <th class="numeric">CTR</th>
+                        <th class="numeric">Vị trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>josephine chamonix</td>
+                        <td class="numeric">503</td>
+                        <td class="numeric">5548</td>
+                        <td class="numeric">9.07%</td>
+                        <td class="numeric">3.5</td>
+                    </tr>
+                    <tr>
+                        <td>kangnam pocha</td>
+                        <td class="numeric">305</td>
+                        <td class="numeric">3955</td>
+                        <td class="numeric">7.71%</td>
+                        <td class="numeric">3.5</td>
+                    </tr>
+                    <tr>
+                        <td>munchers bakery menu</td>
+                        <td class="numeric">282</td>
+                        <td class="numeric">890</td>
+                        <td class="numeric">31.69%</td>
+                        <td class="numeric">2.5</td>
+                    </tr>
+                    <tr>
+                        <td>nola poboys menu</td>
+                        <td class="numeric">242</td>
+                        <td class="numeric">2884</td>
+                        <td class="numeric">8.39%</td>
+                        <td class="numeric">2.6</td>
+                    </tr>
+                    <tr>
+                        <td>kabab king</td>
+                        <td class="numeric">147</td>
+                        <td class="numeric">6818</td>
+                        <td class="numeric">2.16%</td>
+                        <td class="numeric">2.7</td>
+                    </tr>
+                    <tr>
+                        <td>josephine restaurant chamonix</td>
+                        <td class="numeric">96</td>
+                        <td class="numeric">1047</td>
+                        <td class="numeric">9.17%</td>
+                        <td class="numeric">3.5</td>
+                    </tr>
+                    <tr>
+                        <td>el paisano dallas</td>
+                        <td class="numeric">94</td>
+                        <td class="numeric">84244</td>
+                        <td class="numeric">0.11%</td>
+                        <td class="numeric">3.0</td>
+                    </tr>
+                    <tr>
+                        <td>nola poboys</td>
+                        <td class="numeric">91</td>
+                        <td class="numeric">5996</td>
+                        <td class="numeric">1.52%</td>
+                        <td class="numeric">6.3</td>
+                    </tr>
+                    <tr>
+                        <td>hot dog heaven</td>
+                        <td class="numeric">87</td>
+                        <td class="numeric">2157</td>
+                        <td class="numeric">4.03%</td>
+                        <td class="numeric">3.2</td>
+                    </tr>
+                    <tr>
+                        <td>blue fin sushi</td>
+                        <td class="numeric">83</td>
+                        <td class="numeric">1629</td>
+                        <td class="numeric">5.10%</td>
+                        <td class="numeric">3.1</td>
+                    </tr>
+                    <tr>
+                        <td>lumi lane</td>
+                        <td class="numeric">81</td>
+                        <td class="numeric">2729</td>
+                        <td class="numeric">2.97%</td>
+                        <td class="numeric">4.3</td>
+                    </tr>
+                    <tr>
+                        <td>el amigo valparaiso</td>
+                        <td class="numeric">72</td>
+                        <td class="numeric">1520</td>
+                        <td class="numeric">4.74%</td>
+                        <td class="numeric">2.3</td>
+                    </tr>
+                    <tr>
+                        <td>munchers</td>
+                        <td class="numeric">71</td>
+                        <td class="numeric">1976</td>
+                        <td class="numeric">3.59%</td>
+                        <td class="numeric">3.7</td>
+                    </tr>
+                    <tr>
+                        <td>munchers bakery</td>
+                        <td class="numeric">68</td>
+                        <td class="numeric">1414</td>
+                        <td class="numeric">4.81%</td>
+                        <td class="numeric">3.4</td>
+                    </tr>
+                    <tr>
+                        <td>el paisano dallas menu</td>
+                        <td class="numeric">61</td>
+                        <td class="numeric">509</td>
+                        <td class="numeric">11.98%</td>
+                        <td class="numeric">1.9</td>
+                    </tr>
+                    <tr>
+                        <td>kats patch</td>
+                        <td class="numeric">58</td>
+                        <td class="numeric">2433</td>
+                        <td class="numeric">2.38%</td>
+                        <td class="numeric">2.2</td>
+                    </tr>
+                    <tr>
+                        <td>rubi's pizza & grill menu</td>
+                        <td class="numeric">58</td>
+                        <td class="numeric">1508</td>
+                        <td class="numeric">3.85%</td>
+                        <td class="numeric">4.1</td>
+                    </tr>
+                    <tr>
+                        <td>el amigo restaurant menu</td>
+                        <td class="numeric">55</td>
+                        <td class="numeric">525</td>
+                        <td class="numeric">10.48%</td>
+                        <td class="numeric">2.6</td>
+                    </tr>
+                    <tr>
+                        <td>lisa's radial cafe</td>
+                        <td class="numeric">53</td>
+                        <td class="numeric">1576</td>
+                        <td class="numeric">3.36%</td>
+                        <td class="numeric">3.8</td>
+                    </tr>
+                    <tr>
+                        <td>blue fin</td>
+                        <td class="numeric">45</td>
+                        <td class="numeric">1045</td>
+                        <td class="numeric">4.31%</td>
+                        <td class="numeric">3.0</td>
+                    </tr>
+                    <tr>
+                        <td>kabab king menu</td>
+                        <td class="numeric">42</td>
+                        <td class="numeric">2402</td>
+                        <td class="numeric">1.75%</td>
+                        <td class="numeric">5.2</td>
+                    </tr>
+                    <tr>
+                        <td>taqueria arandas racine menu</td>
+                        <td class="numeric">41</td>
+                        <td class="numeric">369</td>
+                        <td class="numeric">11.11%</td>
+                        <td class="numeric">2.2</td>
+                    </tr>
+                    <tr>
+                        <td>hk kitchen and draft house menu</td>
+                        <td class="numeric">40</td>
+                        <td class="numeric">510</td>
+                        <td class="numeric">7.84%</td>
+                        <td class="numeric">2.3</td>
+                    </tr>
+                    <tr>
+                        <td>restaurant josephine chamonix</td>
+                        <td class="numeric">40</td>
+                        <td class="numeric">667</td>
+                        <td class="numeric">6.00%</td>
+                        <td class="numeric">4.7</td>
+                    </tr>
+                    <tr>
+                        <td>rigoberto's mexican food menu</td>
+                        <td class="numeric">40</td>
+                        <td class="numeric">567</td>
+                        <td class="numeric">7.05%</td>
+                        <td class="numeric">2.4</td>
+                    </tr>
+                    <tr>
+                        <td>mack's cash grocery</td>
+                        <td class="numeric">38</td>
+                        <td class="numeric">534</td>
+                        <td class="numeric">7.12%</td>
+                        <td class="numeric">2.7</td>
+                    </tr>
+                    <tr>
+                        <td>hibachi grill & supreme sushi buffet</td>
+                        <td class="numeric">36</td>
+                        <td class="numeric">960</td>
+                        <td class="numeric">3.75%</td>
+                        <td class="numeric">3.6</td>
+                    </tr>
+                    <tr>
+                        <td>the right track sports cafe</td>
+                        <td class="numeric">36</td>
+                        <td class="numeric">509</td>
+                        <td class="numeric">7.07%</td>
+                        <td class="numeric">4.0</td>
+                    </tr>
+                    <tr>
+                        <td>wags food and culture menu</td>
+                        <td class="numeric">36</td>
+                        <td class="numeric">722</td>
+                        <td class="numeric">4.99%</td>
+                        <td class="numeric">3.8</td>
+                    </tr>
+                    <tr>
+                        <td>el paisano</td>
+                        <td class="numeric">101</td>
+                        <td class="numeric">16703</td>
+                        <td class="numeric">0.31%</td>
+                        <td class="numeric">5.2</td>
+                    </tr>
+                    <tr>
+                        <td>el paisano dallas tx</td>
+                        <td class="numeric">34</td>
+                        <td class="numeric">1303</td>
+                        <td class="numeric">2.61%</td>
+                        <td class="numeric">2.9</td>
+                    </tr>
+                    <tr>
+                        <td>jays chicken</td>
+                        <td class="numeric">34</td>
+                        <td class="numeric">1030</td>
+                        <td class="numeric">3.30%</td>
+                        <td class="numeric">3.1</td>
+                    </tr>
+                    <tr>
+                        <td>yannis gyros menu</td>
+                        <td class="numeric">34</td>
+                        <td class="numeric">525</td>
+                        <td class="numeric">6.48%</td>
+                        <td class="numeric">2.3</td>
+                    </tr>
+                    <tr>
+                        <td>josephine's chamonix</td>
+                        <td class="numeric">32</td>
+                        <td class="numeric">267</td>
+                        <td class="numeric">11.99%</td>
+                        <td class="numeric">3.3</td>
+                    </tr>
+                    <tr>
+                        <td>cochi by marvin agustin</td>
+                        <td class="numeric">31</td>
+                        <td class="numeric">1926</td>
+                        <td class="numeric">1.61%</td>
+                        <td class="numeric">7.0</td>
+                    </tr>
+                    <tr>
+                        <td>mannie's seafood</td>
+                        <td class="numeric">31</td>
+                        <td class="numeric">1099</td>
+                        <td class="numeric">2.82%</td>
+                        <td class="numeric">2.6</td>
+                    </tr>
+                    <tr>
+                        <td>yannis</td>
+                        <td class="numeric">31</td>
+                        <td class="numeric">1281</td>
+                        <td class="numeric">2.42%</td>
+                        <td class="numeric">3.4</td>
+                    </tr>
+                    <tr>
+                        <td>el rey de los pollos</td>
+                        <td class="numeric">30</td>
+                        <td class="numeric">995</td>
+                        <td class="numeric">3.02%</td>
+                        <td class="numeric">3.6</td>
+                    </tr>
+                    <tr>
+                        <td>lisas radial cafe</td>
+                        <td class="numeric">30</td>
+                        <td class="numeric">901</td>
+                        <td class="numeric">3.33%</td>
+                        <td class="numeric">4.9</td>
+                    </tr>
+                    <tr>
+                        <td>josephine chamonix reservation online</td>
+                        <td class="numeric">29</td>
+                        <td class="numeric">152</td>
+                        <td class="numeric">19.08%</td>
+                        <td class="numeric">2.8</td>
+                    </tr>
+                    <tr>
+                        <td>kebab king</td>
+                        <td class="numeric">29</td>
+                        <td class="numeric">1123</td>
+                        <td class="numeric">2.58%</td>
+                        <td class="numeric">3.3</td>
+                    </tr>
+                    <tr>
+                        <td>players sports bar</td>
+                        <td class="numeric">29</td>
+                        <td class="numeric">1520</td>
+                        <td class="numeric">1.91%</td>
+                        <td class="numeric">3.7</td>
+                    </tr>
+                    <tr>
+                        <td>chez josephine chamonix</td>
+                        <td class="numeric">28</td>
+                        <td class="numeric">431</td>
+                        <td class="numeric">6.50%</td>
+                        <td class="numeric">4.2</td>
+                    </tr>
+                    <tr>
+                        <td>el amigo</td>
+                        <td class="numeric">28</td>
+                        <td class="numeric">1592</td>
+                        <td class="numeric">1.76%</td>
+                        <td class="numeric">5.4</td>
+                    </tr>
+                    <tr>
+                        <td>hotdog heaven</td>
+                        <td class="numeric">27</td>
+                        <td class="numeric">645</td>
+                        <td class="numeric">4.19%</td>
+                        <td class="numeric">3.5</td>
+                    </tr>
+                    <tr>
+                        <td>rubis pizza and grill</td>
+                        <td class="numeric">27</td>
+                        <td class="numeric">610</td>
+                        <td class="numeric">4.43%</td>
+                        <td class="numeric">3.6</td>
+                    </tr>
+                    <tr>
+                        <td>wags menu</td>
+                        <td class="numeric">27</td>
+                        <td class="numeric">1115</td>
+                        <td class="numeric">2.42%</td>
+                        <td class="numeric">4.9</td>
+                    </tr>
+                    <tr>
+                        <td>josephine chamonix reservation</td>
+                        <td class="numeric">26</td>
+                        <td class="numeric">157</td>
+                        <td class="numeric">16.56%</td>
+                        <td class="numeric">2.8</td>
+                    </tr>
+                    <tr>
+                        <td>arandas</td>
+                        <td class="numeric">25</td>
+                        <td class="numeric">1971</td>
+                        <td class="numeric">1.27%</td>
+                        <td class="numeric">5.5</td>
+                    </tr>
+                    <tr>
+                        <td>hk kitchen</td>
+                        <td class="numeric">25</td>
+                        <td class="numeric">787</td>
+                        <td class="numeric">3.18%</td>
+                        <td class="numeric">4.1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="pages">
+            <h2>📄 Top 30 Trang</h2>
+            <table id="pages-table">
+                <thead>
+                    <tr>
+                        <th>Trang</th>
+                        <th class="numeric">Clicks</th>
+                        <th class="numeric">Impressions</th>
+                        <th class="numeric">CTR</th>
+                        <th class="numeric">Vị trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>https://josephine-restaurant.localoria.com/</td>
+                        <td class="numeric">1003</td>
+                        <td class="numeric">12314</td>
+                        <td class="numeric">8.15%</td>
+                        <td class="numeric">3.9</td>
+                    </tr>
+                    <tr>
+                        <td>https://munchers-bakery.localoria.com/</td>
+                        <td class="numeric">514</td>
+                        <td class="numeric">7150</td>
+                        <td class="numeric">7.19%</td>
+                        <td class="numeric">4.5</td>
+                    </tr>
+                    <tr>
+                        <td>https://kangnam-pocha.localoria.com/</td>
+                        <td class="numeric">367</td>
+                        <td class="numeric">5365</td>
+                        <td class="numeric">6.84%</td>
+                        <td class="numeric">4.2</td>
+                    </tr>
+                    <tr>
+                        <td>https://nola-poboys.localoria.com/full-menu</td>
+                        <td class="numeric">299</td>
+                        <td class="numeric">11511</td>
+                        <td class="numeric">2.60%</td>
+                        <td class="numeric">6.6</td>
+                    </tr>
+                    <tr>
+                        <td>https://el-paisano-dallas.localoria.com/</td>
+                        <td class="numeric">285</td>
+                        <td class="numeric">101496</td>
+                        <td class="numeric">0.28%</td>
+                        <td class="numeric">3.4</td>
+                    </tr>
+                    <tr>
+                        <td>https://blue-fin-sushi-grill.localoria.com/</td>
+                        <td class="numeric">273</td>
+                        <td class="numeric">10563</td>
+                        <td class="numeric">2.58%</td>
+                        <td class="numeric">5.8</td>
+                    </tr>
+                    <tr>
+                        <td>https://kabab-king.localoria.com/</td>
+                        <td class="numeric">255</td>
+                        <td class="numeric">14079</td>
+                        <td class="numeric">1.81%</td>
+                        <td class="numeric">4.3</td>
+                    </tr>
+                    <tr>
+                        <td>https://lisas-radial-cafe.localoria.com/</td>
+                        <td class="numeric">163</td>
+                        <td class="numeric">4538</td>
+                        <td class="numeric">3.59%</td>
+                        <td class="numeric">6.0</td>
+                    </tr>
+                    <tr>
+                        <td>https://hot-dog-heaven.localoria.com/</td>
+                        <td class="numeric">157</td>
+                        <td class="numeric">4774</td>
+                        <td class="numeric">3.29%</td>
+                        <td class="numeric">3.8</td>
+                    </tr>
+                    <tr>
+                        <td>https://jays-krispy-fried-chicken.localoria.com/</td>
+                        <td class="numeric">156</td>
+                        <td class="numeric">3962</td>
+                        <td class="numeric">3.94%</td>
+                        <td class="numeric">3.2</td>
+                    </tr>
+                    <tr>
+                        <td>https://nola-poboys.localoria.com/</td>
+                        <td class="numeric">146</td>
+                        <td class="numeric">12258</td>
+                        <td class="numeric">1.19%</td>
+                        <td class="numeric">7.7</td>
+                    </tr>
+                    <tr>
+                        <td>https://lumi-lane.localoria.com/</td>
+                        <td class="numeric">144</td>
+                        <td class="numeric">5652</td>
+                        <td class="numeric">2.55%</td>
+                        <td class="numeric">4.7</td>
+                    </tr>
+                    <tr>
+                        <td>https://taqueria-arandas-racine.localoria.com/</td>
+                        <td class="numeric">143</td>
+                        <td class="numeric">9802</td>
+                        <td class="numeric">1.46%</td>
+                        <td class="numeric">6.8</td>
+                    </tr>
+                    <tr>
+                        <td>https://rubis-pizza-grill.localoria.com/full-menu</td>
+                        <td class="numeric">130</td>
+                        <td class="numeric">5833</td>
+                        <td class="numeric">2.23%</td>
+                        <td class="numeric">5.3</td>
+                    </tr>
+                    <tr>
+                        <td>https://el-amigo-restaurant.localoria.com/</td>
+                        <td class="numeric">129</td>
+                        <td class="numeric">6884</td>
+                        <td class="numeric">1.87%</td>
+                        <td class="numeric">7.5</td>
+                    </tr>
+                    <tr>
+                        <td>https://el-amigo-restaurant.localoria.com/full-menu</td>
+                        <td class="numeric">119</td>
+                        <td class="numeric">3489</td>
+                        <td class="numeric">3.41%</td>
+                        <td class="numeric">6.8</td>
+                    </tr>
+                    <tr>
+                        <td>https://cochi-by-marvin-agustin.localoria.com/</td>
+                        <td class="numeric">118</td>
+                        <td class="numeric">6783</td>
+                        <td class="numeric">1.74%</td>
+                        <td class="numeric">8.2</td>
+                    </tr>
+                    <tr>
+                        <td>https://granmas-house-of-pancakes.localoria.com/</td>
+                        <td class="numeric">114</td>
+                        <td class="numeric">4224</td>
+                        <td class="numeric">2.70%</td>
+                        <td class="numeric">6.0</td>
+                    </tr>
+                    <tr>
+                        <td>https://macks-cash-grocery.localoria.com/</td>
+                        <td class="numeric">113</td>
+                        <td class="numeric">3004</td>
+                        <td class="numeric">3.76%</td>
+                        <td class="numeric">7.0</td>
+                    </tr>
+                    <tr>
+                        <td>https://rubis-pizza-grill.localoria.com/</td>
+                        <td class="numeric">112</td>
+                        <td class="numeric">7129</td>
+                        <td class="numeric">1.57%</td>
+                        <td class="numeric">7.1</td>
+                    </tr>
+                    <tr>
+                        <td>https://cafe-zum-sen-huhn.localoria.com/</td>
+                        <td class="numeric">106</td>
+                        <td class="numeric">833</td>
+                        <td class="numeric">12.73%</td>
+                        <td class="numeric">3.5</td>
+                    </tr>
+                    <tr>
+                        <td>https://el-cafecito-grants.localoria.com/</td>
+                        <td class="numeric">106</td>
+                        <td class="numeric">8145</td>
+                        <td class="numeric">1.30%</td>
+                        <td class="numeric">5.1</td>
+                    </tr>
+                    <tr>
+                        <td>https://taqueria-arandas-racine.localoria.com/full-menu</td>
+                        <td class="numeric">103</td>
+                        <td class="numeric">5910</td>
+                        <td class="numeric">1.74%</td>
+                        <td class="numeric">6.0</td>
+                    </tr>
+                    <tr>
+                        <td>https://the-right-track-sports-cafe.localoria.com/</td>
+                        <td class="numeric">95</td>
+                        <td class="numeric">2769</td>
+                        <td class="numeric">3.43%</td>
+                        <td class="numeric">9.1</td>
+                    </tr>
+                    <tr>
+                        <td>https://mariscos-el-navegante.localoria.com/</td>
+                        <td class="numeric">93</td>
+                        <td class="numeric">4821</td>
+                        <td class="numeric">1.93%</td>
+                        <td class="numeric">4.5</td>
+                    </tr>
+                    <tr>
+                        <td>https://kats-patch-restaurant.localoria.com/</td>
+                        <td class="numeric">92</td>
+                        <td class="numeric">3975</td>
+                        <td class="numeric">2.31%</td>
+                        <td class="numeric">3.2</td>
+                    </tr>
+                    <tr>
+                        <td>https://mannies-seafood.localoria.com/</td>
+                        <td class="numeric">90</td>
+                        <td class="numeric">5110</td>
+                        <td class="numeric">1.76%</td>
+                        <td class="numeric">4.9</td>
+                    </tr>
+                    <tr>
+                        <td>https://almandi-restaurant.localoria.com/</td>
+                        <td class="numeric">89</td>
+                        <td class="numeric">6308</td>
+                        <td class="numeric">1.41%</td>
+                        <td class="numeric">7.5</td>
+                    </tr>
+                    <tr>
+                        <td>https://al-aseel-grill-and-cafe.localoria.com/</td>
+                        <td class="numeric">87</td>
+                        <td class="numeric">6829</td>
+                        <td class="numeric">1.27%</td>
+                        <td class="numeric">6.0</td>
+                    </tr>
+                    <tr>
+                        <td>https://rigobertos-mexican-food.localoria.com/</td>
+                        <td class="numeric">87</td>
+                        <td class="numeric">2243</td>
+                        <td class="numeric">3.88%</td>
+                        <td class="numeric">5.8</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="anomalies">
+            <h2>⚠️ Bất thường</h2>
+            <div class="anomaly-cards">
+                <div class="anomaly-card warning">
+                    <div class="anomaly-title">Sessions Drop — 2026-04-09</div>
+                    <div class="anomaly-description">Sessions drop: 202 (avg: 5585)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="comparison">
+            <h2>📊 So sánh theo mốc thời gian</h2>
+            <table class="period-compare-table">
+                <thead>
+                    <tr>
+                        <th>Chỉ số</th>
+                        <th>7 ngày<br><span class="sub" style="font-weight:normal;opacity:0.7">vs 7d trước</span></th>
+                        <th>14 ngày<br><span class="sub" style="font-weight:normal;opacity:0.7">vs 14d trước</span></th>
+                        <th>30 ngày<br><span class="sub" style="font-weight:normal;opacity:0.7">vs 30d trước</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sessions</td>
+                        <td>25.9K<br><span class="sub"><span class="bad">-37.7%</span></span></td>
+                        <td>67.4K<br><span class="sub"><span class="bad">-28.4%</span></span></td>
+                        <td>167.6K<br><span class="sub"><span class="good">+51.8%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Users</td>
+                        <td>23.8K<br><span class="sub"><span class="bad">-38.9%</span></span></td>
+                        <td>62.8K<br><span class="sub"><span class="bad">-29.4%</span></span></td>
+                        <td>157.1K<br><span class="sub"><span class="good">+55.3%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Pageviews</td>
+                        <td>39.5K<br><span class="sub"><span class="bad">-35.4%</span></span></td>
+                        <td>100.6K<br><span class="sub"><span class="bad">-20.2%</span></span></td>
+                        <td>236.4K<br><span class="sub"><span class="good">+34.1%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Clicks (GSC)</td>
+                        <td>2.5K<br><span class="sub"><span class="bad">-21.1%</span></span></td>
+                        <td>5.8K<br><span class="sub"><span class="good">+29.0%</span></span></td>
+                        <td>10.7K<br><span class="sub"><span class="good">+51.1%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Impressions</td>
+                        <td>393.9K<br><span class="sub"><span class="bad">-13.2%</span></span></td>
+                        <td>847.8K<br><span class="sub"><span class="good">+53.0%</span></span></td>
+                        <td>1.4M<br><span class="sub"><span class="good">+161.7%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Bounce Rate</td>
+                        <td>60.8%<br><span class="sub"><span class="bad">+45.4%</span></span></td>
+                        <td>51.3%<br><span class="sub"><span class="bad">+13.7%</span></span></td>
+                        <td>47.9%<br><span class="sub"><span class="bad">+10.9%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Engagement Rate</td>
+                        <td>39.2%<br><span class="sub"><span class="bad">-32.6%</span></span></td>
+                        <td>48.7%<br><span class="sub"><span class="bad">-11.3%</span></span></td>
+                        <td>52.1%<br><span class="sub"><span class="bad">-8.3%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>CTR</td>
+                        <td>0.65%<br><span class="sub"><span class="bad">-9.3%</span></span></td>
+                        <td>0.69%<br><span class="sub"><span class="bad">-19.7%</span></span></td>
+                        <td>0.81%<br><span class="sub"><span class="bad">-37.0%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Vị trí TB</td>
+                        <td>8.2<br><span class="sub"><span class="good">-9.0%</span></span></td>
+                        <td>8.6<br><span class="sub"><span class="good">-8.7%</span></span></td>
+                        <td>9.1<br><span class="sub"><span class="bad">+16.3%</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="recommendations">
+            <h2>💡 Kiến nghị</h2>
+            <table>
+                <thead><tr><th>Mức độ</th><th>Kiến nghị</th><th>Chi tiết</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><span class="info">high</span></td>
+                        <td>Điều tra site giảm mạnh</td>
+                        <td>Các site giảm sessions >20% so với kỳ trước: goto-where.com, grubbio.com</td>
+                    </tr>
+                    <tr>
+                        <td><span class="info">medium</span></td>
+                        <td>Theo dõi anomaly</td>
+                        <td>Có 18 cảnh báo được phát hiện.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="info">low</span></td>
+                        <td>Tối ưu content</td>
+                        <td>Xem xét cải thiện nội dung cho các trang có CTR thấp.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const DETAIL_CHART_DATA = {"dates": ["2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09"], "sessions": [2975.0, 3019.0, 42753.0, 3699.0, 3455.0, 3596.0, 3778.0, 3731.0, 3811.0, 4436.0, 4503.0, 4594.0, 3518.0, 3758.0, 4032.0, 4470.0, 15321.0, 4914.0, 4627.0, 4284.0, 4052.0, 4132.0, 4210.0, 4840.0, 4736.0, 4323.0, 4047.0, 3933.0, 3805.0, 202.0], "users": [2669.0, 2808.0, 41381.0, 3424.0, 3189.0, 3254.0, 3577.0, 3427.0, 3533.0, 4065.0, 4117.0, 4172.0, 3361.0, 3492.0, 3700.0, 4208.0, 14851.0, 4467.0, 4288.0, 3858.0, 3718.0, 3807.0, 3973.0, 4438.0, 4373.0, 3887.0, 3733.0, 3595.0, 3585.0, 195.0], "bounce": [43.87, 43.19, 31.230000000000004, 42.63, 45.440000000000005, 47.83, 47.8, 46.150000000000006, 46.47, 44.879999999999995, 46.77, 49.8, 44.0, 44.89, 46.08, 47.83, 34.03, 44.22, 43.309999999999995, 44.96, 43.39, 41.699999999999996, 41.160000000000004, 42.67, 46.39, 46.660000000000004, 45.17, 44.93, 99.79, 100.0], "engagement": [56.13, 56.81, 68.77, 57.37, 54.559999999999995, 52.17, 52.2, 53.849999999999994, 53.53, 55.120000000000005, 53.23, 50.2, 56.00000000000001, 55.11000000000001, 53.92, 52.17, 65.97, 55.779999999999994, 56.69, 55.04, 56.61000000000001, 58.3, 58.84, 57.330000000000005, 53.61, 53.339999999999996, 54.83, 55.06999999999999, 0.21, 0.0], "pageviews": [4776.0, 4909.0, 45058.0, 6132.0, 5665.0, 5447.0, 6034.0, 5873.0, 6032.0, 7144.0, 6949.0, 6945.0, 5665.0, 5932.0, 6287.0, 6924.0, 18099.0, 7850.0, 7555.0, 6754.0, 6389.0, 6892.0, 7565.0, 7802.0, 7305.0, 6635.0, 6335.0, 6139.0, 5027.0, 233.0], "duration": [95.2229, 93.4639, 34.024, 85.0284, 83.5749, 83.1368, 78.5998, 80.547, 84.7786, 100.5798, 85.1762, 75.8318, 88.56, 86.0764, 82.3255, 79.5769, 50.9698, 83.9168, 90.5839, 93.9706, 86.1821, 84.8097, 93.1148, 88.1442, 72.7722, 80.6135, 88.3308, 91.8459, 76.0867, 43.7731], "clicks": [193.0, 198.0, 267.0, 246.0, 233.0, 239.0, 299.0, 270.0, 322.0, 398.0, 364.0, 359.0, 332.0, 376.0, 373.0, 402.0, 444.0, 502.0, 468.0, 467.0, 463.0, 433.0, 455.0, 542.0, 566.0, 461.0, 487.0, 493.0, 0, 0], "impressions": [14655.0, 15724.0, 22003.0, 23719.0, 21339.0, 23733.0, 32858.0, 36498.0, 39979.0, 51362.0, 55569.0, 54085.0, 46173.0, 46442.0, 48271.0, 52203.0, 61550.0, 65616.0, 62930.0, 61033.0, 65412.0, 65658.0, 71666.0, 80673.0, 89296.0, 80408.0, 71045.0, 72469.0, 0, 0], "ctr": [1.32, 1.26, 1.21, 1.04, 1.09, 1.01, 0.91, 0.74, 0.8099999999999999, 0.77, 0.66, 0.66, 0.72, 0.8099999999999999, 0.77, 0.77, 0.72, 0.77, 0.74, 0.77, 0.7100000000000001, 0.66, 0.63, 0.67, 0.63, 0.5700000000000001, 0.69, 0.6799999999999999, 0, 0], "position": [9.6377, 8.9654, 9.4803, 9.2092, 9.5084, 9.8669, 10.2483, 9.9604, 9.8295, 9.5619, 9.113, 8.9609, 9.067, 8.6619, 9.4419, 9.4235, 9.2736, 9.4996, 9.1184, 8.9369, 8.6918, 8.5633, 8.6906, 8.5386, 7.913, 8.0495, 8.3143, 7.9888, 0, 0]};
+
+        function makeOpts(scalesOverride) {
+            const base = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(ctx) {
+                                let val = ctx.parsed.y;
+                                if (val >= 1000000) val = (val/1000000).toFixed(1) + 'M';
+                                else if (val >= 1000) val = (val/1000).toFixed(1) + 'K';
+                                else if (typeof val === 'number') val = val.toFixed(val < 100 ? 2 : 0);
+                                return ctx.dataset.label + ': ' + val;
+                            }
+                        }
+                    }
+                },
+                scales: scalesOverride || { x: { type: 'category' }, y: { beginAtZero: true } }
+            };
+            return base;
+        }
+
+        function initDetailCharts() {
+            new Chart(document.getElementById('chart-ga4-sessions'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [
+                        {
+                            label: 'Sessions',
+                            data: DETAIL_CHART_DATA.sessions,
+                            borderColor: '#3498db',
+                            backgroundColor: '#3498db20',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Users',
+                            data: DETAIL_CHART_DATA.users,
+                            borderColor: '#2ecc71',
+                            backgroundColor: '#2ecc7120',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: makeOpts()
+            });
+
+            new Chart(document.getElementById('chart-ga4-bounce'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [
+                        {
+                            label: 'Bounce Rate %',
+                            data: DETAIL_CHART_DATA.bounce,
+                            borderColor: '#e74c3c',
+                            backgroundColor: '#e74c3c20',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10
+                        },
+                        {
+                            label: 'Engagement Rate %',
+                            data: DETAIL_CHART_DATA.engagement,
+                            borderColor: '#27ae60',
+                            backgroundColor: '#27ae6020',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10
+                        }
+                    ]
+                },
+                options: makeOpts({ x: { type: 'category' }, y: { min: 0, max: 100 } })
+            });
+
+            new Chart(document.getElementById('chart-ga4-pageviews'), {
+                type: 'bar',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [{
+                        label: 'Pageviews',
+                        data: DETAIL_CHART_DATA.pageviews,
+                        backgroundColor: '#3498db'
+                    }]
+                },
+                options: makeOpts()
+            });
+
+            new Chart(document.getElementById('chart-ga4-duration'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [{
+                        label: 'Session Duration (s)',
+                        data: DETAIL_CHART_DATA.duration,
+                        borderColor: '#f39c12',
+                        backgroundColor: '#f39c1220',
+                        tension: 0.1,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHitRadius: 10
+                    }]
+                },
+                options: makeOpts()
+            });
+
+            new Chart(document.getElementById('chart-gsc-clicks'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [
+                        {
+                            label: 'Clicks',
+                            data: DETAIL_CHART_DATA.clicks,
+                            borderColor: '#e74c3c',
+                            backgroundColor: '#e74c3c20',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Impressions',
+                            data: DETAIL_CHART_DATA.impressions,
+                            borderColor: '#3498db',
+                            backgroundColor: '#3498db20',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: makeOpts({ x: { type: 'category' }, y: { beginAtZero: true, position: 'left' }, y1: { beginAtZero: true, position: 'right', grid: { display: false } } })
+            });
+
+            new Chart(document.getElementById('chart-gsc-ctr'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [{
+                        label: 'CTR %',
+                        data: DETAIL_CHART_DATA.ctr,
+                        borderColor: '#2ecc71',
+                        backgroundColor: '#2ecc7120',
+                        tension: 0.1,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHitRadius: 10
+                    }]
+                },
+                options: makeOpts()
+            });
+
+            new Chart(document.getElementById('chart-gsc-position'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [{
+                        label: 'Vị trí',
+                        data: DETAIL_CHART_DATA.position,
+                        borderColor: '#f39c12',
+                        backgroundColor: '#f39c1220',
+                        tension: 0.1,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHitRadius: 10
+                    }]
+                },
+                options: makeOpts({ x: { type: 'category' }, y: { reverse: true } })
+            });
+        }
+
+        initDetailCharts();
+    </script>
+    <script>
+        makeTableSortable('daily-table');
+        makeTableSortable('keywords-table');
+        makeTableSortable('pages-table');
+    </script>
+
+    <script>
+        let darkMode = false;
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            const html = document.documentElement;
+            if (darkMode) {
+                html.classList.add('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '☀️ Light Mode';
+            } else {
+                html.classList.remove('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '🌙 Dark Mode';
+            }
+        }
+
+        // TOC active section highlighting
+        const tocLinks = document.querySelectorAll('.toc-nav a');
+        const sections = document.querySelectorAll('.section');
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.href.endsWith('#' + id)) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => {
+            if (section.id) {
+                observer.observe(section);
+            }
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('.toc-nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Table sorting
+        function makeTableSortable(tableId) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const headers = table.querySelectorAll('th');
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => {
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                    const isNumeric = rows.every(row => {
+                        const text = row.cells[index].textContent.trim();
+                        return text === '' || !isNaN(parseFloat(text.replace(/,/g, '')));
+                    });
+
+                    rows.sort((a, b) => {
+                        let aVal = a.cells[index].textContent.trim();
+                        let bVal = b.cells[index].textContent.trim();
+
+                        if (isNumeric) {
+                            aVal = parseFloat(aVal.replace(/,/g, '')) || 0;
+                            bVal = parseFloat(bVal.replace(/,/g, '')) || 0;
+                            return aVal - bVal;
+                        } else {
+                            return aVal.localeCompare(bVal);
+                        }
+                    });
+
+                    rows.forEach(row => tbody.appendChild(row));
+                });
+            });
+        }
+    </script>
+</body>
+</html>
