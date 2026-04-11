@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Detail - locallya.com</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border-color: #ddd;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --chart-grid: #e0e0e0;
+            --good-color: #27ae60;
+            --bad-color: #e74c3c;
+            --neutral-color: #3498db;
+        }
+
+        html.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --border-color: #444;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            --chart-grid: #444444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+        }
+
+        .cross-link {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .cross-link a {
+            color: var(--neutral-color);
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        .cross-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dark mode toggle */
+        .dark-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .dark-toggle:hover {
+            box-shadow: var(--card-shadow);
+        }
+
+        /* TOC */
+        .toc-nav {
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            z-index: 100;
+            margin-bottom: 30px;
+        }
+
+        .toc-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .toc-nav a.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--neutral-color);
+        }
+
+        .toc-nav a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+        }
+
+        .kpi-card-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .kpi-card-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .kpi-card-change {
+            font-size: 13px;
+        }
+
+        .good {
+            color: var(--good-color);
+        }
+
+        .bad {
+            color: var(--bad-color);
+        }
+
+        .neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Filter */
+        .filter-section {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .filter-select {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .filter-button {
+            background: var(--neutral-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .filter-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Chart */
+        .chart-wrapper {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-wrapper h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .chart-container {
+            height: 350px;
+            margin-bottom: 10px;
+        }
+
+        .chart-legend {
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--border-color);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: var(--text-secondary);
+        }
+
+        th::after {
+            content: " ⇅";
+            opacity: 0.3;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--bg-primary);
+        }
+
+        .numeric {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        .site-name {
+            color: var(--neutral-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .site-name:hover {
+            text-decoration: underline;
+        }
+
+        /* Anomaly cards */
+        .anomaly-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .anomaly-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .anomaly-card.critical {
+            border-left-color: var(--bad-color);
+        }
+
+        .anomaly-card.warning {
+            border-left-color: #f39c12;
+        }
+
+        .anomaly-card.info {
+            border-left-color: var(--neutral-color);
+        }
+
+        .anomaly-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .anomaly-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Recommendations */
+        .recommendation-table {
+            width: 100%;
+        }
+
+        .priority-high {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .priority-medium {
+            background: rgba(243, 156, 18, 0.1);
+        }
+
+        .priority-low {
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        /* Period Toggle */
+        .period-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .period-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .period-btn:hover {
+            border-color: var(--neutral-color);
+            color: var(--text-primary);
+        }
+
+        .period-btn.active {
+            background: var(--neutral-color);
+            color: #ffffff;
+            border-color: var(--neutral-color);
+        }
+
+        /* Period comparison table */
+        .period-compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .period-compare-table thead {
+            background: var(--border-color);
+        }
+
+        .period-compare-table th {
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .period-compare-table th:first-child {
+            text-align: left;
+        }
+
+        .period-compare-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .period-compare-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .period-compare-table .sub {
+            font-size: 11px;
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .toc-nav {
+                font-size: 12px;
+                gap: 10px;
+            }
+
+            .toc-nav a {
+                padding: 6px 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 0 10px 30px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .toc-nav {
+                flex-direction: column;
+                gap: 5px;
+                padding: 10px;
+            }
+
+            .toc-nav a {
+                padding: 5px 0;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                padding-left: 10px;
+            }
+
+            .toc-nav a.active {
+                border-left-color: var(--neutral-color);
+                border-bottom: none;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+    <div class="header">
+        <h1>SEO Detail - locallya.com</h1>
+        <div class="cross-link">
+            <a href="seo-restaurants-2026-04-11.html">← Quay lại Restaurants</a>
+            | <a href="seo-detail-placejoys.com-2026-04-11.html">← placejoys.com</a>
+        </div>
+    </div>
+    <div class="toc-nav">
+        <a href="#kpis">KPI</a>
+        <a href="#ga4">GA4</a>
+        <a href="#gsc">GSC</a>
+        <a href="#daily">Hàng ngày</a>
+        <a href="#keywords">Từ khóa</a>
+        <a href="#pages">Trang</a>
+        <a href="#anomalies">Bất thường</a>
+        <a href="#comparison">So sánh</a>
+        <a href="#recommendations">Kiến nghị</a>
+    </div>
+    <div class="container">
+        <div class="section" id="kpis">
+            <h2>📊 KPI Trang chi tiết</h2>
+            <div class="period-toggle">
+                <button class="period-btn" data-period="7d" onclick="switchPeriod('7d')">7 ngày</button>
+                <button class="period-btn" data-period="14d" onclick="switchPeriod('14d')">14 ngày</button>
+                <button class="period-btn active" data-period="30d" onclick="switchPeriod('30d')">30 ngày</button>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Sessions</div>
+                    <div class="kpi-card-value" id="kpi-sessions-val">6,627</div>
+                    <div class="kpi-card-change" id="kpi-sessions-pct"><span class="good">+28713.0%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Users</div>
+                    <div class="kpi-card-value" id="kpi-users-val">6,278</div>
+                    <div class="kpi-card-change" id="kpi-users-pct"><span class="good">+27195.7%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Pageviews</div>
+                    <div class="kpi-card-value" id="kpi-pageviews-val">8,628</div>
+                    <div class="kpi-card-change" id="kpi-pageviews-pct"><span class="good">+28660.0%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Clicks</div>
+                    <div class="kpi-card-value" id="kpi-clicks-val">231</div>
+                    <div class="kpi-card-change" id="kpi-clicks-pct"><span class="good">+11450.0%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Bounce Rate</div>
+                    <div class="kpi-card-value" id="kpi-bounce_rate-val">59.7%</div>
+                    <div class="kpi-card-change" id="kpi-bounce_rate-pct"><span class="good">-25.1%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Engagement Rate</div>
+                    <div class="kpi-card-value" id="kpi-engagement_rate-val">40.3%</div>
+                    <div class="kpi-card-change" id="kpi-engagement_rate-pct"><span class="good">+98.4%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Impressions</div>
+                    <div class="kpi-card-value" id="kpi-impressions-val">32,372</div>
+                    <div class="kpi-card-change" id="kpi-impressions-pct"><span class="good">+147045.5%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-card-label">Vị trí</div>
+                    <div class="kpi-card-value" id="kpi-position-val">8.8</div>
+                    <div class="kpi-card-change" id="kpi-position-pct"><span class="good">-20.2%</span></div>
+                </div>
+            </div>
+        </div>
+    <script>
+        var KPI_PERIOD_DATA = {"7d": {"sessions": {"value": "4,613", "pct": 158.1}, "users": {"value": "4,392", "pct": 161.6}, "pageviews": {"value": "5,873", "pct": 146.2}, "clicks": {"value": "171", "pct": 185.0}, "impressions": {"value": "24,901", "pct": 242.3}, "bounce_rate": {"value": "69.7%", "pct": 16.4, "reverse": true}, "engagement_rate": {"value": "30.3%", "pct": -24.5}, "position": {"value": "7.9", "pct": -12.0, "reverse": true}}, "14d": {"sessions": {"value": "6,400", "pct": 2731.9}, "users": {"value": "6,071", "pct": 2847.1}, "pageviews": {"value": "8,258", "pct": 2137.9}, "clicks": {"value": "231", "pct": 0}, "impressions": {"value": "32,175", "pct": 16745.5}, "bounce_rate": {"value": "64.4%", "pct": 8.4, "reverse": true}, "engagement_rate": {"value": "35.6%", "pct": -12.3}, "position": {"value": "8.5", "pct": -11.9, "reverse": true}}, "30d": {"sessions": {"value": "6,627", "pct": 28713.0}, "users": {"value": "6,278", "pct": 27195.7}, "pageviews": {"value": "8,628", "pct": 28660.0}, "clicks": {"value": "231", "pct": 11450.0}, "impressions": {"value": "32,372", "pct": 147045.5}, "bounce_rate": {"value": "59.7%", "pct": -25.1, "reverse": true}, "engagement_rate": {"value": "40.3%", "pct": 98.4}, "position": {"value": "8.8", "pct": -20.2, "reverse": true}}};
+        function switchPeriod(period) {
+            document.querySelectorAll('[data-period]').forEach(function(btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-period') === period);
+            });
+            var data = KPI_PERIOD_DATA[period];
+            if (!data) return;
+            var metrics = ['sessions','users','pageviews','clicks','impressions','bounce_rate','engagement_rate','position'];
+            var reverseMetrics = ['bounce_rate','position'];
+            metrics.forEach(function(m) {
+                var valEl = document.getElementById('kpi-' + m + '-val');
+                var pctEl = document.getElementById('kpi-' + m + '-pct');
+                if (valEl) valEl.textContent = data[m].value;
+                if (pctEl) {
+                    var pct = data[m].pct;
+                    var sign = pct > 0 ? '+' : '';
+                    var isReverse = reverseMetrics.indexOf(m) >= 0;
+                    var cls = (pct > 0 && isReverse) || (pct < 0 && !isReverse) ? 'bad' : 'good';
+                    pctEl.innerHTML = '<span class="' + cls + '">' + sign + pct.toFixed(1) + '%</span>';
+                }
+            });
+        }
+    </script>
+
+        <div class="section" id="ga4">
+            <h2>📊 GA4 Analytics</h2>
+            <div class="chart-wrapper">
+                <h3>Sessions & Users theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-ga4-sessions"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Bounce Rate & Engagement</h3>
+                <div class="chart-container">
+                    <canvas id="chart-ga4-bounce"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Pageviews theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-ga4-pageviews"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Session Duration theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-ga4-duration"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="gsc">
+            <h2>🔍 Google Search Console</h2>
+            <div class="chart-wrapper">
+                <h3>Clicks & Impressions theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-gsc-clicks"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3>CTR theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-gsc-ctr"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Vị trí TB theo ngày</h3>
+                <div class="chart-container">
+                    <canvas id="chart-gsc-position"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="daily">
+            <h2>📅 Bảng dữ liệu hàng ngày</h2>
+            <table id="daily-table">
+                <thead>
+                    <tr>
+                        <th>Ngày</th>
+                        <th class="numeric">Sessions</th>
+                        <th class="numeric">Users</th>
+                        <th class="numeric">Pageviews</th>
+                        <th class="numeric">Bounce %</th>
+                        <th class="numeric">Duration</th>
+                        <th class="numeric">Clicks</th>
+                        <th class="numeric">Impressions</th>
+                        <th class="numeric">CTR</th>
+                        <th class="numeric">Vị trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-03-11</td>
+                        <td class="numeric">1</td>
+                        <td class="numeric">1</td>
+                        <td class="numeric">1</td>
+                        <td class="numeric">0.0%</td>
+                        <td class="numeric">1522s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">4</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">3.2</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-12</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0.0%</td>
+                        <td class="numeric">0s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">5.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-13</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">100.0%</td>
+                        <td class="numeric">0s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">3</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">3.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-14</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">3</td>
+                        <td class="numeric">50.0%</td>
+                        <td class="numeric">4s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">1</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">56.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-15</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">3</td>
+                        <td class="numeric">0.0%</td>
+                        <td class="numeric">516s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">5</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">2.4</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-16</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">100.0%</td>
+                        <td class="numeric">0s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">4</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">3.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-17</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0.0%</td>
+                        <td class="numeric">0s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">3</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">30.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-18</td>
+                        <td class="numeric">3</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">17</td>
+                        <td class="numeric">33.3%</td>
+                        <td class="numeric">859s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">9</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">4.7</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-19</td>
+                        <td class="numeric">3</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">3</td>
+                        <td class="numeric">33.3%</td>
+                        <td class="numeric">121s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">3</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">1.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-20</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">100.0%</td>
+                        <td class="numeric">5s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">4</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">3.5</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-21</td>
+                        <td class="numeric">1</td>
+                        <td class="numeric">1</td>
+                        <td class="numeric">1</td>
+                        <td class="numeric">100.0%</td>
+                        <td class="numeric">0s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">2</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">2.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-22</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0.0%</td>
+                        <td class="numeric">0s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">5</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">4.4</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-23</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0.0%</td>
+                        <td class="numeric">0s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">4</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">2.5</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-24</td>
+                        <td class="numeric">65</td>
+                        <td class="numeric">59</td>
+                        <td class="numeric">115</td>
+                        <td class="numeric">41.5%</td>
+                        <td class="numeric">70s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">16</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">5.3</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-25</td>
+                        <td class="numeric">68</td>
+                        <td class="numeric">63</td>
+                        <td class="numeric">102</td>
+                        <td class="numeric">47.1%</td>
+                        <td class="numeric">109s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">34</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">7.4</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-26</td>
+                        <td class="numeric">76</td>
+                        <td class="numeric">69</td>
+                        <td class="numeric">119</td>
+                        <td class="numeric">48.7%</td>
+                        <td class="numeric">45s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">98</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">10.2</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-27</td>
+                        <td class="numeric">94</td>
+                        <td class="numeric">91</td>
+                        <td class="numeric">148</td>
+                        <td class="numeric">45.7%</td>
+                        <td class="numeric">69s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">206</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">10.5</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-28</td>
+                        <td class="numeric">190</td>
+                        <td class="numeric">179</td>
+                        <td class="numeric">272</td>
+                        <td class="numeric">54.7%</td>
+                        <td class="numeric">55s</td>
+                        <td class="numeric">1</td>
+                        <td class="numeric">326</td>
+                        <td class="numeric">0.31%</td>
+                        <td class="numeric">8.4</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-29</td>
+                        <td class="numeric">173</td>
+                        <td class="numeric">162</td>
+                        <td class="numeric">217</td>
+                        <td class="numeric">65.3%</td>
+                        <td class="numeric">66s</td>
+                        <td class="numeric">3</td>
+                        <td class="numeric">513</td>
+                        <td class="numeric">0.58%</td>
+                        <td class="numeric">9.4</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-30</td>
+                        <td class="numeric">151</td>
+                        <td class="numeric">142</td>
+                        <td class="numeric">202</td>
+                        <td class="numeric">62.9%</td>
+                        <td class="numeric">55s</td>
+                        <td class="numeric">4</td>
+                        <td class="numeric">793</td>
+                        <td class="numeric">0.50%</td>
+                        <td class="numeric">8.9</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-31</td>
+                        <td class="numeric">256</td>
+                        <td class="numeric">240</td>
+                        <td class="numeric">344</td>
+                        <td class="numeric">59.0%</td>
+                        <td class="numeric">96s</td>
+                        <td class="numeric">9</td>
+                        <td class="numeric">1076</td>
+                        <td class="numeric">0.84%</td>
+                        <td class="numeric">8.9</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-01</td>
+                        <td class="numeric">333</td>
+                        <td class="numeric">304</td>
+                        <td class="numeric">427</td>
+                        <td class="numeric">66.7%</td>
+                        <td class="numeric">73s</td>
+                        <td class="numeric">22</td>
+                        <td class="numeric">1645</td>
+                        <td class="numeric">1.34%</td>
+                        <td class="numeric">8.6</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-02</td>
+                        <td class="numeric">590</td>
+                        <td class="numeric">561</td>
+                        <td class="numeric">775</td>
+                        <td class="numeric">64.9%</td>
+                        <td class="numeric">58s</td>
+                        <td class="numeric">21</td>
+                        <td class="numeric">2715</td>
+                        <td class="numeric">0.77%</td>
+                        <td class="numeric">8.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-03</td>
+                        <td class="numeric">547</td>
+                        <td class="numeric">516</td>
+                        <td class="numeric">714</td>
+                        <td class="numeric">60.9%</td>
+                        <td class="numeric">69s</td>
+                        <td class="numeric">18</td>
+                        <td class="numeric">4112</td>
+                        <td class="numeric">0.44%</td>
+                        <td class="numeric">8.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-04</td>
+                        <td class="numeric">552</td>
+                        <td class="numeric">531</td>
+                        <td class="numeric">696</td>
+                        <td class="numeric">65.9%</td>
+                        <td class="numeric">53s</td>
+                        <td class="numeric">38</td>
+                        <td class="numeric">4770</td>
+                        <td class="numeric">0.80%</td>
+                        <td class="numeric">7.6</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-05</td>
+                        <td class="numeric">652</td>
+                        <td class="numeric">632</td>
+                        <td class="numeric">819</td>
+                        <td class="numeric">66.7%</td>
+                        <td class="numeric">50s</td>
+                        <td class="numeric">35</td>
+                        <td class="numeric">5257</td>
+                        <td class="numeric">0.67%</td>
+                        <td class="numeric">7.9</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-06</td>
+                        <td class="numeric">945</td>
+                        <td class="numeric">893</td>
+                        <td class="numeric">1259</td>
+                        <td class="numeric">60.7%</td>
+                        <td class="numeric">62s</td>
+                        <td class="numeric">47</td>
+                        <td class="numeric">4929</td>
+                        <td class="numeric">0.95%</td>
+                        <td class="numeric">8.1</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-07</td>
+                        <td class="numeric">917</td>
+                        <td class="numeric">867</td>
+                        <td class="numeric">1162</td>
+                        <td class="numeric">64.8%</td>
+                        <td class="numeric">58s</td>
+                        <td class="numeric">33</td>
+                        <td class="numeric">5833</td>
+                        <td class="numeric">0.57%</td>
+                        <td class="numeric">7.9</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-08</td>
+                        <td class="numeric">1000</td>
+                        <td class="numeric">953</td>
+                        <td class="numeric">1223</td>
+                        <td class="numeric">99.3%</td>
+                        <td class="numeric">44s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">0.0</td>
+                    </tr>
+                    <tr>
+                        <td>2026-04-09</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0.0%</td>
+                        <td class="numeric">0s</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0</td>
+                        <td class="numeric">0.00%</td>
+                        <td class="numeric">0.0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="keywords">
+            <h2>🔑 Top 50 Từ khóa</h2>
+            <table id="keywords-table">
+                <thead>
+                    <tr>
+                        <th>Từ khóa</th>
+                        <th class="numeric">Clicks</th>
+                        <th class="numeric">Impressions</th>
+                        <th class="numeric">CTR</th>
+                        <th class="numeric">Vị trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="pages">
+            <h2>📄 Top 30 Trang</h2>
+            <table id="pages-table">
+                <thead>
+                    <tr>
+                        <th>Trang</th>
+                        <th class="numeric">Clicks</th>
+                        <th class="numeric">Impressions</th>
+                        <th class="numeric">CTR</th>
+                        <th class="numeric">Vị trí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="anomalies">
+            <h2>⚠️ Bất thường</h2>
+            <div class="anomaly-cards">
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-06</div>
+                    <div class="anomaly-description">Sessions spike: 945 (avg: 265)</div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-07</div>
+                    <div class="anomaly-description">Sessions spike: 917 (avg: 265)</div>
+                </div>
+                <div class="anomaly-card info">
+                    <div class="anomaly-title">Sessions Spike — 2026-04-08</div>
+                    <div class="anomaly-description">Sessions spike: 1000 (avg: 265)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="comparison">
+            <h2>📊 So sánh theo mốc thời gian</h2>
+            <table class="period-compare-table">
+                <thead>
+                    <tr>
+                        <th>Chỉ số</th>
+                        <th>7 ngày<br><span class="sub" style="font-weight:normal;opacity:0.7">vs 7d trước</span></th>
+                        <th>14 ngày<br><span class="sub" style="font-weight:normal;opacity:0.7">vs 14d trước</span></th>
+                        <th>30 ngày<br><span class="sub" style="font-weight:normal;opacity:0.7">vs 30d trước</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sessions</td>
+                        <td>4,613<br><span class="sub"><span class="good">+158.1%</span></span></td>
+                        <td>6,400<br><span class="sub"><span class="good">+2731.9%</span></span></td>
+                        <td>6,627<br><span class="sub"><span class="good">+28713.0%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Users</td>
+                        <td>4,392<br><span class="sub"><span class="good">+161.6%</span></span></td>
+                        <td>6,071<br><span class="sub"><span class="good">+2847.1%</span></span></td>
+                        <td>6,278<br><span class="sub"><span class="good">+27195.7%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Pageviews</td>
+                        <td>5,873<br><span class="sub"><span class="good">+146.2%</span></span></td>
+                        <td>8,258<br><span class="sub"><span class="good">+2137.9%</span></span></td>
+                        <td>8,628<br><span class="sub"><span class="good">+28660.0%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Clicks (GSC)</td>
+                        <td>171<br><span class="sub"><span class="good">+185.0%</span></span></td>
+                        <td>231<br><span class="sub"><span class="good">0.0%</span></span></td>
+                        <td>231<br><span class="sub"><span class="good">+11450.0%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Impressions</td>
+                        <td>24,901<br><span class="sub"><span class="good">+242.3%</span></span></td>
+                        <td>32,175<br><span class="sub"><span class="good">+16745.5%</span></span></td>
+                        <td>32,372<br><span class="sub"><span class="good">+147045.5%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Bounce Rate</td>
+                        <td>69.7%<br><span class="sub"><span class="bad">+16.4%</span></span></td>
+                        <td>64.4%<br><span class="sub"><span class="bad">+8.4%</span></span></td>
+                        <td>59.7%<br><span class="sub"><span class="good">-25.1%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Engagement Rate</td>
+                        <td>30.3%<br><span class="sub"><span class="bad">-24.5%</span></span></td>
+                        <td>35.6%<br><span class="sub"><span class="bad">-12.3%</span></span></td>
+                        <td>40.3%<br><span class="sub"><span class="good">+98.4%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>CTR</td>
+                        <td>0.69%<br><span class="sub"><span class="good">+10.6%</span></span></td>
+                        <td>0.65%<br><span class="sub"><span class="good">0.0%</span></span></td>
+                        <td>0.28%<br><span class="sub"><span class="bad">-95.7%</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>Vị trí TB</td>
+                        <td>7.9<br><span class="sub"><span class="good">-12.0%</span></span></td>
+                        <td>8.5<br><span class="sub"><span class="good">-11.9%</span></span></td>
+                        <td>8.8<br><span class="sub"><span class="good">-20.2%</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="recommendations">
+            <h2>💡 Kiến nghị</h2>
+            <table>
+                <thead><tr><th>Mức độ</th><th>Kiến nghị</th><th>Chi tiết</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><span class="info">high</span></td>
+                        <td>Điều tra site giảm mạnh</td>
+                        <td>Các site giảm sessions >20% so với kỳ trước: goto-where.com, grubbio.com</td>
+                    </tr>
+                    <tr>
+                        <td><span class="info">medium</span></td>
+                        <td>Theo dõi anomaly</td>
+                        <td>Có 18 cảnh báo được phát hiện.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="info">low</span></td>
+                        <td>Tối ưu content</td>
+                        <td>Xem xét cải thiện nội dung cho các trang có CTR thấp.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const DETAIL_CHART_DATA = {"dates": ["2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09"], "sessions": [1, 0, 2, 2, 2, 2, 0, 3, 3, 2, 1, 0, 0, 65, 68, 76, 94, 190, 173, 151, 256, 333, 590, 547, 552, 652, 945, 917, 1000, 0], "users": [1, 0, 2, 2, 2, 2, 0, 2, 2, 2, 1, 0, 0, 59, 63, 69, 91, 179, 162, 142, 240, 304, 561, 516, 531, 632, 893, 867, 953, 0], "bounce": [0, 0, 100, 50.0, 0, 100, 0, 33.33, 33.33, 100, 100, 0, 0, 41.54, 47.06, 48.68, 45.739999999999995, 54.74, 65.32, 62.91, 58.98, 66.67, 64.92, 60.88, 65.94, 66.72, 60.74, 64.78, 99.3, 0], "engagement": [100, 0, 0, 50.0, 100, 0, 0, 66.67, 66.67, 0, 0, 0, 0, 58.46, 52.94, 51.32, 54.26, 45.26, 34.68, 37.09, 41.02, 33.33, 35.08, 39.12, 34.06, 33.28, 39.26, 35.22, 0.7000000000000001, 0], "pageviews": [1, 0, 2, 3, 3, 2, 0, 17, 3, 2, 1, 0, 0, 115, 102, 119, 148, 272, 217, 202, 344, 427, 775, 714, 696, 819, 1259, 1162, 1223, 0], "duration": [1521.6068, 0, 0, 4.0885, 515.7714, 0, 0, 859.1484, 120.8469, 4.8442, 0, 0, 0, 69.8183, 109.2199, 45.1719, 69.2689, 55.2148, 66.2764, 54.7078, 96.0926, 72.5459, 58.1071, 69.4095, 53.0233, 49.9527, 61.6041, 58.0825, 43.6565, 0], "clicks": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 4, 9, 22, 21, 18, 38, 35, 47, 33, 0, 0], "impressions": [4, 2, 3, 1, 5, 4, 3, 9, 3, 4, 2, 5, 4, 16, 34, 98, 206, 326, 513, 793, 1076, 1645, 2715, 4112, 4770, 5257, 4929, 5833, 0, 0], "ctr": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.31, 0.58, 0.5, 0.84, 1.34, 0.77, 0.44, 0.8, 0.67, 0.95, 0.5700000000000001, 0, 0], "position": [3.25, 5, 3, 56, 2.4, 3, 30, 4.6667, 1, 3.5, 2, 4.4, 2.5, 5.3125, 7.3824, 10.2041, 10.5437, 8.3834, 9.4288, 8.9105, 8.8959, 8.5678, 8.0214, 8.0109, 7.6122, 7.8547, 8.0674, 7.9119, 0, 0]};
+
+        function makeOpts(scalesOverride) {
+            const base = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(ctx) {
+                                let val = ctx.parsed.y;
+                                if (val >= 1000000) val = (val/1000000).toFixed(1) + 'M';
+                                else if (val >= 1000) val = (val/1000).toFixed(1) + 'K';
+                                else if (typeof val === 'number') val = val.toFixed(val < 100 ? 2 : 0);
+                                return ctx.dataset.label + ': ' + val;
+                            }
+                        }
+                    }
+                },
+                scales: scalesOverride || { x: { type: 'category' }, y: { beginAtZero: true } }
+            };
+            return base;
+        }
+
+        function initDetailCharts() {
+            new Chart(document.getElementById('chart-ga4-sessions'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [
+                        {
+                            label: 'Sessions',
+                            data: DETAIL_CHART_DATA.sessions,
+                            borderColor: '#3498db',
+                            backgroundColor: '#3498db20',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Users',
+                            data: DETAIL_CHART_DATA.users,
+                            borderColor: '#2ecc71',
+                            backgroundColor: '#2ecc7120',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: makeOpts()
+            });
+
+            new Chart(document.getElementById('chart-ga4-bounce'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [
+                        {
+                            label: 'Bounce Rate %',
+                            data: DETAIL_CHART_DATA.bounce,
+                            borderColor: '#e74c3c',
+                            backgroundColor: '#e74c3c20',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10
+                        },
+                        {
+                            label: 'Engagement Rate %',
+                            data: DETAIL_CHART_DATA.engagement,
+                            borderColor: '#27ae60',
+                            backgroundColor: '#27ae6020',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10
+                        }
+                    ]
+                },
+                options: makeOpts({ x: { type: 'category' }, y: { min: 0, max: 100 } })
+            });
+
+            new Chart(document.getElementById('chart-ga4-pageviews'), {
+                type: 'bar',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [{
+                        label: 'Pageviews',
+                        data: DETAIL_CHART_DATA.pageviews,
+                        backgroundColor: '#3498db'
+                    }]
+                },
+                options: makeOpts()
+            });
+
+            new Chart(document.getElementById('chart-ga4-duration'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [{
+                        label: 'Session Duration (s)',
+                        data: DETAIL_CHART_DATA.duration,
+                        borderColor: '#f39c12',
+                        backgroundColor: '#f39c1220',
+                        tension: 0.1,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHitRadius: 10
+                    }]
+                },
+                options: makeOpts()
+            });
+
+            new Chart(document.getElementById('chart-gsc-clicks'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [
+                        {
+                            label: 'Clicks',
+                            data: DETAIL_CHART_DATA.clicks,
+                            borderColor: '#e74c3c',
+                            backgroundColor: '#e74c3c20',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Impressions',
+                            data: DETAIL_CHART_DATA.impressions,
+                            borderColor: '#3498db',
+                            backgroundColor: '#3498db20',
+                            tension: 0.1,
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHitRadius: 10,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: makeOpts({ x: { type: 'category' }, y: { beginAtZero: true, position: 'left' }, y1: { beginAtZero: true, position: 'right', grid: { display: false } } })
+            });
+
+            new Chart(document.getElementById('chart-gsc-ctr'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [{
+                        label: 'CTR %',
+                        data: DETAIL_CHART_DATA.ctr,
+                        borderColor: '#2ecc71',
+                        backgroundColor: '#2ecc7120',
+                        tension: 0.1,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHitRadius: 10
+                    }]
+                },
+                options: makeOpts()
+            });
+
+            new Chart(document.getElementById('chart-gsc-position'), {
+                type: 'line',
+                data: {
+                    labels: DETAIL_CHART_DATA.dates,
+                    datasets: [{
+                        label: 'Vị trí',
+                        data: DETAIL_CHART_DATA.position,
+                        borderColor: '#f39c12',
+                        backgroundColor: '#f39c1220',
+                        tension: 0.1,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHitRadius: 10
+                    }]
+                },
+                options: makeOpts({ x: { type: 'category' }, y: { reverse: true } })
+            });
+        }
+
+        initDetailCharts();
+    </script>
+    <script>
+        makeTableSortable('daily-table');
+        makeTableSortable('keywords-table');
+        makeTableSortable('pages-table');
+    </script>
+
+    <script>
+        let darkMode = false;
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            const html = document.documentElement;
+            if (darkMode) {
+                html.classList.add('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '☀️ Light Mode';
+            } else {
+                html.classList.remove('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '🌙 Dark Mode';
+            }
+        }
+
+        // TOC active section highlighting
+        const tocLinks = document.querySelectorAll('.toc-nav a');
+        const sections = document.querySelectorAll('.section');
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.href.endsWith('#' + id)) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => {
+            if (section.id) {
+                observer.observe(section);
+            }
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('.toc-nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Table sorting
+        function makeTableSortable(tableId) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const headers = table.querySelectorAll('th');
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => {
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                    const isNumeric = rows.every(row => {
+                        const text = row.cells[index].textContent.trim();
+                        return text === '' || !isNaN(parseFloat(text.replace(/,/g, '')));
+                    });
+
+                    rows.sort((a, b) => {
+                        let aVal = a.cells[index].textContent.trim();
+                        let bVal = b.cells[index].textContent.trim();
+
+                        if (isNumeric) {
+                            aVal = parseFloat(aVal.replace(/,/g, '')) || 0;
+                            bVal = parseFloat(bVal.replace(/,/g, '')) || 0;
+                            return aVal - bVal;
+                        } else {
+                            return aVal.localeCompare(bVal);
+                        }
+                    });
+
+                    rows.forEach(row => tbody.appendChild(row));
+                });
+            });
+        }
+    </script>
+</body>
+</html>
