@@ -1,128 +1,680 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>SEO Reports Index</title>
-<style>
-body { font-family: -apple-system, Segoe UI, Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f7f8fa; color: #222; }
-h1 { color: #1a73e8; }
-.date-block { background: #fff; border-radius: 8px; padding: 18px 22px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.date-block h2 { margin-top: 0; font-size: 18px; }
-.badge { display: inline-block; background: #e8f0fe; color: #1a73e8; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
-.latest { background: #fef7e0; color: #f9ab00; }
-a { color: #1a73e8; text-decoration: none; }
-a:hover { text-decoration: underline; }
-.links { margin: 8px 0; }
-.details-summary { color: #666; font-size: 13px; cursor: pointer; }
-.details-list a { display: inline-block; margin: 3px 8px 3px 0; font-size: 13px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Dashboard - Tất cả báo cáo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border-color: #ddd;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --chart-grid: #e0e0e0;
+            --good-color: #27ae60;
+            --bad-color: #e74c3c;
+            --neutral-color: #3498db;
+        }
+
+        html.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --border-color: #444;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            --chart-grid: #444444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+        }
+
+        .cross-link {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .cross-link a {
+            color: var(--neutral-color);
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        .cross-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dark mode toggle */
+        .dark-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .dark-toggle:hover {
+            box-shadow: var(--card-shadow);
+        }
+
+        /* TOC */
+        .toc-nav {
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            z-index: 100;
+            margin-bottom: 30px;
+        }
+
+        .toc-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .toc-nav a.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--neutral-color);
+        }
+
+        .toc-nav a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+        }
+
+        .kpi-card-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .kpi-card-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .kpi-card-change {
+            font-size: 13px;
+        }
+
+        .good {
+            color: var(--good-color);
+        }
+
+        .bad {
+            color: var(--bad-color);
+        }
+
+        .neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Filter */
+        .filter-section {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .filter-select {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .filter-button {
+            background: var(--neutral-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .filter-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Chart */
+        .chart-wrapper {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-wrapper h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .chart-container {
+            height: 350px;
+            margin-bottom: 10px;
+        }
+
+        .chart-legend {
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--border-color);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: var(--text-secondary);
+        }
+
+        th::after {
+            content: " ⇅";
+            opacity: 0.3;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--bg-primary);
+        }
+
+        .numeric {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        .site-name {
+            color: var(--neutral-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .site-name:hover {
+            text-decoration: underline;
+        }
+
+        /* Anomaly cards */
+        .anomaly-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .anomaly-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .anomaly-card.critical {
+            border-left-color: var(--bad-color);
+        }
+
+        .anomaly-card.warning {
+            border-left-color: #f39c12;
+        }
+
+        .anomaly-card.info {
+            border-left-color: var(--neutral-color);
+        }
+
+        .anomaly-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .anomaly-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Recommendations */
+        .recommendation-table {
+            width: 100%;
+        }
+
+        .priority-high {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .priority-medium {
+            background: rgba(243, 156, 18, 0.1);
+        }
+
+        .priority-low {
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        /* Period Toggle */
+        .period-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .period-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .period-btn:hover {
+            border-color: var(--neutral-color);
+            color: var(--text-primary);
+        }
+
+        .period-btn.active {
+            background: var(--neutral-color);
+            color: #ffffff;
+            border-color: var(--neutral-color);
+        }
+
+        /* Period comparison table */
+        .period-compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .period-compare-table thead {
+            background: var(--border-color);
+        }
+
+        .period-compare-table th {
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .period-compare-table th:first-child {
+            text-align: left;
+        }
+
+        .period-compare-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .period-compare-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .period-compare-table .sub {
+            font-size: 11px;
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .toc-nav {
+                font-size: 12px;
+                gap: 10px;
+            }
+
+            .toc-nav a {
+                padding: 6px 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 0 10px 30px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .toc-nav {
+                flex-direction: column;
+                gap: 5px;
+                padding: 10px;
+            }
+
+            .toc-nav a {
+                padding: 5px 0;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                padding-left: 10px;
+            }
+
+            .toc-nav a.active {
+                border-left-color: var(--neutral-color);
+                border-bottom: none;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-<h1>📊 SEO Reports</h1>
-<p>Báo cáo tự động cập nhật hàng ngày — 2026-04-10</p>
-<div class="date-block">
-  <h2>2026-04-10 <span class="badge latest">Mới nhất</span></h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-04-10.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-04-10.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">14 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-04-10.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-04-10.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-04-10.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-04-10.html">grubbio.com</a> <a href="seo-detail-locallya.com-2026-04-10.html">locallya.com</a> <a href="seo-detail-localoria.com-2026-04-10.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-04-10.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-04-10.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-04-10.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-04-10.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-04-10.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-04-10.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-04-10.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-04-10.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-04-09</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-04-09.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-04-09.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">14 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-04-09.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-04-09.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-04-09.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-04-09.html">grubbio.com</a> <a href="seo-detail-locallya.com-2026-04-09.html">locallya.com</a> <a href="seo-detail-localoria.com-2026-04-09.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-04-09.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-04-09.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-04-09.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-04-09.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-04-09.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-04-09.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-04-09.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-04-09.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-04-06</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-04-06.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-04-06.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-04-06.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-04-06.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-04-06.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-04-06.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-04-06.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-04-06.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-04-06.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-04-06.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-04-06.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-04-06.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-04-06.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-04-06.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-04-06.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-04-05</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-04-05.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-04-05.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-04-05.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-04-05.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-04-05.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-04-05.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-04-05.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-04-05.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-04-05.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-04-05.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-04-05.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-04-05.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-04-05.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-04-05.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-04-05.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-04-04</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-04-04.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-04-04.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-04-04.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-04-04.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-04-04.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-04-04.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-04-04.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-04-04.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-04-04.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-04-04.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-04-04.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-04-04.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-04-04.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-04-04.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-04-04.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-04-03</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-04-03.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-04-03.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-04-03.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-04-03.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-04-03.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-04-03.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-04-03.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-04-03.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-04-03.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-04-03.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-04-03.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-04-03.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-04-03.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-04-03.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-04-03.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-31</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-31.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-31.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-31.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-31.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-31.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-31.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-31.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-31.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-31.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-31.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-31.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-31.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-31.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-31.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-31.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-30</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-30.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-30.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-30.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-30.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-30.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-30.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-30.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-30.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-30.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-30.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-30.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-30.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-30.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-30.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-30.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-29</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-29.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-29.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-29.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-29.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-29.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-29.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-29.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-29.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-29.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-29.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-29.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-29.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-29.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-29.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-29.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-28</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-28.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-28.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-28.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-28.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-28.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-28.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-28.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-28.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-28.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-28.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-28.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-28.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-28.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-28.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-28.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-27</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-27.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-27.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-27.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-27.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-27.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-27.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-27.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-27.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-27.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-27.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-27.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-27.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-27.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-27.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-27.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-25</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-25.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-25.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-25.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-25.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-25.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-25.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-25.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-25.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-25.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-25.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-25.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-25.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-25.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-25.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-25.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-24</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-24.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-24.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-24.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-24.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-24.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-24.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-24.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-24.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-24.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-24.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-24.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-24.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-24.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-24.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-24.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-23</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-23.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-23.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-23.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-23.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-23.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-23.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-23.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-23.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-23.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-23.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-23.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-23.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-23.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-23.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-23.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-22</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-22.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-22.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-22.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-22.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-22.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-22.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-22.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-22.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-22.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-22.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-22.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-22.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-22.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-22.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-22.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-21</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-21.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-21.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-21.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-21.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-21.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-21.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-21.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-21.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-21.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-21.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-21.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-21.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-21.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-21.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-21.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-20</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-20.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-20.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-20.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-20.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-20.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-20.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-20.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-20.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-20.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-20.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-20.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-20.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-20.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-20.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-20.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-19</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-19.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-19.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-19.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-19.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-19.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-19.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-19.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-19.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-19.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-19.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-19.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-19.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-19.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-19.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-19.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-18</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-18.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-18.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-18.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-18.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-18.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-18.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-18.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-18.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-18.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-18.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-18.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-18.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-18.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-18.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-18.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-17</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-17.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-17.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-17.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-17.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-17.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-17.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-17.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-17.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-17.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-17.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-17.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-17.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-17.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-17.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-17.html">wherevi.com</a> </div></details>
-</div>
-<div class="date-block">
-  <h2>2026-03-16</h2>
-  <div class="links"> 🍽 <a href="seo-restaurants-2026-03-16.html">Nhà hàng</a>  🏨 <a href="seo-hotels-2026-03-16.html">Khách sạn</a> </div>
-  <details><summary class="details-summary">13 báo cáo chi tiết</summary><div class="details-list"><a href="seo-detail-foodplacee.com-2026-03-16.html">foodplacee.com</a> <a href="seo-detail-gohotelly.com-2026-03-16.html">gohotelly.com</a> <a href="seo-detail-goto-where.com-2026-03-16.html">goto-where.com</a> <a href="seo-detail-grubbio.com-2026-03-16.html">grubbio.com</a> <a href="seo-detail-localoria.com-2026-03-16.html">localoria.com</a> <a href="seo-detail-menu-world.com-2026-03-16.html">menu-world.com</a> <a href="seo-detail-menufyy.com-2026-03-16.html">menufyy.com</a> <a href="seo-detail-menustic.com-2026-03-16.html">menustic.com</a> <a href="seo-detail-placejoys.com-2026-03-16.html">placejoys.com</a> <a href="seo-detail-res-menu.net-2026-03-16.html">res-menu.net</a> <a href="seo-detail-restaurants-world.net-2026-03-16.html">restaurants-world.net</a> <a href="seo-detail-wherebly.com-2026-03-16.html">wherebly.com</a> <a href="seo-detail-wherevi.com-2026-03-16.html">wherevi.com</a> </div></details>
-</div>
-</body></html>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+    <div class="header">
+        <h1>SEO Dashboard</h1>
+        <p>Báo cáo tổng hợp SEO cho tất cả website - 2026-04-11</p>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2>Chọn mảng</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-restaurants-2026-04-11.html'">
+                    <div class="kpi-card-label">Mảng Nhà hàng</div>
+                    <div class="kpi-card-value">13</div>
+                    <div class="kpi-card-change">websites</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-hotels-2026-04-11.html'">
+                    <div class="kpi-card-label">Mảng Khách sạn</div>
+                    <div class="kpi-card-value">1</div>
+                    <div class="kpi-card-change">website</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Website chi tiết</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-localoria.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">localoria.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-wherebly.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">wherebly.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-res-menu.net-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">res-menu.net</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-foodplacee.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">foodplacee.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-restaurants-world.net-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">restaurants-world.net</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-goto-where.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">goto-where.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-menu-world.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">menu-world.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-grubbio.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">grubbio.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-menustic.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">menustic.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-menufyy.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">menufyy.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-wherevi.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">wherevi.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-placejoys.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">placejoys.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-locallya.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">locallya.com</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="location.href='seo-detail-gohotelly.com-2026-04-11.html'">
+                    <div class="kpi-card-label">Chi tiết</div>
+                    <div class="kpi-card-value" style="font-size: 16px; word-break: break-word;">gohotelly.com</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let darkMode = false;
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            const html = document.documentElement;
+            if (darkMode) {
+                html.classList.add('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '☀️ Light Mode';
+            } else {
+                html.classList.remove('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '🌙 Dark Mode';
+            }
+        }
+
+        // TOC active section highlighting
+        const tocLinks = document.querySelectorAll('.toc-nav a');
+        const sections = document.querySelectorAll('.section');
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.href.endsWith('#' + id)) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => {
+            if (section.id) {
+                observer.observe(section);
+            }
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('.toc-nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Table sorting
+        function makeTableSortable(tableId) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const headers = table.querySelectorAll('th');
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => {
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                    const isNumeric = rows.every(row => {
+                        const text = row.cells[index].textContent.trim();
+                        return text === '' || !isNaN(parseFloat(text.replace(/,/g, '')));
+                    });
+
+                    rows.sort((a, b) => {
+                        let aVal = a.cells[index].textContent.trim();
+                        let bVal = b.cells[index].textContent.trim();
+
+                        if (isNumeric) {
+                            aVal = parseFloat(aVal.replace(/,/g, '')) || 0;
+                            bVal = parseFloat(bVal.replace(/,/g, '')) || 0;
+                            return aVal - bVal;
+                        } else {
+                            return aVal.localeCompare(bVal);
+                        }
+                    });
+
+                    rows.forEach(row => tbody.appendChild(row));
+                });
+            });
+        }
+    </script>
+</body>
+</html>
